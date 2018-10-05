@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: common-configmap
+  namespace: default
+data:
+  DEV_SPRING_LOG_LEVEL: DEBUG
+  DEV_IKEA_LOG_LEVEL: DEBUG
+  TEST_SPRING_LOG_LEVEL: INFO
+  TEST_IKEA_LOG_LEVEL: DEBUG
+  PPE_SPRING_LOG_LEVEL: INFO
+  PPE_IKEA_LOG_LEVEL: INFO
+  PROD_SPRING_LOG_LEVEL: INFO
+  PROD_IKEA_LOG_LEVEL: INFO

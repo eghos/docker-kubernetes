@@ -1,4 +1,8 @@
 # Configuration
 
-Configuration Files for the CICD Pipeline.
+Configuration Files for:
+
+Kubernetes (Ingress Configuration, Config Maps)
+Jenkins File
+AWS CloudFormation artefacts
 
