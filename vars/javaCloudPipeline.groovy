@@ -115,15 +115,6 @@ def call(Map pipelineParams) {
                 }
             }
 
-            stage('Setup 2') {
-                when {
-                    changeRequest target: 'master'
-                }
-                steps {
-                    echo "TEST"
-                }
-            }
-
             stage('Update Versions') {
                 steps {
                     withCredentials([sshUserPrivateKey(credentialsId: 'l-apimgt-u-itsehbgATikea.com', keyFileVariable: 'SSH_KEY')]) {
@@ -356,13 +347,22 @@ def call(Map pipelineParams) {
 
             stage('Docker Deploy to PROD') {
                 when {
+                    changeRequest target: 'master'
+                }
+                steps {
+                    echo "PR created to Master Branch. PPE Deployment will be performed in this stage."
+                }
+            }
+
+            stage('Docker Deploy to PROD') {
+                when {
                     anyOf {
                         branch 'master';
                         branch "hotfix/*"
                     }
                 }
                 steps {
-                    sh 'echo'
+                    echo 'Merge request to Master Branch has been approved. PROD Deployment will be performed in this stage.'
                 }
             }
 
