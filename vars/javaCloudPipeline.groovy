@@ -345,7 +345,7 @@ def call(Map pipelineParams) {
                 }
             }
 
-            stage('Docker Deploy to PROD') {
+            stage('Docker Deploy to PPE') {
                 when {
                     changeRequest target: 'master'
                 }
