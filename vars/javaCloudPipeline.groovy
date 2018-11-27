@@ -397,5 +397,64 @@ def call(Map pipelineParams) {
             }
         }
     }
+}
 
+def generateAwsDeployStage(region, env) {
+    return {
+        stage("${region}") {
+            withCredentials(bindings: [usernamePassword(credentialsId: 'bc608fa5-71e6-4e08-b769-af3ca6024715', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
+                sh "docker login -u ${USERNAME} -p ${PASSWORD} ${DOCKER_REPO}"
+                script {
+                    sh "docker build -t ${AWS_DOCKER_TAG}:${DOCKER_VERSION} ."
+                    sh "docker push ${AWS_DOCKER_TAG}:${DOCKER_VERSION}"
+                }
+                sh "docker logout ${DOCKER_REPO}"
+                sh "docker login -u ${USERNAME} -p ${PASSWORD} ${DOCKER_REPO}"
+                sh 'chmod +x ./build/deploy-service.yaml'
+                sh 'chmod +x ./build/ingress.yaml'
+                sh """
+                cd build
+                export CONFIGMAP=configmap-${region}-${env}
+                export TARGET_HOST=aws
+                export DOCKER_VERSION=${DOCKER_VERSION}
+                cp configmap-${region}-${env}.yaml configmap-${region}-${env}-aws.yaml
+                cp deploy-service.yaml deploy-service-aws.yaml
+                cp ingress.yaml ingress-aws.yaml
+                sed -i -e \"s|IMAGE_NAME_VAR|${AWS_DOCKER_TAG}:${DOCKER_VERSION}|g\" deploy-service-aws.yaml
+                sed -i -e \"s|INTERNAL_SVC_HOSTNAME_VAR|${INTERNAL_SVC_HOSTNAME}|g\" ingress-aws.yaml
+                cd ./${env}-ucp-bundle-admin
+                . ./env.sh
+                cd ..
+                . ./deploy.sh
+            """
+                sh "docker logout ${DOCKER_REPO}"
+            }
+        }
+    }
+}
+
+def generateAzureDeployStage(region, env) {
+    return {
+        stage("${region}") {
+            withCredentials([azureServicePrincipal('sp-ipim-ip-aks')]) {
+                script {
+                    ACRLOGINSERVER = sh(returnStdout: true, script: 'az acr show --resource-group ${AZ_RG_NAME} --name ${AZ_ACR_NAME} --query "loginServer" --output tsv').trim()
+                    sh 'chmod +x ./build/deploy-service.yaml'
+                    sh 'chmod +x ./build/ingress.yaml'
+                    sh """
+                cd build
+                export CONFIGMAP=configmap-${region}-${env}
+                export TARGET_HOST=azure
+                export DOCKER_VERSION=${DOCKER_VERSION}
+                cp \"configmap-${region}-${env}.yaml\" \"configmap-${region}-${env}-azure.yaml\"
+                cp \"deploy-service.yaml\" \"deploy-service-azure.yaml\"
+                cp \"ingress.yaml\" \"ingress-azure.yaml\"
+                sed -i -e \"s|IMAGE_NAME_VAR|${ACRLOGINSERVER}/${DOCKER_ORG_IMAGE}:${DOCKER_VERSION}|g\" deploy-service-azure.yaml
+                sed -i -e \"s|INTERNAL_SVC_HOSTNAME_VAR|${AZ_INTERNAL_SVC_HOSTNAME}|g\" ingress-azure.yaml
+                . ./deploy.sh
+            """
+                }
+            }
+        }
+    }
 }
