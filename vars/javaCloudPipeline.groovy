@@ -461,8 +461,7 @@ def generateAwsDeployStage(region, env) {
                 }
                 sh "docker logout ${DOCKER_REPO}"
                 sh "docker login -u ${USERNAME} -p ${PASSWORD} ${DOCKER_REPO}"
-                sh 'chmod +x ./build/deploy-service.yaml'
-                sh 'chmod +x ./build/ingress.yaml'
+                sh 'chmod +x ./build/*.yaml'
                 sh """
                     cd build
                     export CONFIGMAP=configmap-${region}-${env}
@@ -491,8 +490,7 @@ def generateAzureDeployStage(region, env) {
                 script {
                     ACRLOGINSERVER = sh(returnStdout: true, script: "az acr show --resource-group ${AZ_RG_NAME} --name ${AZ_ACR_NAME} --query \"loginServer\" --output tsv").trim()
                     AZ_ENV_REGION_SVC_HOSTNAME = "${AZ_INTERNAL_SVC_HOSTNAME}".replace('<ENV>', "${env}").replace('<REGION>', "${region}")
-                    sh 'chmod +x ./build/deploy-service.yaml'
-                    sh 'chmod +x ./build/ingress.yaml'
+                    sh 'chmod +x ./build/*.yaml'
                     sh """
                         cd build
                         export CONFIGMAP=configmap-${region}-${env}
