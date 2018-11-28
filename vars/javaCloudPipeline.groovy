@@ -4,18 +4,18 @@ def call(Map pipelineParams) {
         agent any
 
         parameters {
-            string(name: 'REGION',                   defaultValue: 'ireland',                                  description: 'Target region deployment e.g. ireland, virginia')
-            string(name: 'DOCKER_ORG',               defaultValue: 'apimgt',                                   description: 'Docker Repository user e.g. apimgt')
-            string(name: 'DOCKER_REPO',              defaultValue: 'dtrdev.hip.red.cdtapps.com',               description: 'Docker Repo URL e.g. dtrdev.hip.red.cdtapps.com')
-            string(name: 'SVC_PATH',                 defaultValue: 'price-service',                            description: 'Ingress Service Path e.g. testapi')
-            string(name: 'INTERNAL_SVC_HOSTNAME',    defaultValue: 'dev.eu-west-1.svc.hipint.red.cdtapps.com', description: 'AWS Ingress Internal Host Path e.g. dev.eu-west-1.svc.hipint.red.cdtapps.com')
-            string(name: 'AZ_INTERNAL_SVC_HOSTNAME', defaultValue: 'dev-az-svc.westeurope.cloudapp.azure.com', description: 'Azure Ingress Internal Host Path e.g. dev-az-svc.westeurope.cloudapp.azure.com')
-            string(name: 'KUBERNETES_NAMESPACE',     defaultValue: 'default',                                  description: 'The Kubernetes namespace for the service e.g. default')
-            string(name: 'AZRGNAME',                 defaultValue: 'ipimip-dev-westEurope-rg',                 description: 'Azure region name')
-            string(name: 'AZACRNAME',                defaultValue: 'acrwedevgupuy7',                           description: 'Azure container registry')
-            string(name: 'AZAKSCLUSTERNAME',         defaultValue: 'akswedevgupuy7',                           description: 'Azure Kubernetes cluster name')
-            string(name: 'GIT_SVC_ACOUNT_EMAIL',     defaultValue: 'l-apimgt-u-itsehbg@ikea.com',              description: 'GitHub Service Account Email')
-            string(name: 'GIT_SVC_ACCOUNT_USER',     defaultValue: 'l-apimgt-u-itsehbg',                       description: 'GitHub Service Account Name')
+            string(name: 'REGION',                           defaultValue: 'ireland',                                  description: 'Target region deployment e.g. ireland, virginia')
+            string(name: 'DOCKER_ORG',                       defaultValue: 'apimgt',                                   description: 'Docker Repository user e.g. apimgt')
+            string(name: 'DOCKER_REPO',                      defaultValue: 'dtrdev.hip.red.cdtapps.com',               description: 'Docker Repo URL e.g. dtrdev.hip.red.cdtapps.com')
+            string(name: 'SVC_PATH',                         defaultValue: 'price-service',                            description: 'Ingress Service Path e.g. testapi')
+            string(name: 'INTERNAL_SVC_HOSTNAME',            defaultValue: 'dev.eu-west-1.svc.hipint.red.cdtapps.com', description: 'AWS Ingress Internal Host Path e.g. dev.eu-west-1.svc.hipint.red.cdtapps.com')
+            string(name: 'AZ_INTERNAL_SVC_HOSTNAME',         defaultValue: 'dev-az-svc.westeurope.cloudapp.azure.com', description: 'Azure Ingress Internal Host Path e.g. dev-az-svc.westeurope.cloudapp.azure.com')
+            string(name: 'KUBERNETES_NAMESPACE',             defaultValue: 'default',                                  description: 'The Kubernetes namespace for the service e.g. default')
+            string(name: 'TEST_WESTEUROPE_AZRGNAME',         defaultValue: 'ipimip-dev-westEurope-rg',                 description: 'Azure region name')
+            string(name: 'TEST_WESTEUROPE_AZACRNAME',        defaultValue: 'acrwedevgupuy7',                           description: 'Azure container registry')
+            string(name: 'TEST_WESTEUROPE_AZAKSCLUSTERNAME', defaultValue: 'akswedevgupuy7',                           description: 'Azure Kubernetes cluster name')
+            string(name: 'GIT_SVC_ACOUNT_EMAIL',             defaultValue: 'l-apimgt-u-itsehbg@ikea.com',              description: 'GitHub Service Account Email')
+            string(name: 'GIT_SVC_ACCOUNT_USER',             defaultValue: 'l-apimgt-u-itsehbg',                       description: 'GitHub Service Account Name')
         }
 
         environment {
@@ -54,7 +54,7 @@ def call(Map pipelineParams) {
 
         stages {
 
-            stage("CI Skip?") {
+            stage("CI/CD Skip?") {
                 when {
                     expression {
                         result = sh (script: "git log -1 | grep '.*\\[ci skip\\].*'", returnStatus: true)
