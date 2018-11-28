@@ -426,10 +426,9 @@ def call(Map pipelineParams) {
                                 sh "git remote set-url origin ${GIT_URL}"
                                 sh 'git config --global user.email "l-apimgt-u-itsehbg@ikea.com"'
                                 sh 'git config --global user.name "l-apimgt-u-itsehbg"'
-                                sh 'git config --global push.default simple'
                                 sh 'git add pom.xml'
                                 sh 'git commit -am "System - Update POM Version [ci skip]"'
-                                sh "git push"
+                                sh "git push origin HEAD"
                             }
                         }
                     }
