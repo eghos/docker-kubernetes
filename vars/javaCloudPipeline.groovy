@@ -421,14 +421,15 @@ def call(Map pipelineParams) {
                     withCredentials([sshUserPrivateKey(credentialsId: 'l-apimgt-u-itsehbgATikea.com', keyFileVariable: 'SSH_KEY')]) {
                         withEnv(["GIT_SSH_COMMAND=ssh -o StrictHostKeyChecking=no -o User=${GIT_USER} -i ${SSH_KEY}"]) {
                             script {
-                                sh 'git remote rm origin'
+                                // sh 'git remote rm origin'
                                 // sh 'git remote add origin "git@git.build.ingka.ikea.com:IPIM-IP/price-service.git"'
-                                sh "git remote add origin ${GIT_URL}"
+                                // sh "git remote set-url origin ${GIT_URL}"
+                                sh 'git config url."git@git.build.ingka.ikea.com:".insteadOf "https://git.build.ingka.ikea.com/"'
                                 sh 'git config --global user.email "l-apimgt-u-itsehbg@ikea.com"'
                                 sh 'git config --global user.name "l-apimgt-u-itsehbg"'
                                 sh 'git add pom.xml'
                                 sh 'git commit -am "System - Update POM Version [ci skip]"'
-                                sh "git push origin ${BRANCH_NAME_FULL}"
+                                sh "git push origin HEAD"
                             }
                         }
                     }
