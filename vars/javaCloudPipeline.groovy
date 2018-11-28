@@ -46,7 +46,7 @@ def call(Map pipelineParams) {
 
             GIT_EMAIL =             "${GIT_SVC_ACOUNT_EMAIL}"
             GIT_USER =              "${GIT_SVC_ACCOUNT_USER}"
-            GIT_URL =               env.GIT_URL.replace('https://', 'git@')
+//            GIT_URL =               env.GIT_URL.replace('https://', 'git@')
 
             JAVA_HOME =             "/usr/lib/jvm/java-10-oracle"
             JAVA_HOME8 =            "/usr/lib/jvm/java-8-oracle"
@@ -55,11 +55,15 @@ def call(Map pipelineParams) {
             AZ_AKS_CLUSTER_NAME   = ""
             AZ_RG_NAME            = ""
 
+            TEST = getCloudEnvironmentProps("AZURE_DEV_WESTEUROPE_DNS")
+
+
+
         }
 
         stages {
 
-            stage("CI/CD Skip?") {
+            stage("CICD Skip?") {
                 when {
                     expression {
                         result = sh (script: "git log -1 | grep '.*\\[ci skip\\].*'", returnStatus: true)
@@ -75,9 +79,7 @@ def call(Map pipelineParams) {
                 }
             }
 
-            
-
-            stage('Setup Config') {
+            stage('Setup K8S Config') {
                 parallel {
                     stage('PROD') {
                         when {
@@ -140,6 +142,7 @@ def call(Map pipelineParams) {
                     echo "BUILD_URL ${BUILD_URL}"
                     echo "JOB_URL ${JOB_URL}"
                     echo "CHANGE_AUTHOR_EMAIL ${GIT_COMMIT}"
+                    echo "TEST ${TEST}"
 
                     script {
                         deploymentProperties = readProperties file:'deployment.properties'
@@ -416,7 +419,7 @@ def call(Map pipelineParams) {
                 }
             }
 
-            stage('Commit POM') {
+            stage('Commit Updated Version') {
                 steps {
                     withCredentials([sshUserPrivateKey(credentialsId: 'l-apimgt-u-itsehbgATikea.com', keyFileVariable: 'SSH_KEY')]) {
                         withEnv(["GIT_SSH_COMMAND=ssh -o StrictHostKeyChecking=no -o User=${GIT_USER} -i ${SSH_KEY}"]) {
