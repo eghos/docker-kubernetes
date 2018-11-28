@@ -47,9 +47,9 @@ def call(Map pipelineParams) {
             JAVA_HOME =             "/usr/lib/jvm/java-10-oracle"
             JAVA_HOME8 =            "/usr/lib/jvm/java-8-oracle"
 
-            AZ_ACR_NAME =           "${params.AZACRNAME}"
-            AZ_AKS_CLUSTER_NAME =   "${params.AZAKSCLUSTERNAME}"
-            AZ_RG_NAME =            "${params.AZRGNAME}"
+            AZ_ACR_NAME =           "${params.TEST_WESTEUROPE_AZACRNAME}"
+            AZ_AKS_CLUSTER_NAME =   "${params.TEST_WESTEUROPE_AZAKSCLUSTERNAME}"
+            AZ_RG_NAME =            "${params.TEST_WESTEUROPE_AZRGNAME}"
         }
 
         stages {
