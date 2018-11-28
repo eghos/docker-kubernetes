@@ -59,12 +59,6 @@ def call(Map pipelineParams) {
 
         stages {
 
-            stage('start') {
-                steps {
-                    sh 'git config --global url."https://git.build.ingka.ikea.com/".insteadOf "git@git.build.ingka.ikea.com:"'
-                }
-            }
-
             stage("CI/CD Skip?") {
                 when {
                     expression {
