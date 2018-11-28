@@ -28,9 +28,9 @@ def call(Map pipelineParams) {
             INTERNAL_SVC_HOSTNAME =    "${params.INTERNAL_SVC_HOSTNAME}"
             AZ_INTERNAL_SVC_HOSTNAME = "${params.AZ_INTERNAL_SVC_HOSTNAME}"
             // SVC_PATH =                 "${params.SVC_PATH}"
-            REPO_NAME =                 env.JOB_NAME
             KUBERNETES_NAMESPACE =     "${params.KUBERNETES_NAMESPACE}"
 
+            REPO_NAME =             "${env.JOB_NAME}"
             BRANCH_NAME_FULL =      env.BRANCH_NAME.replace('', '')
             IMAGE_NAME =            readMavenPom().getArtifactId()
             VERSION_FROM_POM =      readMavenPom().getVersion()
