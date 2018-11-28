@@ -1,6 +1,6 @@
 #!/usr/bin/env groovy
 
-def test='hello'
+def test = "hello"
 
 def call(String property) {
 //    Properties props = new Properties()
