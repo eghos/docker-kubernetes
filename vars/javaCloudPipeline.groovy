@@ -423,7 +423,7 @@ def call(Map pipelineParams) {
                             script {
                                 // sh 'git remote rm origin'
                                 // sh 'git remote add origin "git@git.build.ingka.ikea.com:IPIM-IP/price-service.git"'
-                                sh "git remote set-url origin ${GIT_URL}"
+                                // sh "git remote set-url origin ${GIT_URL}"
                                 sh 'git config --global user.email "l-apimgt-u-itsehbg@ikea.com"'
                                 sh 'git config --global user.name "l-apimgt-u-itsehbg"'
                                 sh 'git add pom.xml'
