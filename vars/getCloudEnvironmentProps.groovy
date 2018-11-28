@@ -8,5 +8,5 @@ def call(String property) {
 //    props.load(propsFile.newDataInputStream())
 //
 //    return props.getProperty(property)
-    return ${test}
+    return test
 }
