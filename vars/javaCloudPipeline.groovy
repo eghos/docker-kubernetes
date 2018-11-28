@@ -98,7 +98,7 @@ def call(Map pipelineParams) {
                     stage('NON-PROD') {
                         when {
                             anyOf {
-                                branch "develop"
+                                branch "develop*"
                                 branch "release/*"
                             }
                         }
