@@ -221,34 +221,34 @@ def call(Map pipelineParams) {
                 }
             }
 
-            stage('Code Test') {
-                when {
-                    anyOf {
-                        branch "develop*";
-                        branch "PR*"
-                        branch "release/*"
-                        branch "hotfix/*"
-                    }
-                }
-                steps {
-                    withCredentials(bindings: [usernamePassword(credentialsId: 'bc608fa5-71e6-4e08-b769-af3ca6024715', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
-                        sh 'chmod +x ./build/mvnw'
-                        sh './mvnw -f pom.xml test'
-                        //sh './mvnw -f pom.xml sonar:sonar -Dsonar.login=$USERNAME -Dsonar.password=$PASSWORD'
+        //     stage('Code Test') {
+        //         when {
+        //             anyOf {
+        //                 branch "develop*";
+        //                 branch "PR*"
+        //                 branch "release/*"
+        //                 branch "hotfix/*"
+        //             }
+        //         }
+        //         steps {
+        //             withCredentials(bindings: [usernamePassword(credentialsId: 'bc608fa5-71e6-4e08-b769-af3ca6024715', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
+        //                 sh 'chmod +x ./build/mvnw'
+        //                 sh './mvnw -f pom.xml test'
+        //                 //sh './mvnw -f pom.xml sonar:sonar -Dsonar.login=$USERNAME -Dsonar.password=$PASSWORD'
 
-                        sh ''' export JAVA_HOME=$JAVA_HOME8
-          cd build
-          ./mvnw -f ../pom.xml sonar:sonar -Dsonar.login=d4e0a890f5606a8df6c5ef32ed480abc611b6a7a   -Dsonar.projectKey=ipimip.${IMAGE_NAME}.dev'''
+        //                 sh ''' export JAVA_HOME=$JAVA_HOME8
+        //   cd build
+        //   ./mvnw -f ../pom.xml sonar:sonar -Dsonar.login=d4e0a890f5606a8df6c5ef32ed480abc611b6a7a   -Dsonar.projectKey=ipimip.${IMAGE_NAME}.dev'''
 
-                        //d4e0a890f5606a8df6c5ef32ed480abc611b6a7a = staging2
-                        //2af9224b1068533d1c48def794f022f2df1b928e = staging
+        //                 //d4e0a890f5606a8df6c5ef32ed480abc611b6a7a = staging2
+        //                 //2af9224b1068533d1c48def794f022f2df1b928e = staging
 
-                        //aws instance 7.2
-                        //sh './mvnw -f ../pom.xml sonar:sonar -Dsonar.login=$USERNAME -Dsonar.password=$PASSWORD'
+        //                 //aws instance 7.2
+        //                 //sh './mvnw -f ../pom.xml sonar:sonar -Dsonar.login=$USERNAME -Dsonar.password=$PASSWORD'
 
-                    }
-                }
-            }
+        //             }
+        //         }
+        //     }
 
             stage('Code Deploy to Nexus') {
                 when {
@@ -421,8 +421,8 @@ def call(Map pipelineParams) {
                     withCredentials([sshUserPrivateKey(credentialsId: 'l-apimgt-u-itsehbgATikea.com', keyFileVariable: 'SSH_KEY')]) {
                         withEnv(["GIT_SSH_COMMAND=ssh -o StrictHostKeyChecking=no -o User=${GIT_USER} -i ${SSH_KEY}"]) {
                             sh 'git remote rm origin'
-                            // sh 'git remote add origin "git@git.build.ingka.ikea.com:IPIM-IP/price-service.git"'
-                            sh "git remote add origin \"${GIT_URL}\""
+                            sh 'git remote add origin "git@git.build.ingka.ikea.com:IPIM-IP/price-service.git"'
+                            // sh "git remote add origin \"${GIT_URL}\""
 
                             sh 'git config --global user.email "l-apimgt-u-itsehbg@ikea.com"'
                             sh 'git config --global user.name "l-apimgt-u-itsehbg"'
