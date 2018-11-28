@@ -1,9 +1,12 @@
 #!/usr/bin/env groovy
 
-def call(String property) {
-    Properties props = new Properties()
-    File propsFile = new File('/CloudPlatform.properties')
-    props.load(propsFile.newDataInputStream())
+def test="hello"
 
-    return props.getProperty(property)
+def call(String property) {
+//    Properties props = new Properties()
+//    File propsFile = new File('/CloudPlatform.properties')
+//    props.load(propsFile.newDataInputStream())
+//
+//    return props.getProperty(property)
+    return test
 }
