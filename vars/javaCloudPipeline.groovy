@@ -93,6 +93,9 @@ def call(Map pipelineParams) {
                                 AZ_AKS_CLUSTER_NAME = "${params.PROD_WESTEUROPE_AZAKSCLUSTERNAME}"
                                 AZ_RG_NAME = "${params.PROD_WESTEUROPE_AZRGNAME}"
                             }
+                            echo "AZ_ACR_NAME: ${AZ_ACR_NAME}"
+                            echo "AZ_AKS_CLUSTER_NAME: ${AZ_AKS_CLUSTER_NAME}"
+                            echo "AZ_RG_NAME: ${AZ_RG_NAME}"
                         }
                     }
                     stage('NON-PROD') {
@@ -108,6 +111,9 @@ def call(Map pipelineParams) {
                                 AZ_AKS_CLUSTER_NAME = "${params.NONPROD_WESTEUROPE_AZAKSCLUSTERNAME}"
                                 AZ_RG_NAME = "${params.NONPROD_WESTEUROPE_AZRGNAME}"
                             }
+                            echo "AZ_ACR_NAME: ${AZ_ACR_NAME}"
+                            echo "AZ_AKS_CLUSTER_NAME: ${AZ_AKS_CLUSTER_NAME}"
+                            echo "AZ_RG_NAME: ${AZ_RG_NAME}"
                         }
                     }
                 }
@@ -292,7 +298,7 @@ def call(Map pipelineParams) {
                             sh "az account set -s ${AZURE_SUBSCRIPTION_ID}"
                             sh "az acr login --name ${AZ_ACR_NAME}"
                             sh "az aks get-credentials --resource-group=${AZ_RG_NAME} --name=${AZ_AKS_CLUSTER_NAME}"
-                            ACR_LOGIN_SERVER = sh(returnStdout: true, script: 'az acr show --resource-group ${AZ_RG_NAME} --name ${AZ_ACR_NAME} --query "loginServer" --output tsv').trim()
+                            ACR_LOGIN_SERVER = sh(returnStdout: true, script: "az acr show --resource-group ${AZ_RG_NAME} --name ${AZ_ACR_NAME} --query \"loginServer\" --output tsv").trim()
                             sh "docker build -t ${ACR_LOGIN_SERVER}/${DOCKER_ORG_IMAGE}:${DOCKER_VERSION} ."
                             sh "docker push ${ACR_LOGIN_SERVER}/${DOCKER_ORG_IMAGE}:${DOCKER_VERSION}"
 
