@@ -4,26 +4,31 @@ def call(Map pipelineParams) {
         agent any
 
         parameters {
-            string(name: 'REGION',                           defaultValue: 'ireland',                                  description: 'Target region deployment e.g. ireland, virginia')
-            string(name: 'DOCKER_ORG',                       defaultValue: 'apimgt',                                   description: 'Docker Repository user e.g. apimgt')
-            string(name: 'DOCKER_REPO',                      defaultValue: 'dtrdev.hip.red.cdtapps.com',               description: 'Docker Repo URL e.g. dtrdev.hip.red.cdtapps.com')
-            string(name: 'SVC_PATH',                         defaultValue: 'price-service',                            description: 'Ingress Service Path e.g. testapi')
-            string(name: 'INTERNAL_SVC_HOSTNAME',            defaultValue: 'dev.eu-west-1.svc.hipint.red.cdtapps.com', description: 'AWS Ingress Internal Host Path e.g. dev.eu-west-1.svc.hipint.red.cdtapps.com')
-            string(name: 'AZ_INTERNAL_SVC_HOSTNAME',         defaultValue: 'dev-az-svc.westeurope.cloudapp.azure.com', description: 'Azure Ingress Internal Host Path e.g. dev-az-svc.westeurope.cloudapp.azure.com')
-            string(name: 'KUBERNETES_NAMESPACE',             defaultValue: 'default',                                  description: 'The Kubernetes namespace for the service e.g. default')
-            string(name: 'TEST_WESTEUROPE_AZRGNAME',         defaultValue: 'ipimip-dev-westEurope-rg',                 description: 'Azure region name')
-            string(name: 'TEST_WESTEUROPE_AZACRNAME',        defaultValue: 'acrwedevgupuy7',                           description: 'Azure container registry')
-            string(name: 'TEST_WESTEUROPE_AZAKSCLUSTERNAME', defaultValue: 'akswedevgupuy7',                           description: 'Azure Kubernetes cluster name')
-            string(name: 'GIT_SVC_ACOUNT_EMAIL',             defaultValue: 'l-apimgt-u-itsehbg@ikea.com',              description: 'GitHub Service Account Email')
-            string(name: 'GIT_SVC_ACCOUNT_USER',             defaultValue: 'l-apimgt-u-itsehbg',                       description: 'GitHub Service Account Name')
+            string(name: 'REGION',                              defaultValue: 'ireland',                                  description: 'Target region deployment e.g. ireland, virginia')
+            string(name: 'DOCKER_ORG',                          defaultValue: 'apimgt',                                   description: 'Docker Repository user e.g. apimgt')
+            string(name: 'DOCKER_REPO',                         defaultValue: 'dtrdev.hip.red.cdtapps.com',               description: 'Docker Repo URL e.g. dtrdev.hip.red.cdtapps.com')
+            // string(name: 'SVC_PATH',                         defaultValue: 'price-service',                            description: 'Ingress Service Path e.g. testapi')
+            string(name: 'INTERNAL_SVC_HOSTNAME',               defaultValue: 'dev.eu-west-1.svc.hipint.red.cdtapps.com', description: 'AWS Ingress Internal Host Path e.g. dev.eu-west-1.svc.hipint.red.cdtapps.com')
+            string(name: 'AZ_INTERNAL_SVC_HOSTNAME',            defaultValue: '<ENV>-az-svc.<REGION>.cloudapp.azure.com', description: 'Azure Ingress Internal Host Path e.g. dev-az-svc.westeurope.cloudapp.azure.com')
+            string(name: 'KUBERNETES_NAMESPACE',                defaultValue: 'default',                                  description: 'The Kubernetes namespace for the service e.g. default')
+            string(name: 'NONPROD_WESTEUROPE_AZRGNAME',         defaultValue: 'ipimip-dev-westEurope-rg',                 description: 'Azure region name')
+            string(name: 'NONPROD_WESTEUROPE_AZACRNAME',        defaultValue: 'acrwedevgupuy7',                           description: 'Azure container registry')
+            string(name: 'NONPROD_WESTEUROPE_AZAKSCLUSTERNAME', defaultValue: 'akswedevgupuy7',                           description: 'Azure Kubernetes cluster name')
+            string(name: 'PROD_WESTEUROPE_AZRGNAME',            defaultValue: 'ipimip-ppe-westEurope-rg',                 description: 'Azure region name')
+            string(name: 'PROD_WESTEUROPE_AZACRNAME',           defaultValue: 'acrweppeafsibk',                           description: 'Azure container registry')
+            string(name: 'PROD_WESTEUROPE_AZAKSCLUSTERNAME',    defaultValue: 'aksweppeafsibk',                           description: 'Azure Kubernetes cluster name')
+            string(name: 'GIT_SVC_ACOUNT_EMAIL',                defaultValue: 'l-apimgt-u-itsehbg@ikea.com',              description: 'GitHub Service Account Email')
+            string(name: 'GIT_SVC_ACCOUNT_USER',                defaultValue: 'l-apimgt-u-itsehbg',                       description: 'GitHub Service Account Name')
         }
 
         environment {
+
             ORG =                      "${params.DOCKER_ORG}"
             DOCKER_REPO =              "${params.DOCKER_REPO}"
             INTERNAL_SVC_HOSTNAME =    "${params.INTERNAL_SVC_HOSTNAME}"
             AZ_INTERNAL_SVC_HOSTNAME = "${params.AZ_INTERNAL_SVC_HOSTNAME}"
-            SVC_PATH =                 "${params.SVC_PATH}"
+            // SVC_PATH =                 "${params.SVC_PATH}"
+            REPO_NAME =                 env.JOB_NAME
             KUBERNETES_NAMESPACE =     "${params.KUBERNETES_NAMESPACE}"
 
             BRANCH_NAME_FULL =      env.BRANCH_NAME.replace('', '')
@@ -47,9 +52,10 @@ def call(Map pipelineParams) {
             JAVA_HOME =             "/usr/lib/jvm/java-10-oracle"
             JAVA_HOME8 =            "/usr/lib/jvm/java-8-oracle"
 
-            AZ_ACR_NAME =           "${params.TEST_WESTEUROPE_AZACRNAME}"
-            AZ_AKS_CLUSTER_NAME =   "${params.TEST_WESTEUROPE_AZAKSCLUSTERNAME}"
-            AZ_RG_NAME =            "${params.TEST_WESTEUROPE_AZRGNAME}"
+            AZ_ACR_NAME           = ""
+            AZ_AKS_CLUSTER_NAME   = ""
+            AZ_RG_NAME            = ""
+
         }
 
         stages {
@@ -66,6 +72,43 @@ def call(Map pipelineParams) {
                         echo 'Got ci=skip, aborting build'
                         currentBuild.result = 'ABORTED'
                         error('CI-Skip')
+                    }
+                }
+            }
+
+            
+
+            stage('Setup Config') {
+                parallel {
+                    stage('PROD') {
+                        when {
+                            anyOf {
+                                branch "master"
+                                changeRequest target: 'master'
+                            }
+                        }
+                        steps {
+                            script {
+                                AZ_ACR_NAME = "${params.PROD_WESTEUROPE_AZACRNAME}"
+                                AZ_AKS_CLUSTER_NAME = "${params.PROD_WESTEUROPE_AZAKSCLUSTERNAME}"
+                                AZ_RG_NAME = "${params.PROD_WESTEUROPE_AZRGNAME}"
+                            }
+                        }
+                    }
+                    stage('NON-PROD') {
+                        when {
+                            anyOf {
+                                branch "develop"
+                                branch "release/*"
+                            }
+                        }
+                        steps {
+                            script {
+                                AZ_ACR_NAME = "${params.NONPROD_WESTEUROPE_AZACRNAME}"
+                                AZ_AKS_CLUSTER_NAME = "${params.NONPROD_WESTEUROPE_AZAKSCLUSTERNAME}"
+                                AZ_RG_NAME = "${params.NONPROD_WESTEUROPE_AZRGNAME}"
+                            }
+                        }
                     }
                 }
             }
@@ -110,6 +153,8 @@ def call(Map pipelineParams) {
 
                         DEPLOY_TO_ON_PREM = deploymentProperties['DEPLOY_TO_ON_PREM']
                         ON_PREM_REGION = deploymentProperties['ON_PREM_REGION']
+
+                        URI_ROOT_PATH = deploymentProperties['URI_ROOT_PATH']
 
                     }
                 }
@@ -371,7 +416,7 @@ def call(Map pipelineParams) {
                     withCredentials([sshUserPrivateKey(credentialsId: 'l-apimgt-u-itsehbgATikea.com', keyFileVariable: 'SSH_KEY')]) {
                         withEnv(["GIT_SSH_COMMAND=ssh -o StrictHostKeyChecking=no -o User=${GIT_USER} -i ${SSH_KEY}"]) {
                             sh 'git remote rm origin'
-                            sh 'git remote add origin "git@git.build.ingka.ikea.com:IPIM-IP/${SVC_PATH}.git"'
+                            sh 'git remote add origin "git@git.build.ingka.ikea.com:IPIM-IP/${REPO_NAME}.git"'
                             //sh 'git remote add origin "${GIT_URL}"'
 
                             sh 'git config --global user.email "l-apimgt-u-itsehbg@ikea.com"'
@@ -438,6 +483,7 @@ def generateAzureDeployStage(region, env) {
         stage("${region}") {
             withCredentials([azureServicePrincipal('sp-ipim-ip-aks')]) {
                 script {
+                    AZ_ENV_REGION_SVC_HOSTNAME = AZ_INTERNAL_SVC_HOSTNAME.replace('<ENV>', ${env}).replace('<REGION>', ${region})
                     ACRLOGINSERVER = sh(returnStdout: true, script: 'az acr show --resource-group ${AZ_RG_NAME} --name ${AZ_ACR_NAME} --query "loginServer" --output tsv').trim()
                     sh 'chmod +x ./build/deploy-service.yaml'
                     sh 'chmod +x ./build/ingress.yaml'
@@ -450,7 +496,7 @@ def generateAzureDeployStage(region, env) {
                 cp \"deploy-service.yaml\" \"deploy-service-azure.yaml\"
                 cp \"ingress.yaml\" \"ingress-azure.yaml\"
                 sed -i -e \"s|IMAGE_NAME_VAR|${ACRLOGINSERVER}/${DOCKER_ORG_IMAGE}:${DOCKER_VERSION}|g\" deploy-service-azure.yaml
-                sed -i -e \"s|INTERNAL_SVC_HOSTNAME_VAR|${AZ_INTERNAL_SVC_HOSTNAME}|g\" ingress-azure.yaml
+                sed -i -e \"s|INTERNAL_SVC_HOSTNAME_VAR|${AZ_ENV_REGION_SVC_HOSTNAME}|g\" ingress-azure.yaml
                 . ./deploy.sh
             """
                 }
