@@ -1,6 +1,6 @@
 #!/usr/bin/env groovy
 
-def test="hello"
+def test='hello'
 
 def call(String property) {
 //    Properties props = new Properties()
@@ -8,5 +8,5 @@ def call(String property) {
 //    props.load(propsFile.newDataInputStream())
 //
 //    return props.getProperty(property)
-    return test
+    return ${test}
 }
