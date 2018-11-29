@@ -51,17 +51,16 @@ def call(Map pipelineParams) {
             AZ_AKS_CLUSTER_NAME      = ""
             AZ_RG_NAME               = ""
 
-//            AZURE_DEV_WESTEUROPE_DNS_PROP            = getCloudEnvironmentProps("AZURE_DEV_WESTEUROPE_DNS")
-//            AZURE_SVC_HOSTNAME_PROP                  = getCloudEnvironmentProps("AZURE_SVC_HOSTNAME")
-//            GIT_SVC_ACOUNT_EMAIL_PROP                = getCloudEnvironmentProps("GIT_SVC_ACOUNT_EMAIL")
-//            GIT_SVC_ACCOUNT_USER_PROP                = getCloudEnvironmentProps("GIT_SVC_ACCOUNT_USER")
-//            NONPROD_WESTEUROPE_AZRGNAME_PROP         = getCloudEnvironmentProps("NONPROD_WESTEUROPE_AZRGNAME")
-//            NONPROD_WESTEUROPE_AZACRNAME_PROP        = getCloudEnvironmentProps("NONPROD_WESTEUROPE_AZACRNAME")
-//            NONPROD_WESTEUROPE_AZAKSCLUSTERNAME_PROP = getCloudEnvironmentProps("NONPROD_WESTEUROPE_AZAKSCLUSTERNAME")
-//            PROD_WESTEUROPE_AZRGNAME_PROP            = getCloudEnvironmentProps("PROD_WESTEUROPE_AZRGNAME")
-//            PROD_WESTEUROPE_AZACRNAME_PROP           = getCloudEnvironmentProps("PROD_WESTEUROPE_AZACRNAME")
-//            PROD_WESTEUROPE_AZAKSCLUSTERNAME_PROP    = getCloudEnvironmentProps("PROD_WESTEUROPE_AZAKSCLUSTERNAME")
-            TEST = getCloudEnvironmentProps.getAzureDevWesteuropeDns()
+            AZURE_DEV_WESTEUROPE_DNS_PROP            = getCloudEnvironmentProps.getAzureDevWesteuropeDns()
+            AZURE_SVC_HOSTNAME_PROP                  = getCloudEnvironmentProps.getAzureSvcHostname()
+            GIT_SVC_ACOUNT_EMAIL_PROP                = getCloudEnvironmentProps.getGitSvcAccountEmail()
+            GIT_SVC_ACCOUNT_USER_PROP                = getCloudEnvironmentProps.getGitSvcAccountUser()
+            NONPROD_WESTEUROPE_AZRGNAME_PROP         = getCloudEnvironmentProps.getNonProdWesteuropeAzRgName()
+            NONPROD_WESTEUROPE_AZACRNAME_PROP        = getCloudEnvironmentProps.getNonProdWesteuropeAzAcrName()
+            NONPROD_WESTEUROPE_AZAKSCLUSTERNAME_PROP = getCloudEnvironmentProps.getNonProdWesteuropeAzAksClusterName()
+            PROD_WESTEUROPE_AZRGNAME_PROP            = getCloudEnvironmentProps.getProdWesteuropeAzRgName()
+            PROD_WESTEUROPE_AZACRNAME_PROP           = getCloudEnvironmentProps.getProdWesteuropeAzAcrName()
+            PROD_WESTEUROPE_AZAKSCLUSTERNAME_PROP    = getCloudEnvironmentProps.getProdWesteuropeAzAksClusterName()
 //            GIT_URL =               env.GIT_URL.replace('https://', 'git@')
         }
 
@@ -146,17 +145,16 @@ def call(Map pipelineParams) {
                     echo "BUILD_URL ${BUILD_URL}"
                     echo "JOB_URL ${JOB_URL}"
                     echo "CHANGE_AUTHOR_EMAIL ${GIT_COMMIT}"
-//                    echo "AZURE_DEV_WESTEUROPE_DNS_PROP ${AZURE_DEV_WESTEUROPE_DNS_PROP}"
-//                    echo "AZURE_SVC_HOSTNAME_PROP ${AZURE_SVC_HOSTNAME_PROP}"
-//                    echo "GIT_SVC_ACOUNT_EMAIL_PROP ${GIT_SVC_ACOUNT_EMAIL_PROP}"
-//                    echo "GIT_SVC_ACCOUNT_USER_PROP ${GIT_SVC_ACCOUNT_USER_PROP}"
-//                    echo "NONPROD_WESTEUROPE_AZRGNAME_PROP ${NONPROD_WESTEUROPE_AZRGNAME_PROP}"
-//                    echo "NONPROD_WESTEUROPE_AZACRNAME_PROP ${NONPROD_WESTEUROPE_AZACRNAME_PROP}"
-//                    echo "NONPROD_WESTEUROPE_AZAKSCLUSTERNAME_PROP ${NONPROD_WESTEUROPE_AZAKSCLUSTERNAME_PROP}"
-//                    echo "PROD_WESTEUROPE_AZRGNAME_PROP ${PROD_WESTEUROPE_AZRGNAME_PROP}"
-//                    echo "PROD_WESTEUROPE_AZACRNAME_PROP ${PROD_WESTEUROPE_AZACRNAME_PROP}"
-//                    echo "PROD_WESTEUROPE_AZAKSCLUSTERNAME_PROP ${PROD_WESTEUROPE_AZAKSCLUSTERNAME_PROP}"
-                    echo "test: ${TEST}"
+                    echo "AZURE_DEV_WESTEUROPE_DNS_PROP ${AZURE_DEV_WESTEUROPE_DNS_PROP}"
+                    echo "AZURE_SVC_HOSTNAME_PROP ${AZURE_SVC_HOSTNAME_PROP}"
+                    echo "GIT_SVC_ACOUNT_EMAIL_PROP ${GIT_SVC_ACOUNT_EMAIL_PROP}"
+                    echo "GIT_SVC_ACCOUNT_USER_PROP ${GIT_SVC_ACCOUNT_USER_PROP}"
+                    echo "NONPROD_WESTEUROPE_AZRGNAME_PROP ${NONPROD_WESTEUROPE_AZRGNAME_PROP}"
+                    echo "NONPROD_WESTEUROPE_AZACRNAME_PROP ${NONPROD_WESTEUROPE_AZACRNAME_PROP}"
+                    echo "NONPROD_WESTEUROPE_AZAKSCLUSTERNAME_PROP ${NONPROD_WESTEUROPE_AZAKSCLUSTERNAME_PROP}"
+                    echo "PROD_WESTEUROPE_AZRGNAME_PROP ${PROD_WESTEUROPE_AZRGNAME_PROP}"
+                    echo "PROD_WESTEUROPE_AZACRNAME_PROP ${PROD_WESTEUROPE_AZACRNAME_PROP}"
+                    echo "PROD_WESTEUROPE_AZAKSCLUSTERNAME_PROP ${PROD_WESTEUROPE_AZAKSCLUSTERNAME_PROP}"
 
                     script {
                         deploymentProperties = readProperties file:'deployment.properties'
