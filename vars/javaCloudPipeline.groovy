@@ -432,23 +432,17 @@ def call(Map pipelineParams) {
 
             stage('Commit Updated Version') {
                 steps {
-                    echo "test 1"
                     withCredentials([sshUserPrivateKey(credentialsId: 'l-apimgt-u-itsehbgATikea.com', keyFileVariable: 'SSH_KEY')]) {
-                        echo "test 2"
                         withEnv(["GIT_SSH_COMMAND=ssh -o StrictHostKeyChecking=no -o User=${GIT_SVC_ACCOUNT_USER_PROP} -i ${SSH_KEY}"]) {
                             script {
-                                echo "test 3"
                                 sh 'git remote rm origin'
                                 sh 'git remote add origin "git@git.build.ingka.ikea.com:IPIM-IP/price-service.git"'
 //                                 sh "git remote set-url origin ${GIT_URL}"
 
-                                // Below line could be causing the intermittent error for Git SCM, if true then need to remove and find alternate
-//                                sh 'git config url."git@git.build.ingka.ikea.com:".insteadOf "https://git.build.ingka.ikea.com/"'
                                 sh 'git config --global user.email "l-apimgt-u-itsehbg@ikea.com"'
                                 sh 'git config --global user.name "l-apimgt-u-itsehbg"'
                                 sh 'git add pom.xml'
                                 sh 'git commit -am "System - Update POM Version [ci skip]"'
-//                                sh "git push origin HEAD"
                                 sh 'git push origin "${BRANCH_NAME_FULL}"'
                             }
                         }
@@ -517,6 +511,7 @@ def generateAzureDeployStage(region, env) {
                         export CONFIGMAP=configmap-${region}-${env}
                         export TARGET_HOST=azure
                         export DOCKER_VERSION=${DOCKER_VERSION}
+                        export URI_ROOT_PATH_VAR=${URI_ROOT_PATH}
                         cp \"configmap-${region}-${env}.yaml\" \"configmap-${region}-${env}-azure.yaml\"
                         cp \"deploy-service.yaml\" \"deploy-service-azure.yaml\"
                         cp \"ingress.yaml\" \"ingress-azure.yaml\"
