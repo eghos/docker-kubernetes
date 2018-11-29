@@ -44,6 +44,8 @@ def call(Map pipelineParams) {
             AWS_DOCKER_TAG           = "${DOCKER_REPO}/${ORG}/${IMAGE_NAME}"
             DOCKER_ORG_IMAGE         = "${ORG}/${IMAGE_NAME}"
 
+            GIT_USER =              "${GIT_SVC_ACCOUNT_USER}"
+
             JAVA_HOME                = "/usr/lib/jvm/java-10-oracle"
             JAVA_HOME8               = "/usr/lib/jvm/java-8-oracle"
 
@@ -432,7 +434,7 @@ def call(Map pipelineParams) {
             stage('Commit Updated Version') {
                 steps {
                     withCredentials([sshUserPrivateKey(credentialsId: 'l-apimgt-u-itsehbgATikea.com', keyFileVariable: 'SSH_KEY')]) {
-                        withEnv(["GIT_SSH_COMMAND=ssh -o StrictHostKeyChecking=no -o User=${GIT_SVC_ACCOUNT_USER_PROP} -i ${SSH_KEY}"]) {
+                        withEnv(["GIT_SSH_COMMAND=ssh -o StrictHostKeyChecking=no -o User=${GIT_USER} -i ${SSH_KEY}"]) {
                             script {
                                 sh 'git remote rm origin'
                                 sh 'git remote add origin "git@git.build.ingka.ikea.com:IPIM-IP/price-service.git"'
