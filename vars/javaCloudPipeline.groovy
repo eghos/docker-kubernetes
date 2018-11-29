@@ -51,18 +51,17 @@ def call(Map pipelineParams) {
             AZ_AKS_CLUSTER_NAME      = ""
             AZ_RG_NAME               = ""
 
-            AZURE_DEV_WESTEUROPE_DNS_PROP            = getCloudEnvironmentProps.getAzureDevWesteuropeDns()
-            AZURE_SVC_HOSTNAME_PROP                  = getCloudEnvironmentProps.getAzureSvcHostname()
-            GIT_SVC_ACOUNT_EMAIL_PROP                = getCloudEnvironmentProps.getGitSvcAccountEmail()
-            GIT_SVC_ACCOUNT_USER_PROP                = getCloudEnvironmentProps.getGitSvcAccountUser()
-            NONPROD_WESTEUROPE_AZRGNAME_PROP         = getCloudEnvironmentProps.getNonProdWesteuropeAzRgName()
-            NONPROD_WESTEUROPE_AZACRNAME_PROP        = getCloudEnvironmentProps.getNonProdWesteuropeAzAcrName()
-            NONPROD_WESTEUROPE_AZAKSCLUSTERNAME_PROP = getCloudEnvironmentProps.getNonProdWesteuropeAzAksClusterName()
-            PROD_WESTEUROPE_AZRGNAME_PROP            = getCloudEnvironmentProps.getProdWesteuropeAzRgName()
-            PROD_WESTEUROPE_AZACRNAME_PROP           = getCloudEnvironmentProps.getProdWesteuropeAzAcrName()
-            PROD_WESTEUROPE_AZAKSCLUSTERNAME_PROP    = getCloudEnvironmentProps.getProdWesteuropeAzAksClusterName()
+            AZURE_DEV_WESTEUROPE_DNS_PROP            = cloudEnvironmentProps.getAzureDevWesteuropeDns()
+            AZURE_SVC_HOSTNAME_PROP                  = cloudEnvironmentProps.getAzureSvcHostname()
+            GIT_SVC_ACOUNT_EMAIL_PROP                = cloudEnvironmentProps.getGitSvcAccountEmail()
+            GIT_SVC_ACCOUNT_USER_PROP                = cloudEnvironmentProps.getGitSvcAccountUser()
+            NONPROD_WESTEUROPE_AZRGNAME_PROP         = cloudEnvironmentProps.getNonProdWesteuropeAzRgName()
+            NONPROD_WESTEUROPE_AZACRNAME_PROP        = cloudEnvironmentProps.getNonProdWesteuropeAzAcrName()
+            NONPROD_WESTEUROPE_AZAKSCLUSTERNAME_PROP = cloudEnvironmentProps.getNonProdWesteuropeAzAksClusterName()
+            PROD_WESTEUROPE_AZRGNAME_PROP            = cloudEnvironmentProps.getProdWesteuropeAzRgName()
+            PROD_WESTEUROPE_AZACRNAME_PROP           = cloudEnvironmentProps.getProdWesteuropeAzAcrName()
+            PROD_WESTEUROPE_AZAKSCLUSTERNAME_PROP    = cloudEnvironmentProps.getProdWesteuropeAzAksClusterName()
 //            GIT_URL =               env.GIT_URL.replace('https://', 'git@')
-            //test
         }
 
         stages {

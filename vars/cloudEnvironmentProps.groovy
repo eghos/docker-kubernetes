@@ -1,5 +1,5 @@
 //#!/usr/bin/env groovy
-class getCloudEnvironmentProps{
+class cloudEnvironmentProps{
     def AZURE_DEV_WESTEUROPE_DNS            = "dev-az-svc.westeurope.cloudapp.azure.com"
     def AZURE_SVC_HOSTNAME                  = "<ENV>-az-svc.<REGION>.cloudapp.azure.com"
     def GIT_SVC_ACOUNT_EMAIL                = "l-apimgt-u-itsehbg@ikea.com"
