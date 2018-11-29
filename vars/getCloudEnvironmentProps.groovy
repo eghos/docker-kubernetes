@@ -18,9 +18,9 @@
 //    return "${test_var}"
 //}
 class getCloudEnvironmentProps{
-    String test_var = "qwert"
+    def AZURE_DEV_WESTEUROPE_DNS            = "dev-az-svc.westeurope.cloudapp.azure.com"
 
-    def getTest(){
-        return test_var
+    def getAzureDevWesteuropeDns(){
+        return AZURE_DEV_WESTEUROPE_DNS
     }
 }
