@@ -12,3 +12,7 @@ def call(String property) {
     def PROD_WESTEUROPE_AZAKSCLUSTERNAME    = "aksweppeafsibk"
     return property
 }
+
+def getTest(){
+    return "hi!"
+}

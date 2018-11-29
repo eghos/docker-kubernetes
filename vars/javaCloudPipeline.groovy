@@ -61,6 +61,7 @@ def call(Map pipelineParams) {
             PROD_WESTEUROPE_AZRGNAME_PROP            = getCloudEnvironmentProps("PROD_WESTEUROPE_AZRGNAME")
             PROD_WESTEUROPE_AZACRNAME_PROP           = getCloudEnvironmentProps("PROD_WESTEUROPE_AZACRNAME")
             PROD_WESTEUROPE_AZAKSCLUSTERNAME_PROP    = getCloudEnvironmentProps("PROD_WESTEUROPE_AZAKSCLUSTERNAME")
+            TEST = getCloudEnvironmentProps.getTest()
 //            GIT_URL =               env.GIT_URL.replace('https://', 'git@')
         }
 
@@ -155,6 +156,7 @@ def call(Map pipelineParams) {
                     echo "PROD_WESTEUROPE_AZRGNAME_PROP ${PROD_WESTEUROPE_AZRGNAME_PROP}"
                     echo "PROD_WESTEUROPE_AZACRNAME_PROP ${PROD_WESTEUROPE_AZACRNAME_PROP}"
                     echo "PROD_WESTEUROPE_AZAKSCLUSTERNAME_PROP ${PROD_WESTEUROPE_AZAKSCLUSTERNAME_PROP}"
+                    echo "test: ${TEST}"
 
                     script {
                         deploymentProperties = readProperties file:'deployment.properties'
