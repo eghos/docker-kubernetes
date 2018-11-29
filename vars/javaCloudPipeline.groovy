@@ -62,6 +62,7 @@ def call(Map pipelineParams) {
             PROD_WESTEUROPE_AZACRNAME_PROP           = getCloudEnvironmentProps.getProdWesteuropeAzAcrName()
             PROD_WESTEUROPE_AZAKSCLUSTERNAME_PROP    = getCloudEnvironmentProps.getProdWesteuropeAzAksClusterName()
 //            GIT_URL =               env.GIT_URL.replace('https://', 'git@')
+            //test
         }
 
         stages {
