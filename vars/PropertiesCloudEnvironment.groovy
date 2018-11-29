@@ -18,7 +18,7 @@
 //    return "${test_var}"
 //}
 class PropertiesCloudEnvironment{
-    def AZURE_DEV_WESTEUROPE_DNS            = "dev-az-svc.westeurope.cloudapp.azure.com"
+    String AZURE_DEV_WESTEUROPE_DNS            = "dev-az-svc.westeurope.cloudapp.azure.com"
 
     def getAzureDevWesteuropeDns(){
         return this.AZURE_DEV_WESTEUROPE_DNS
