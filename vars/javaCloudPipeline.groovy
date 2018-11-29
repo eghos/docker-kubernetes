@@ -23,47 +23,50 @@ def call(Map pipelineParams) {
 
         environment {
 
-            ORG =                      "${params.DOCKER_ORG}"
-            DOCKER_REPO =              "${params.DOCKER_REPO}"
-            INTERNAL_SVC_HOSTNAME =    "${params.INTERNAL_SVC_HOSTNAME}"
+            ORG                      = "${params.DOCKER_ORG}"
+            DOCKER_REPO              = "${params.DOCKER_REPO}"
+            INTERNAL_SVC_HOSTNAME    = "${params.INTERNAL_SVC_HOSTNAME}"
             AZ_INTERNAL_SVC_HOSTNAME = "${params.AZ_INTERNAL_SVC_HOSTNAME}"
-            // SVC_PATH =                 "${params.SVC_PATH}"
-            KUBERNETES_NAMESPACE =     "${params.KUBERNETES_NAMESPACE}"
+            // SVC_PATH              = "${params.SVC_PATH}"
+            KUBERNETES_NAMESPACE     = "${params.KUBERNETES_NAMESPACE}"
 
-            BRANCH_NAME_FULL =      env.BRANCH_NAME.replace('', '')
-            IMAGE_NAME =            readMavenPom().getArtifactId()
-            VERSION_FROM_POM =      readMavenPom().getVersion()
-            DEV_SNAPSHOT_VERSION =  "1.0.${BUILD_NUMBER}-SNAPSHOT"
-            RELEASE_NUMBER =        env.BRANCH_NAME.replace('release/', '')
-            RELEASE_VERSION =       "${RELEASE_NUMBER}.RELEASE"
+            BRANCH_NAME_FULL         = env.BRANCH_NAME.replace('', '')
+            IMAGE_NAME               = readMavenPom().getArtifactId()
+            VERSION_FROM_POM         = readMavenPom().getVersion()
+            DEV_SNAPSHOT_VERSION     = "1.0.${BUILD_NUMBER}-SNAPSHOT"
+            RELEASE_NUMBER           = env.BRANCH_NAME.replace('release/', '')
+            RELEASE_VERSION          = "${RELEASE_NUMBER}.RELEASE"
 
-            DEPLOY_TO_AWS     =     ""
-            DEPLOY_TO_AZURE   =     ""
-            DEPLOY_TO_ON_PREM =     ""
+            AWS_DOCKER_TAG           = "${DOCKER_REPO}/${ORG}/${IMAGE_NAME}"
+            DOCKER_ORG_IMAGE         = "${ORG}/${IMAGE_NAME}"
 
-            AWS_DOCKER_TAG =        "${DOCKER_REPO}/${ORG}/${IMAGE_NAME}"
-            DOCKER_ORG_IMAGE =      "${ORG}/${IMAGE_NAME}"
+            JAVA_HOME                = "/usr/lib/jvm/java-10-oracle"
+            JAVA_HOME8               = "/usr/lib/jvm/java-8-oracle"
 
-            GIT_EMAIL =             "${GIT_SVC_ACOUNT_EMAIL}"
-            GIT_USER =              "${GIT_SVC_ACCOUNT_USER}"
+            DEPLOY_TO_AWS            = ""
+            DEPLOY_TO_AZURE          = ""
+            DEPLOY_TO_ON_PREM        = ""
+
+            AZ_ACR_NAME              = ""
+            AZ_AKS_CLUSTER_NAME      = ""
+            AZ_RG_NAME               = ""
+
+            AZURE_DEV_WESTEUROPE_DNS_PROP            = getCloudEnvironmentProps("AZURE_DEV_WESTEUROPE_DNS")
+            AZURE_SVC_HOSTNAME_PROP                  = getCloudEnvironmentProps("AZURE_SVC_HOSTNAME")
+            GIT_SVC_ACOUNT_EMAIL_PROP                = getCloudEnvironmentProps("GIT_SVC_ACOUNT_EMAIL")
+            GIT_SVC_ACCOUNT_USER_PROP                = getCloudEnvironmentProps("GIT_SVC_ACCOUNT_USER")
+            NONPROD_WESTEUROPE_AZRGNAME_PROP         = getCloudEnvironmentProps("NONPROD_WESTEUROPE_AZRGNAME")
+            NONPROD_WESTEUROPE_AZACRNAME_PROP        = getCloudEnvironmentProps("NONPROD_WESTEUROPE_AZACRNAME")
+            NONPROD_WESTEUROPE_AZAKSCLUSTERNAME_PROP = getCloudEnvironmentProps("NONPROD_WESTEUROPE_AZAKSCLUSTERNAME")
+            PROD_WESTEUROPE_AZRGNAME_PROP            = getCloudEnvironmentProps("PROD_WESTEUROPE_AZRGNAME")
+            PROD_WESTEUROPE_AZACRNAME_PROP           = getCloudEnvironmentProps("PROD_WESTEUROPE_AZACRNAME")
+            PROD_WESTEUROPE_AZAKSCLUSTERNAME_PROP    = getCloudEnvironmentProps("PROD_WESTEUROPE_AZAKSCLUSTERNAME")
 //            GIT_URL =               env.GIT_URL.replace('https://', 'git@')
-
-            JAVA_HOME =             "/usr/lib/jvm/java-10-oracle"
-            JAVA_HOME8 =            "/usr/lib/jvm/java-8-oracle"
-
-            AZ_ACR_NAME           = ""
-            AZ_AKS_CLUSTER_NAME   = ""
-            AZ_RG_NAME            = ""
-
-            TEST = getCloudEnvironmentProps("AZURE_DEV_WESTEUROPE_DNS")
-
-
-
         }
 
         stages {
 
-            stage("CICD Skip?") {
+            stage("Skip CICD?") {
                 when {
                     expression {
                         result = sh (script: "git log -1 | grep '.*\\[ci skip\\].*'", returnStatus: true)
@@ -90,9 +93,9 @@ def call(Map pipelineParams) {
                         }
                         steps {
                             script {
-                                AZ_ACR_NAME = "${params.PROD_WESTEUROPE_AZACRNAME}"
+                                AZ_ACR_NAME         = "${params.PROD_WESTEUROPE_AZACRNAME}"
                                 AZ_AKS_CLUSTER_NAME = "${params.PROD_WESTEUROPE_AZAKSCLUSTERNAME}"
-                                AZ_RG_NAME = "${params.PROD_WESTEUROPE_AZRGNAME}"
+                                AZ_RG_NAME          = "${params.PROD_WESTEUROPE_AZRGNAME}"
                             }
                             echo "AZ_ACR_NAME: ${AZ_ACR_NAME}"
                             echo "AZ_AKS_CLUSTER_NAME: ${AZ_AKS_CLUSTER_NAME}"
@@ -108,9 +111,9 @@ def call(Map pipelineParams) {
                         }
                         steps {
                             script {
-                                AZ_ACR_NAME = "${params.NONPROD_WESTEUROPE_AZACRNAME}"
+                                AZ_ACR_NAME         = "${params.NONPROD_WESTEUROPE_AZACRNAME}"
                                 AZ_AKS_CLUSTER_NAME = "${params.NONPROD_WESTEUROPE_AZAKSCLUSTERNAME}"
-                                AZ_RG_NAME = "${params.NONPROD_WESTEUROPE_AZRGNAME}"
+                                AZ_RG_NAME          = "${params.NONPROD_WESTEUROPE_AZRGNAME}"
                             }
                             echo "AZ_ACR_NAME: ${AZ_ACR_NAME}"
                             echo "AZ_AKS_CLUSTER_NAME: ${AZ_AKS_CLUSTER_NAME}"
@@ -120,7 +123,7 @@ def call(Map pipelineParams) {
                 }
             }
 
-            stage('Setup') {
+            stage('Setup General') {
                 steps {
                     sh 'which java'
                     sh 'java -version'
@@ -147,22 +150,22 @@ def call(Map pipelineParams) {
                     script {
                         deploymentProperties = readProperties file:'deployment.properties'
 
-                        DEPLOY_TO_AWS = deploymentProperties['DEPLOY_TO_AWS']
+                        DEPLOY_TO_AWS      = deploymentProperties['DEPLOY_TO_AWS']
 
-                        AWS_DEV_REGION = deploymentProperties['AWS_DEV_REGION'].split(',').collect{it as String}
-                        AWS_TEST_REGION = deploymentProperties['AWS_TEST_REGION'].split(',').collect{it as String}
-                        AWS_PROD_REGION = deploymentProperties['AWS_PROD_REGION'].split(',').collect{it as String}
+                        AWS_DEV_REGION    = deploymentProperties['AWS_DEV_REGION'].split(',').collect{it as String}
+                        AWS_TEST_REGION   = deploymentProperties['AWS_TEST_REGION'].split(',').collect{it as String}
+                        AWS_PROD_REGION   = deploymentProperties['AWS_PROD_REGION'].split(',').collect{it as String}
 
-                        DEPLOY_TO_AZURE = deploymentProperties['DEPLOY_TO_AZURE']
+                        DEPLOY_TO_AZURE   = deploymentProperties['DEPLOY_TO_AZURE']
 
-                        AZURE_DEV_REGION = deploymentProperties['AZURE_DEV_REGION'].split(',').collect{it as String}
+                        AZURE_DEV_REGION  = deploymentProperties['AZURE_DEV_REGION'].split(',').collect{it as String}
                         AZURE_TEST_REGION = deploymentProperties['AZURE_TEST_REGION'].split(',').collect{it as String}
                         AZURE_PROD_REGION = deploymentProperties['AZURE_PROD_REGION'].split(',').collect{it as String}
 
                         DEPLOY_TO_ON_PREM = deploymentProperties['DEPLOY_TO_ON_PREM']
-                        ON_PREM_REGION = deploymentProperties['ON_PREM_REGION']
+                        ON_PREM_REGION    = deploymentProperties['ON_PREM_REGION']
 
-                        URI_ROOT_PATH = deploymentProperties['URI_ROOT_PATH']
+                        URI_ROOT_PATH     = deploymentProperties['URI_ROOT_PATH']
 
                     }
                 }
@@ -175,18 +178,17 @@ def call(Map pipelineParams) {
                         script {
                             if (env.BRANCH_NAME.startsWith("PR")) {
                                 echo 'This is a PR Branch'
-                                //Update pom.xml version - In Dev branch, this is used to ensure JAR artefact has correct Version when pushed to Nexus.
-                                sh './mvnw -B org.codehaus.mojo:versions-maven-plugin:2.5:set -DprocessAllModules -DnewVersion=${DEV_PR_VERSION}'
+//                                sh './mvnw -B org.codehaus.mojo:versions-maven-plugin:2.5:set -DprocessAllModules -DnewVersion=${DEV_PR_VERSION}'
                             }
 
                             if (env.BRANCH_NAME.startsWith("develop")) {
                                 echo 'This is a develop Branch'
+                                //Update pom.xml version
                                 sh './mvnw -B org.codehaus.mojo:versions-maven-plugin:2.5:set -DprocessAllModules -DnewVersion=1.0.${BUILD_NUMBER}-SNAPSHOT'
                                 DOCKER_VERSION = "${DEV_SNAPSHOT_VERSION}"
                             }
 
                             if (env.BRANCH_NAME.startsWith("release/")) {
-
                                 echo 'This is a release Branch'
                                 //Update pom.xml version
                                 sh './mvnw -B org.codehaus.mojo:versions-maven-plugin:2.5:set -DprocessAllModules -DnewVersion=${RELEASE_VERSION}'
@@ -253,18 +255,18 @@ def call(Map pipelineParams) {
         //         }
         //     }
 
-            stage('Code Deploy to Nexus') {
-                when {
-                    anyOf {
-                        branch "develop*";
-                        branch "release/*"
-                    }
-                }
-                steps {
-                    sh 'chmod +x ./mvnw'
-                    sh './mvnw -f pom.xml -Dmaven.test.skip=true deploy'
-                }
-            }
+//            stage('Code Deploy to Nexus') {
+//                when {
+//                    anyOf {
+//                        branch "develop*";
+//                        branch "release/*"
+//                    }
+//                }
+//                steps {
+//                    sh 'chmod +x ./mvnw'
+//                    sh './mvnw -f pom.xml -Dmaven.test.skip=true deploy'
+//                }
+//            }
 
             stage('Docker Build') {
                 when {
@@ -423,18 +425,18 @@ def call(Map pipelineParams) {
                 steps {
                     withCredentials([sshUserPrivateKey(credentialsId: 'l-apimgt-u-itsehbgATikea.com', keyFileVariable: 'SSH_KEY')]) {
                         withEnv(["GIT_SSH_COMMAND=ssh -o StrictHostKeyChecking=no -o User=${GIT_USER} -i ${SSH_KEY}"]) {
+                            currentBuild.result = 'ABORTED'
+                            error('Aborted purposefully so we can re-run')
+
                             script {
                                  sh 'git remote rm origin'
                                  sh 'git remote add origin "git@git.build.ingka.ikea.com:IPIM-IP/price-service.git"'
 //                                 sh "git remote set-url origin ${GIT_URL}"
 
-                                // Below line could be causing the intermittent error for Git SCM, if true then need to remove and find alternate
-//                                sh 'git config url."git@git.build.ingka.ikea.com:".insteadOf "https://git.build.ingka.ikea.com/"'
                                 sh 'git config --global user.email "l-apimgt-u-itsehbg@ikea.com"'
                                 sh 'git config --global user.name "l-apimgt-u-itsehbg"'
                                 sh 'git add pom.xml'
                                 sh 'git commit -am "System - Update POM Version [ci skip]"'
-//                                sh "git push origin HEAD"
                                 sh 'git push origin "${BRANCH_NAME_FULL}"'
                             }
                         }
