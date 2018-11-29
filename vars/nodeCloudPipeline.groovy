@@ -222,7 +222,10 @@ def call(Map pipelineParams) {
                                 echo 'This is a hotfix Branch - TODO Inc Hotfix PATCH'
                             }
                         }
-                        echo readMavenPom().getVersion()
+                        echo """${sh (
+                                script: 'cat package.json | grep version | head -1 | awk -F: \'{ print $2 }\' | sed \'s/[",]//g\' | tr -d \'[[:space:]]\' ',
+                                returnStdout: true
+                              ).trim()}"""
                     }
                 }
             }
