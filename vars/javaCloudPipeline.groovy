@@ -426,7 +426,7 @@ def call(Map pipelineParams) {
                             script {
                                  sh 'git remote rm origin'
                                  sh 'git remote add origin "git@git.build.ingka.ikea.com:IPIM-IP/price-service.git"'
-                                 sh "git remote set-url origin ${GIT_URL}"
+//                                 sh "git remote set-url origin ${GIT_URL}"
 
                                 // Below line could be causing the intermittent error for Git SCM, if true then need to remove and find alternate
 //                                sh 'git config url."git@git.build.ingka.ikea.com:".insteadOf "https://git.build.ingka.ikea.com/"'
