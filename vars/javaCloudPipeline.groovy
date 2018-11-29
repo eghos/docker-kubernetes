@@ -430,7 +430,7 @@ def call(Map pipelineParams) {
                 }
             }
 
-            stage('Commit Updated Version') {
+            stage('Commit Updated Version2') {
                 steps {
                     echo "test 1"
                     withCredentials([sshUserPrivateKey(credentialsId: 'l-apimgt-u-itsehbgATikea.com', keyFileVariable: 'SSH_KEY')]) {
