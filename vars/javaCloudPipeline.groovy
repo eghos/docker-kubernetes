@@ -264,18 +264,18 @@ def call(Map pipelineParams) {
         //         }
         //     }
 
-//            stage('Code Deploy to Nexus') {
-//                when {
-//                    anyOf {
-//                        branch "develop*";
-//                        branch "release/*"
-//                    }
-//                }
-//                steps {
-//                    sh 'chmod +x ./mvnw'
-//                    sh './mvnw -f pom.xml -Dmaven.test.skip=true deploy'
-//                }
-//            }
+            stage('Code Deploy to Nexus') {
+                when {
+                    anyOf {
+                        branch "develop*";
+                        branch "release/*"
+                    }
+                }
+                steps {
+                    sh 'chmod +x ./mvnw'
+                    sh './mvnw -f pom.xml -Dmaven.test.skip=true deploy'
+                }
+            }
 
             stage('Docker Build') {
                 when {
@@ -430,11 +430,11 @@ def call(Map pipelineParams) {
                 }
             }
 
-            stage('Commit Updated Version') {
-                steps {
-                    withCredentials([sshUserPrivateKey(credentialsId: 'l-apimgt-u-itsehbgATikea.com', keyFileVariable: 'SSH_KEY')]) {
-                        withEnv(["GIT_SSH_COMMAND=ssh -o StrictHostKeyChecking=no -o User=${GIT_SVC_ACCOUNT_USER_PROP} -i ${SSH_KEY}"]) {
-                            script {
+//            stage('Commit Updated Version') {
+//                steps {
+//                    withCredentials([sshUserPrivateKey(credentialsId: 'l-apimgt-u-itsehbgATikea.com', keyFileVariable: 'SSH_KEY')]) {
+//                        withEnv(["GIT_SSH_COMMAND=ssh -o StrictHostKeyChecking=no -o User=${GIT_SVC_ACCOUNT_USER_PROP} -i ${SSH_KEY}"]) {
+//                            script {
 //                                sh 'git remote rm origin'
 //                                sh 'git remote add origin "git@git.build.ingka.ikea.com:IPIM-IP/price-service.git"'
 ////                                 sh "git remote set-url origin ${GIT_URL}"
@@ -444,11 +444,11 @@ def call(Map pipelineParams) {
 //                                sh 'git add pom.xml'
 //                                sh 'git commit -am "System - Update POM Version [ci skip]"'
 //                                sh 'git push origin "${BRANCH_NAME_FULL}"'
-                            }
-                        }
-                    }
-                }
-            }
+//                            }
+//                        }
+//                    }
+//                }
+//            }
 
             stage('Clean Up') {
                 steps {
