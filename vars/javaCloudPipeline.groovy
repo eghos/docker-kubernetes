@@ -434,7 +434,8 @@ def call(Map pipelineParams) {
                                 sh 'git config --global user.name "l-apimgt-u-itsehbg"'
                                 sh 'git add pom.xml'
                                 sh 'git commit -am "System - Update POM Version [ci skip]"'
-                                sh "git push origin HEAD"
+//                                sh "git push origin HEAD"
+                                sh 'git push origin "${BRANCH_NAME_FULL}"'
                             }
                         }
                     }
