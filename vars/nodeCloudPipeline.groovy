@@ -437,7 +437,7 @@ def call(Map pipelineParams) {
                         withEnv(["GIT_SSH_COMMAND=ssh -o StrictHostKeyChecking=no -o User=${GIT_USER} -i ${SSH_KEY}"]) {
                             script {
                                 sh 'git remote rm origin'
-                                sh 'git remote add origin "git@git.build.ingka.ikea.com:IPIM-IP/price-service.git"'
+                                sh 'git remote add origin "git@git.build.ingka.ikea.com:IPIM-IP/kafka-rate-consumer.git"'
 //                                 sh "git remote set-url origin ${GIT_URL}"
 
                                 sh 'git config --global user.email "l-apimgt-u-itsehbg@ikea.com"'
