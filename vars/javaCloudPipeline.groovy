@@ -7,7 +7,6 @@ def call(Map pipelineParams) {
             string(name: 'REGION',                              defaultValue: 'ireland',                                  description: 'Target region deployment e.g. ireland, virginia')
             string(name: 'DOCKER_ORG',                          defaultValue: 'apimgt',                                   description: 'Docker Repository user e.g. apimgt')
             string(name: 'DOCKER_REPO',                         defaultValue: 'dtrdev.hip.red.cdtapps.com',               description: 'Docker Repo URL e.g. dtrdev.hip.red.cdtapps.com')
-            // string(name: 'SVC_PATH',                         defaultValue: 'price-service',                            description: 'Ingress Service Path e.g. testapi')
             string(name: 'INTERNAL_SVC_HOSTNAME',               defaultValue: 'dev.eu-west-1.svc.hipint.red.cdtapps.com', description: 'AWS Ingress Internal Host Path e.g. dev.eu-west-1.svc.hipint.red.cdtapps.com')
             string(name: 'AZ_INTERNAL_SVC_HOSTNAME',            defaultValue: '<ENV>-az-svc.<REGION>.cloudapp.azure.com', description: 'Azure Ingress Internal Host Path e.g. dev-az-svc.westeurope.cloudapp.azure.com')
             string(name: 'KUBERNETES_NAMESPACE',                defaultValue: 'default',                                  description: 'The Kubernetes namespace for the service e.g. default')
@@ -111,13 +110,16 @@ def call(Map pipelineParams) {
                         }
                         steps {
                             script {
-                                AZ_ACR_NAME         = "${params.NONPROD_WESTEUROPE_AZACRNAME}"
-                                AZ_AKS_CLUSTER_NAME = "${params.NONPROD_WESTEUROPE_AZAKSCLUSTERNAME}"
-                                AZ_RG_NAME          = "${params.NONPROD_WESTEUROPE_AZRGNAME}"
+//                                AZ_ACR_NAME         = "${params.NONPROD_WESTEUROPE_AZACRNAME}"
+//                                AZ_AKS_CLUSTER_NAME = "${params.NONPROD_WESTEUROPE_AZAKSCLUSTERNAME}"
+//                                AZ_RG_NAME          = "${params.NONPROD_WESTEUROPE_AZRGNAME}"
+                                AZ_ACR_NAME         = "${NONPROD_WESTEUROPE_AZACRNAME_PROP}"
+                                AZ_AKS_CLUSTER_NAME = "${NONPROD_WESTEUROPE_AZAKSCLUSTERNAME_PROP}"
+                                AZ_RG_NAME          = "${NONPROD_WESTEUROPE_AZRGNAME_PROP}"
                             }
-                            echo "AZ_ACR_NAME: ${AZ_ACR_NAME}"
-                            echo "AZ_AKS_CLUSTER_NAME: ${AZ_AKS_CLUSTER_NAME}"
-                            echo "AZ_RG_NAME: ${AZ_RG_NAME}"
+                            echo "AZ_ACR_NAME (NONPROD_WESTEUROPE_AZACRNAME_PROP): ${AZ_ACR_NAME}"
+                            echo "AZ_AKS_CLUSTER_NAME (NONPROD_WESTEUROPE_AZAKSCLUSTERNAME_PROP): ${AZ_AKS_CLUSTER_NAME}"
+                            echo "AZ_RG_NAME (NONPROD_WESTEUROPE_AZRGNAME_PROP): ${AZ_RG_NAME}"
                         }
                     }
                 }
