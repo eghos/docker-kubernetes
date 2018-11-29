@@ -4,7 +4,7 @@ def call(Map pipelineParams) {
         agent any
 
         parameters {
-            string(name: 'REGION',                              defaultValue: 'ireland',                                  description: 'Target region deployment e.g. ireland, virginia')
+//            string(name: 'REGION',                              defaultValue: 'ireland',                                  description: 'Target region deployment e.g. ireland, virginia')
             string(name: 'DOCKER_ORG',                          defaultValue: 'apimgt',                                   description: 'Docker Repository user e.g. apimgt')
             string(name: 'DOCKER_REPO',                         defaultValue: 'dtrdev.hip.red.cdtapps.com',               description: 'Docker Repo URL e.g. dtrdev.hip.red.cdtapps.com')
             string(name: 'INTERNAL_SVC_HOSTNAME',               defaultValue: 'dev.eu-west-1.svc.hipint.red.cdtapps.com', description: 'AWS Ingress Internal Host Path e.g. dev.eu-west-1.svc.hipint.red.cdtapps.com')
@@ -16,8 +16,8 @@ def call(Map pipelineParams) {
 //            string(name: 'PROD_WESTEUROPE_AZRGNAME',            defaultValue: 'ipimip-ppe-westEurope-rg',                 description: 'Azure region name')
 //            string(name: 'PROD_WESTEUROPE_AZACRNAME',           defaultValue: 'acrweppeafsibk',                           description: 'Azure container registry')
 //            string(name: 'PROD_WESTEUROPE_AZAKSCLUSTERNAME',    defaultValue: 'aksweppeafsibk',                           description: 'Azure Kubernetes cluster name')
-            string(name: 'GIT_SVC_ACOUNT_EMAIL',                defaultValue: 'l-apimgt-u-itsehbg@ikea.com',              description: 'GitHub Service Account Email')
-            string(name: 'GIT_SVC_ACCOUNT_USER',                defaultValue: 'l-apimgt-u-itsehbg',                       description: 'GitHub Service Account Name')
+//            string(name: 'GIT_SVC_ACOUNT_EMAIL',                defaultValue: 'l-apimgt-u-itsehbg@ikea.com',              description: 'GitHub Service Account Email')
+//            string(name: 'GIT_SVC_ACCOUNT_USER',                defaultValue: 'l-apimgt-u-itsehbg',                       description: 'GitHub Service Account Name')
         }
 
         environment {
