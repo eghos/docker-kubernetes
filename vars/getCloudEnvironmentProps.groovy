@@ -1,6 +1,6 @@
 #!/usr/bin/env groovy
 
-def test = "hello"
+
 
 def call(String property) {
 //    Properties props = new Properties()
@@ -8,5 +8,8 @@ def call(String property) {
 //    props.load(propsFile.newDataInputStream())
 //
 //    return props.getProperty(property)
-    return "hard coded"
+    def AZURE_DEV_WESTEUROPE_DNS = "dev-az-svc.westeurope.cloudapp.azure.com"
+    def GIT_SVC_ACOUNT_EMAIL     = "l-apimgt-u-itsehbg@ikea.com"
+    def GIT_SVC_ACCOUNT_USER     = "l-apimgt-u-itsehbg"
+    return property
 }
