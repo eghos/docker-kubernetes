@@ -432,9 +432,12 @@ def call(Map pipelineParams) {
 
             stage('Commit Updated Version') {
                 steps {
+                    echo "test 1"
                     withCredentials([sshUserPrivateKey(credentialsId: 'l-apimgt-u-itsehbgATikea.com', keyFileVariable: 'SSH_KEY')]) {
+                        echo "test 2"
                         withEnv(["GIT_SSH_COMMAND=ssh -o StrictHostKeyChecking=no -o User=${GIT_USER} -i ${SSH_KEY}"]) {
                             script {
+                                echo "test 3"
                                 sh 'git remote rm origin'
                                 sh 'git remote add origin "git@git.build.ingka.ikea.com:IPIM-IP/price-service.git"'
 //                                 sh "git remote set-url origin ${GIT_URL}"
