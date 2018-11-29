@@ -18,9 +18,9 @@
 //    return "${test_var}"
 //}
 class getCloudEnvironmentProps{
-    String test_var = "qwert"
+    String test_var1 = "qwert"
 
-    def getTest(){
-        return test_var
+    def getTest(String test_var){
+        return this.test_var
     }
 }
