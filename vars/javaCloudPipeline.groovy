@@ -425,9 +425,6 @@ def call(Map pipelineParams) {
                 steps {
                     withCredentials([sshUserPrivateKey(credentialsId: 'l-apimgt-u-itsehbgATikea.com', keyFileVariable: 'SSH_KEY')]) {
                         withEnv(["GIT_SSH_COMMAND=ssh -o StrictHostKeyChecking=no -o User=${GIT_USER} -i ${SSH_KEY}"]) {
-                            currentBuild.result = 'ABORTED'
-                            error('Aborted purposefully so we can re-run')
-
                             script {
                                  sh 'git remote rm origin'
                                  sh 'git remote add origin "git@git.build.ingka.ikea.com:IPIM-IP/price-service.git"'
