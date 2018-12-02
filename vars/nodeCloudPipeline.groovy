@@ -4,20 +4,20 @@ def call(Map pipelineParams) {
         agent any
 
         parameters {
-            string(name: 'REGION',                              defaultValue: 'ireland',                                  description: 'Target region deployment e.g. ireland, virginia')
+//            string(name: 'REGION',                              defaultValue: 'ireland',                                  description: 'Target region deployment e.g. ireland, virginia')
             string(name: 'DOCKER_ORG',                          defaultValue: 'apimgt',                                   description: 'Docker Repository user e.g. apimgt')
             string(name: 'DOCKER_REPO',                         defaultValue: 'dtrdev.hip.red.cdtapps.com',               description: 'Docker Repo URL e.g. dtrdev.hip.red.cdtapps.com')
             string(name: 'INTERNAL_SVC_HOSTNAME',               defaultValue: 'dev.eu-west-1.svc.hipint.red.cdtapps.com', description: 'AWS Ingress Internal Host Path e.g. dev.eu-west-1.svc.hipint.red.cdtapps.com')
             string(name: 'AZ_INTERNAL_SVC_HOSTNAME',            defaultValue: '<ENV>-az-svc.<REGION>.cloudapp.azure.com', description: 'Azure Ingress Internal Host Path e.g. dev-az-svc.westeurope.cloudapp.azure.com')
-            string(name: 'KUBERNETES_NAMESPACE',                defaultValue: 'default',                                  description: 'The Kubernetes namespace for the service e.g. default')
-            string(name: 'NONPROD_WESTEUROPE_AZRGNAME',         defaultValue: 'ipimip-dev-westEurope-rg',                 description: 'Azure region name')
-            string(name: 'NONPROD_WESTEUROPE_AZACRNAME',        defaultValue: 'acrwedevgupuy7',                           description: 'Azure container registry')
-            string(name: 'NONPROD_WESTEUROPE_AZAKSCLUSTERNAME', defaultValue: 'akswedevgupuy7',                           description: 'Azure Kubernetes cluster name')
-            string(name: 'PROD_WESTEUROPE_AZRGNAME',            defaultValue: 'ipimip-ppe-westEurope-rg',                 description: 'Azure region name')
-            string(name: 'PROD_WESTEUROPE_AZACRNAME',           defaultValue: 'acrweppeafsibk',                           description: 'Azure container registry')
-            string(name: 'PROD_WESTEUROPE_AZAKSCLUSTERNAME',    defaultValue: 'aksweppeafsibk',                           description: 'Azure Kubernetes cluster name')
-            string(name: 'GIT_SVC_ACOUNT_EMAIL',                defaultValue: 'l-apimgt-u-itsehbg@ikea.com',              description: 'GitHub Service Account Email')
-            string(name: 'GIT_SVC_ACCOUNT_USER',                defaultValue: 'l-apimgt-u-itsehbg',                       description: 'GitHub Service Account Name')
+//            string(name: 'KUBERNETES_NAMESPACE',                defaultValue: 'default',                                  description: 'The Kubernetes namespace for the service e.g. default')
+//            string(name: 'NONPROD_WESTEUROPE_AZRGNAME',         defaultValue: 'ipimip-dev-westEurope-rg',                 description: 'Azure region name')
+//            string(name: 'NONPROD_WESTEUROPE_AZACRNAME',        defaultValue: 'acrwedevgupuy7',                           description: 'Azure container registry')
+//            string(name: 'NONPROD_WESTEUROPE_AZAKSCLUSTERNAME', defaultValue: 'akswedevgupuy7',                           description: 'Azure Kubernetes cluster name')
+//            string(name: 'PROD_WESTEUROPE_AZRGNAME',            defaultValue: 'ipimip-ppe-westEurope-rg',                 description: 'Azure region name')
+//            string(name: 'PROD_WESTEUROPE_AZACRNAME',           defaultValue: 'acrweppeafsibk',                           description: 'Azure container registry')
+//            string(name: 'PROD_WESTEUROPE_AZAKSCLUSTERNAME',    defaultValue: 'aksweppeafsibk',                           description: 'Azure Kubernetes cluster name')
+//            string(name: 'GIT_SVC_ACOUNT_EMAIL',                defaultValue: 'l-apimgt-u-itsehbg@ikea.com',              description: 'GitHub Service Account Email')
+//            string(name: 'GIT_SVC_ACCOUNT_USER',                defaultValue: 'l-apimgt-u-itsehbg',                       description: 'GitHub Service Account Name')
         }
 
         environment {
@@ -26,7 +26,7 @@ def call(Map pipelineParams) {
             DOCKER_REPO              = "${params.DOCKER_REPO}"
             INTERNAL_SVC_HOSTNAME    = "${params.INTERNAL_SVC_HOSTNAME}"
             AZ_INTERNAL_SVC_HOSTNAME = "${params.AZ_INTERNAL_SVC_HOSTNAME}"
-            KUBERNETES_NAMESPACE     = "${params.KUBERNETES_NAMESPACE}"
+//            KUBERNETES_NAMESPACE     = "${params.KUBERNETES_NAMESPACE}"
 
             BRANCH_NAME_FULL         = env.BRANCH_NAME.replace('', '')
             IMAGE_NAME               = """${sh (
@@ -57,17 +57,17 @@ def call(Map pipelineParams) {
             AZ_AKS_CLUSTER_NAME      = ""
             AZ_RG_NAME               = ""
 
-            // AZURE_DEV_WESTEUROPE_DNS_PROP            = getCloudEnvironmentProps("AZURE_DEV_WESTEUROPE_DNS")
-            // AZURE_SVC_HOSTNAME_PROP                  = getCloudEnvironmentProps("AZURE_SVC_HOSTNAME")
-            // GIT_SVC_ACOUNT_EMAIL_PROP                = getCloudEnvironmentProps("GIT_SVC_ACOUNT_EMAIL")
-            // GIT_SVC_ACCOUNT_USER_PROP                = getCloudEnvironmentProps("GIT_SVC_ACCOUNT_USER")
-            // NONPROD_WESTEUROPE_AZRGNAME_PROP         = getCloudEnvironmentProps("NONPROD_WESTEUROPE_AZRGNAME")
-            // NONPROD_WESTEUROPE_AZACRNAME_PROP        = getCloudEnvironmentProps("NONPROD_WESTEUROPE_AZACRNAME")
-            // NONPROD_WESTEUROPE_AZAKSCLUSTERNAME_PROP = getCloudEnvironmentProps("NONPROD_WESTEUROPE_AZAKSCLUSTERNAME")
-            // PROD_WESTEUROPE_AZRGNAME_PROP            = getCloudEnvironmentProps("PROD_WESTEUROPE_AZRGNAME")
-            // PROD_WESTEUROPE_AZACRNAME_PROP           = getCloudEnvironmentProps("PROD_WESTEUROPE_AZACRNAME")
-            // PROD_WESTEUROPE_AZAKSCLUSTERNAME_PROP    = getCloudEnvironmentProps("PROD_WESTEUROPE_AZAKSCLUSTERNAME")
-            // GIT_URL =               env.GIT_URL.replace('https://', 'git@')
+            AZURE_DEV_WESTEUROPE_DNS_PROP            = cloudEnvironmentProps.getAzureDevWesteuropeDns()
+            AZURE_SVC_HOSTNAME_PROP                  = cloudEnvironmentProps.getAzureSvcHostname()
+            GIT_SVC_ACOUNT_EMAIL_PROP                = cloudEnvironmentProps.getGitSvcAccountEmail()
+            GIT_SVC_ACCOUNT_USER_PROP                = cloudEnvironmentProps.getGitSvcAccountUser()
+            NONPROD_WESTEUROPE_AZRGNAME_PROP         = cloudEnvironmentProps.getNonProdWesteuropeAzRgName()
+            NONPROD_WESTEUROPE_AZACRNAME_PROP        = cloudEnvironmentProps.getNonProdWesteuropeAzAcrName()
+            NONPROD_WESTEUROPE_AZAKSCLUSTERNAME_PROP = cloudEnvironmentProps.getNonProdWesteuropeAzAksClusterName()
+            PROD_WESTEUROPE_AZRGNAME_PROP            = cloudEnvironmentProps.getProdWesteuropeAzRgName()
+            PROD_WESTEUROPE_AZACRNAME_PROP           = cloudEnvironmentProps.getProdWesteuropeAzAcrName()
+            PROD_WESTEUROPE_AZAKSCLUSTERNAME_PROP    = cloudEnvironmentProps.getProdWesteuropeAzAksClusterName()
+//            GIT_URL =               env.GIT_URL.replace('https://', 'git@')
         }
 
         tools {
@@ -103,13 +103,16 @@ def call(Map pipelineParams) {
                         }
                         steps {
                             script {
-                                AZ_ACR_NAME         = "${params.PROD_WESTEUROPE_AZACRNAME}"
-                                AZ_AKS_CLUSTER_NAME = "${params.PROD_WESTEUROPE_AZAKSCLUSTERNAME}"
-                                AZ_RG_NAME          = "${params.PROD_WESTEUROPE_AZRGNAME}"
+//                                AZ_ACR_NAME         = "${params.PROD_WESTEUROPE_AZACRNAME}"
+//                                AZ_AKS_CLUSTER_NAME = "${params.PROD_WESTEUROPE_AZAKSCLUSTERNAME}"
+//                                AZ_RG_NAME          = "${params.PROD_WESTEUROPE_AZRGNAME}"
+                                AZ_ACR_NAME         = "${PROD_WESTEUROPE_AZACRNAME_PROP}"
+                                AZ_AKS_CLUSTER_NAME = "${PROD_WESTEUROPE_AZAKSCLUSTERNAME_PROP}"
+                                AZ_RG_NAME          = "${PROD_WESTEUROPE_AZRGNAME_PROP}"
                             }
-                            echo "AZ_ACR_NAME: ${AZ_ACR_NAME}"
-                            echo "AZ_AKS_CLUSTER_NAME: ${AZ_AKS_CLUSTER_NAME}"
-                            echo "AZ_RG_NAME: ${AZ_RG_NAME}"
+                            echo "AZ_ACR_NAME (PROD_WESTEUROPE_AZACRNAME_PROP): ${AZ_ACR_NAME}"
+                            echo "AZ_AKS_CLUSTER_NAME (PROD_WESTEUROPE_AZAKSCLUSTERNAME_PROP): ${AZ_AKS_CLUSTER_NAME}"
+                            echo "AZ_RG_NAME (PROD_WESTEUROPE_AZRGNAME_PROP): ${AZ_RG_NAME}"
                         }
                     }
                     stage('NON-PROD') {
@@ -121,13 +124,16 @@ def call(Map pipelineParams) {
                         }
                         steps {
                             script {
-                                AZ_ACR_NAME         = "${params.NONPROD_WESTEUROPE_AZACRNAME}"
-                                AZ_AKS_CLUSTER_NAME = "${params.NONPROD_WESTEUROPE_AZAKSCLUSTERNAME}"
-                                AZ_RG_NAME          = "${params.NONPROD_WESTEUROPE_AZRGNAME}"
+//                                AZ_ACR_NAME         = "${params.NONPROD_WESTEUROPE_AZACRNAME}"
+//                                AZ_AKS_CLUSTER_NAME = "${params.NONPROD_WESTEUROPE_AZAKSCLUSTERNAME}"
+//                                AZ_RG_NAME          = "${params.NONPROD_WESTEUROPE_AZRGNAME}"
+                                AZ_ACR_NAME         = "${NONPROD_WESTEUROPE_AZACRNAME_PROP}"
+                                AZ_AKS_CLUSTER_NAME = "${NONPROD_WESTEUROPE_AZAKSCLUSTERNAME_PROP}"
+                                AZ_RG_NAME          = "${NONPROD_WESTEUROPE_AZRGNAME_PROP}"
                             }
-                            echo "AZ_ACR_NAME: ${AZ_ACR_NAME}"
-                            echo "AZ_AKS_CLUSTER_NAME: ${AZ_AKS_CLUSTER_NAME}"
-                            echo "AZ_RG_NAME: ${AZ_RG_NAME}"
+                            echo "AZ_ACR_NAME (NONPROD_WESTEUROPE_AZACRNAME_PROP): ${AZ_ACR_NAME}"
+                            echo "AZ_AKS_CLUSTER_NAME (NONPROD_WESTEUROPE_AZAKSCLUSTERNAME_PROP): ${AZ_AKS_CLUSTER_NAME}"
+                            echo "AZ_RG_NAME (NONPROD_WESTEUROPE_AZRGNAME_PROP): ${AZ_RG_NAME}"
                         }
                     }
                 }
@@ -155,16 +161,16 @@ def call(Map pipelineParams) {
                     echo "BUILD_URL ${BUILD_URL}"
                     echo "JOB_URL ${JOB_URL}"
                     echo "CHANGE_AUTHOR_EMAIL ${GIT_COMMIT}"
-                    // echo "AZURE_DEV_WESTEUROPE_DNS_PROP ${AZURE_DEV_WESTEUROPE_DNS_PROP}"
-                    // echo "AZURE_SVC_HOSTNAME_PROP ${AZURE_SVC_HOSTNAME_PROP}"
-                    // echo "GIT_SVC_ACOUNT_EMAIL_PROP ${GIT_SVC_ACOUNT_EMAIL_PROP}"
-                    // echo "GIT_SVC_ACCOUNT_USER_PROP ${GIT_SVC_ACCOUNT_USER_PROP}"
-                    // echo "NONPROD_WESTEUROPE_AZRGNAME_PROP ${NONPROD_WESTEUROPE_AZRGNAME_PROP}"
-                    // echo "NONPROD_WESTEUROPE_AZACRNAME_PROP ${NONPROD_WESTEUROPE_AZACRNAME_PROP}"
-                    // echo "NONPROD_WESTEUROPE_AZAKSCLUSTERNAME_PROP ${NONPROD_WESTEUROPE_AZAKSCLUSTERNAME_PROP}"
-                    // echo "PROD_WESTEUROPE_AZRGNAME_PROP ${PROD_WESTEUROPE_AZRGNAME_PROP}"
-                    // echo "PROD_WESTEUROPE_AZACRNAME_PROP ${PROD_WESTEUROPE_AZACRNAME_PROP}"
-                    // echo "PROD_WESTEUROPE_AZAKSCLUSTERNAME_PROP ${PROD_WESTEUROPE_AZAKSCLUSTERNAME_PROP}"
+                    echo "AZURE_DEV_WESTEUROPE_DNS_PROP ${AZURE_DEV_WESTEUROPE_DNS_PROP}"
+                    echo "AZURE_SVC_HOSTNAME_PROP ${AZURE_SVC_HOSTNAME_PROP}"
+                    echo "GIT_SVC_ACOUNT_EMAIL_PROP ${GIT_SVC_ACOUNT_EMAIL_PROP}"
+                    echo "GIT_SVC_ACCOUNT_USER_PROP ${GIT_SVC_ACCOUNT_USER_PROP}"
+                    echo "NONPROD_WESTEUROPE_AZRGNAME_PROP ${NONPROD_WESTEUROPE_AZRGNAME_PROP}"
+                    echo "NONPROD_WESTEUROPE_AZACRNAME_PROP ${NONPROD_WESTEUROPE_AZACRNAME_PROP}"
+                    echo "NONPROD_WESTEUROPE_AZAKSCLUSTERNAME_PROP ${NONPROD_WESTEUROPE_AZAKSCLUSTERNAME_PROP}"
+                    echo "PROD_WESTEUROPE_AZRGNAME_PROP ${PROD_WESTEUROPE_AZRGNAME_PROP}"
+                    echo "PROD_WESTEUROPE_AZACRNAME_PROP ${PROD_WESTEUROPE_AZACRNAME_PROP}"
+                    echo "PROD_WESTEUROPE_AZAKSCLUSTERNAME_PROP ${PROD_WESTEUROPE_AZAKSCLUSTERNAME_PROP}"
 
                     script {
                         deploymentProperties = readProperties file:'deployment.properties'

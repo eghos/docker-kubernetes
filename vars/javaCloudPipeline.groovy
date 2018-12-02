@@ -9,7 +9,7 @@ def call(Map pipelineParams) {
             string(name: 'DOCKER_REPO',                         defaultValue: 'dtrdev.hip.red.cdtapps.com',               description: 'Docker Repo URL e.g. dtrdev.hip.red.cdtapps.com')
             string(name: 'INTERNAL_SVC_HOSTNAME',               defaultValue: 'dev.eu-west-1.svc.hipint.red.cdtapps.com', description: 'AWS Ingress Internal Host Path e.g. dev.eu-west-1.svc.hipint.red.cdtapps.com')
             string(name: 'AZ_INTERNAL_SVC_HOSTNAME',            defaultValue: '<ENV>-az-svc.<REGION>.cloudapp.azure.com', description: 'Azure Ingress Internal Host Path e.g. dev-az-svc.westeurope.cloudapp.azure.com')
-            string(name: 'KUBERNETES_NAMESPACE',                defaultValue: 'default',                                  description: 'The Kubernetes namespace for the service e.g. default')
+//            string(name: 'KUBERNETES_NAMESPACE',                defaultValue: 'default',                                  description: 'The Kubernetes namespace for the service e.g. default')
 //            string(name: 'NONPROD_WESTEUROPE_AZRGNAME',         defaultValue: 'ipimip-dev-westEurope-rg',                 description: 'Azure region name')
 //            string(name: 'NONPROD_WESTEUROPE_AZACRNAME',        defaultValue: 'acrwedevgupuy7',                           description: 'Azure container registry')
 //            string(name: 'NONPROD_WESTEUROPE_AZAKSCLUSTERNAME', defaultValue: 'akswedevgupuy7',                           description: 'Azure Kubernetes cluster name')
@@ -27,7 +27,7 @@ def call(Map pipelineParams) {
             INTERNAL_SVC_HOSTNAME    = "${params.INTERNAL_SVC_HOSTNAME}"
             AZ_INTERNAL_SVC_HOSTNAME = "${params.AZ_INTERNAL_SVC_HOSTNAME}"
             // SVC_PATH              = "${params.SVC_PATH}"
-            KUBERNETES_NAMESPACE     = "${params.KUBERNETES_NAMESPACE}"
+//            KUBERNETES_NAMESPACE     = "${params.KUBERNETES_NAMESPACE}"
 
             BRANCH_NAME_FULL         = env.BRANCH_NAME.replace('', '')
             IMAGE_NAME               = readMavenPom().getArtifactId()
