@@ -5,13 +5,13 @@ class cloudEnvironmentProps{
     def AZURE_PPE_WESTEUROPE_DNS            = "ppe-az-svc.westeurope.cloudapp.azure.com"
     def AZURE_PROD_WESTEUROPE_DNS           = "prod-az-svc.westeurope.cloudapp.azure.com"
 
-//    def NONPROD_WESTEUROPE_AZRGNAME         = "ipimip-dev-westEurope-rg"
-//    def NONPROD_WESTEUROPE_AZACRNAME        = "acrwedevgupuy7"
-//    def NONPROD_WESTEUROPE_AZAKSCLUSTERNAME = "akswedevgupuy7"
+    def NONPROD_WESTEUROPE_AZRGNAME         = "ipimip-dev-westEurope-rg"
+    def NONPROD_WESTEUROPE_AZACRNAME        = "acrwedevgupuy7"
+    def NONPROD_WESTEUROPE_AZAKSCLUSTERNAME = "akswedevgupuy7"
 
-    def NONPROD_WESTEUROPE_AZRGNAME         = "ipimip-test-westEurope-rg"
-    def NONPROD_WESTEUROPE_AZACRNAME        = "acrwetest5i4vqq"
-    def NONPROD_WESTEUROPE_AZAKSCLUSTERNAME = "akswetest5i4vqq"
+//    def NONPROD_WESTEUROPE_AZRGNAME         = "ipimip-test-westEurope-rg"
+//    def NONPROD_WESTEUROPE_AZACRNAME        = "acrwetest5i4vqq"
+//    def NONPROD_WESTEUROPE_AZAKSCLUSTERNAME = "akswetest5i4vqq"
 
     def PROD_WESTEUROPE_AZRGNAME            = "ipimip-ppe-westEurope-rg"
     def PROD_WESTEUROPE_AZACRNAME           = "acrweppeafsibk"
