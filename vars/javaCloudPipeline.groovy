@@ -136,7 +136,7 @@ def call(Map pipelineParams) {
                     sh 'whoami'
 
                     echo "GIT URL: ${GIT_URL}"
-                    echo "GIT URL2: ${GIT_URL2}"
+                    echo "GIT URL_MODIFIED: ${URL_MODIFIED}"
                     echo "BUILD_NUMBER ${BUILD_NUMBER}"
                     echo "BUILD_ID ${BUILD_ID}"
                     echo "BUILD_DISPLAY_NAME ${BUILD_DISPLAY_NAME}"
