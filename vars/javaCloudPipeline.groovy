@@ -293,7 +293,7 @@ def call(Map pipelineParams) {
                     withCredentials([azureServicePrincipal('sp-ipim-ip-aks')]) {
                         script {
                             AWS_DEV_REGION_MAP = AWS_DEV_REGION.collectEntries {
-                                ["${it}" : generateAwsDeployStage(it, "test")]
+                                ["${it}" : generateAwsDeployStage(it, "dev")]
                             }
                             AWS_TEST_REGION_MAP = AWS_TEST_REGION.collectEntries {
                                 ["${it}" : generateAwsDeployStage(it, "test")]
@@ -303,7 +303,7 @@ def call(Map pipelineParams) {
                             }
 
                             AZURE_DEV_REGION_MAP = AZURE_DEV_REGION.collectEntries {
-                                ["${it}" : generateAzureDeployStage(it, "dev")]
+                                ["${it}" : generateAzureDeployStage(it, "test")]
                             }
                             AZURE_TEST_REGION_MAP = AZURE_TEST_REGION.collectEntries {
                                 ["${it}" : generateAzureDeployStage(it, "test")]
