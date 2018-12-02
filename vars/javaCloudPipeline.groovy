@@ -4,20 +4,10 @@ def call(Map pipelineParams) {
         agent any
 
         parameters {
-//            string(name: 'REGION',                              defaultValue: 'ireland',                                  description: 'Target region deployment e.g. ireland, virginia')
             string(name: 'DOCKER_ORG',                          defaultValue: 'apimgt',                                   description: 'Docker Repository user e.g. apimgt')
             string(name: 'DOCKER_REPO',                         defaultValue: 'dtrdev.hip.red.cdtapps.com',               description: 'Docker Repo URL e.g. dtrdev.hip.red.cdtapps.com')
             string(name: 'INTERNAL_SVC_HOSTNAME',               defaultValue: 'dev.eu-west-1.svc.hipint.red.cdtapps.com', description: 'AWS Ingress Internal Host Path e.g. dev.eu-west-1.svc.hipint.red.cdtapps.com')
-            string(name: 'AZ_INTERNAL_SVC_HOSTNAME',            defaultValue: '<ENV>-az-svc.<REGION>.cloudapp.azure.com', description: 'Azure Ingress Internal Host Path e.g. dev-az-svc.westeurope.cloudapp.azure.com')
-//            string(name: 'KUBERNETES_NAMESPACE',                defaultValue: 'default',                                  description: 'The Kubernetes namespace for the service e.g. default')
-//            string(name: 'NONPROD_WESTEUROPE_AZRGNAME',         defaultValue: 'ipimip-dev-westEurope-rg',                 description: 'Azure region name')
-//            string(name: 'NONPROD_WESTEUROPE_AZACRNAME',        defaultValue: 'acrwedevgupuy7',                           description: 'Azure container registry')
-//            string(name: 'NONPROD_WESTEUROPE_AZAKSCLUSTERNAME', defaultValue: 'akswedevgupuy7',                           description: 'Azure Kubernetes cluster name')
-//            string(name: 'PROD_WESTEUROPE_AZRGNAME',            defaultValue: 'ipimip-ppe-westEurope-rg',                 description: 'Azure region name')
-//            string(name: 'PROD_WESTEUROPE_AZACRNAME',           defaultValue: 'acrweppeafsibk',                           description: 'Azure container registry')
-//            string(name: 'PROD_WESTEUROPE_AZAKSCLUSTERNAME',    defaultValue: 'aksweppeafsibk',                           description: 'Azure Kubernetes cluster name')
-//            string(name: 'GIT_SVC_ACOUNT_EMAIL',                defaultValue: 'l-apimgt-u-itsehbg@ikea.com',              description: 'GitHub Service Account Email')
-//            string(name: 'GIT_SVC_ACCOUNT_USER',                defaultValue: 'l-apimgt-u-itsehbg',                       description: 'GitHub Service Account Name')
+//            string(name: 'AZ_INTERNAL_SVC_HOSTNAME',            defaultValue: '<ENV>-az-svc.<REGION>.cloudapp.azure.com', description: 'Azure Ingress Internal Host Path e.g. dev-az-svc.westeurope.cloudapp.azure.com')
         }
 
         environment {
@@ -25,9 +15,7 @@ def call(Map pipelineParams) {
             ORG                      = "${params.DOCKER_ORG}"
             DOCKER_REPO              = "${params.DOCKER_REPO}"
             INTERNAL_SVC_HOSTNAME    = "${params.INTERNAL_SVC_HOSTNAME}"
-            AZ_INTERNAL_SVC_HOSTNAME = "${params.AZ_INTERNAL_SVC_HOSTNAME}"
-            // SVC_PATH              = "${params.SVC_PATH}"
-//            KUBERNETES_NAMESPACE     = "${params.KUBERNETES_NAMESPACE}"
+//            AZ_INTERNAL_SVC_HOSTNAME = "${params.AZ_INTERNAL_SVC_HOSTNAME}"
 
             BRANCH_NAME_FULL         = env.BRANCH_NAME.replace('', '')
             IMAGE_NAME               = readMavenPom().getArtifactId()
@@ -93,9 +81,6 @@ def call(Map pipelineParams) {
                         }
                         steps {
                             script {
-//                                AZ_ACR_NAME         = "${params.PROD_WESTEUROPE_AZACRNAME}"
-//                                AZ_AKS_CLUSTER_NAME = "${params.PROD_WESTEUROPE_AZAKSCLUSTERNAME}"
-//                                AZ_RG_NAME          = "${params.PROD_WESTEUROPE_AZRGNAME}"
                                 AZ_ACR_NAME         = "${PROD_WESTEUROPE_AZACRNAME_PROP}"
                                 AZ_AKS_CLUSTER_NAME = "${PROD_WESTEUROPE_AZAKSCLUSTERNAME_PROP}"
                                 AZ_RG_NAME          = "${PROD_WESTEUROPE_AZRGNAME_PROP}"
@@ -114,9 +99,6 @@ def call(Map pipelineParams) {
                         }
                         steps {
                             script {
-//                                AZ_ACR_NAME         = "${params.NONPROD_WESTEUROPE_AZACRNAME}"
-//                                AZ_AKS_CLUSTER_NAME = "${params.NONPROD_WESTEUROPE_AZAKSCLUSTERNAME}"
-//                                AZ_RG_NAME          = "${params.NONPROD_WESTEUROPE_AZRGNAME}"
                                 AZ_ACR_NAME         = "${NONPROD_WESTEUROPE_AZACRNAME_PROP}"
                                 AZ_AKS_CLUSTER_NAME = "${NONPROD_WESTEUROPE_AZAKSCLUSTERNAME_PROP}"
                                 AZ_RG_NAME          = "${NONPROD_WESTEUROPE_AZRGNAME_PROP}"
@@ -443,9 +425,8 @@ def call(Map pipelineParams) {
                         withEnv(["GIT_SSH_COMMAND=ssh -o StrictHostKeyChecking=no -o User=${GIT_SVC_ACCOUNT_USER_PROP} -i ${SSH_KEY}"]) {
                             script {
                                 sh 'git remote rm origin'
-//                                sh "git remote add origin git@git.build.ingka.ikea.com:IPIM-IP/${IMAGE_NAME}.git"
+                                //sh "git remote add origin git@git.build.ingka.ikea.com:IPIM-IP/${IMAGE_NAME}.git"
                                 sh "git remote add origin ${GIT_URL_MODIFIED}"
-
                                 sh 'git config --global user.email "l-apimgt-u-itsehbg@ikea.com"'
                                 sh 'git config --global user.name "l-apimgt-u-itsehbg"'
                                 sh 'git add pom.xml'
@@ -511,7 +492,7 @@ def generateAzureDeployStage(region, env) {
             withCredentials([azureServicePrincipal('sp-ipim-ip-aks')]) {
                 script {
                     ACRLOGINSERVER = sh(returnStdout: true, script: "az acr show --resource-group ${AZ_RG_NAME} --name ${AZ_ACR_NAME} --query \"loginServer\" --output tsv").trim()
-                    AZ_ENV_REGION_SVC_HOSTNAME = "${AZ_INTERNAL_SVC_HOSTNAME}".replace('<ENV>', "${env}").replace('<REGION>', "${region}")
+                    AZ_ENV_REGION_SVC_HOSTNAME = "${AZURE_DEV_WESTEUROPE_DNS_PROPE}".replace('<ENV>', "${env}").replace('<REGION>', "${region}")
                     sh 'chmod +x ./build/*.yaml'
                     sh """
                         cd build

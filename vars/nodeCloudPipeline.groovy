@@ -4,21 +4,11 @@ def call(Map pipelineParams) {
         agent any
 
         parameters {
-//            string(name: 'REGION',                              defaultValue: 'ireland',                                  description: 'Target region deployment e.g. ireland, virginia')
             string(name: 'DOCKER_ORG',                          defaultValue: 'apimgt',                                   description: 'Docker Repository user e.g. apimgt')
             string(name: 'DOCKER_REPO',                         defaultValue: 'dtrdev.hip.red.cdtapps.com',               description: 'Docker Repo URL e.g. dtrdev.hip.red.cdtapps.com')
             string(name: 'INTERNAL_SVC_HOSTNAME',               defaultValue: 'dev.eu-west-1.svc.hipint.red.cdtapps.com', description: 'AWS Ingress Internal Host Path e.g. dev.eu-west-1.svc.hipint.red.cdtapps.com')
             string(name: 'AZ_INTERNAL_SVC_HOSTNAME',            defaultValue: '<ENV>-az-svc.<REGION>.cloudapp.azure.com', description: 'Azure Ingress Internal Host Path e.g. dev-az-svc.westeurope.cloudapp.azure.com')
-//            string(name: 'KUBERNETES_NAMESPACE',                defaultValue: 'default',                                  description: 'The Kubernetes namespace for the service e.g. default')
-//            string(name: 'NONPROD_WESTEUROPE_AZRGNAME',         defaultValue: 'ipimip-dev-westEurope-rg',                 description: 'Azure region name')
-//            string(name: 'NONPROD_WESTEUROPE_AZACRNAME',        defaultValue: 'acrwedevgupuy7',                           description: 'Azure container registry')
-//            string(name: 'NONPROD_WESTEUROPE_AZAKSCLUSTERNAME', defaultValue: 'akswedevgupuy7',                           description: 'Azure Kubernetes cluster name')
-//            string(name: 'PROD_WESTEUROPE_AZRGNAME',            defaultValue: 'ipimip-ppe-westEurope-rg',                 description: 'Azure region name')
-//            string(name: 'PROD_WESTEUROPE_AZACRNAME',           defaultValue: 'acrweppeafsibk',                           description: 'Azure container registry')
-//            string(name: 'PROD_WESTEUROPE_AZAKSCLUSTERNAME',    defaultValue: 'aksweppeafsibk',                           description: 'Azure Kubernetes cluster name')
-//            string(name: 'GIT_SVC_ACOUNT_EMAIL',                defaultValue: 'l-apimgt-u-itsehbg@ikea.com',              description: 'GitHub Service Account Email')
-//            string(name: 'GIT_SVC_ACCOUNT_USER',                defaultValue: 'l-apimgt-u-itsehbg',                       description: 'GitHub Service Account Name')
-        }
+}
 
         environment {
 
@@ -26,7 +16,6 @@ def call(Map pipelineParams) {
             DOCKER_REPO              = "${params.DOCKER_REPO}"
             INTERNAL_SVC_HOSTNAME    = "${params.INTERNAL_SVC_HOSTNAME}"
             AZ_INTERNAL_SVC_HOSTNAME = "${params.AZ_INTERNAL_SVC_HOSTNAME}"
-//            KUBERNETES_NAMESPACE     = "${params.KUBERNETES_NAMESPACE}"
 
             BRANCH_NAME_FULL         = env.BRANCH_NAME.replace('', '')
             IMAGE_NAME               = """${sh (
@@ -40,6 +29,8 @@ def call(Map pipelineParams) {
             DEV_SNAPSHOT_VERSION     = "1.0.${BUILD_NUMBER}-SNAPSHOT"
             RELEASE_NUMBER           = env.BRANCH_NAME.replace('release/', '')
             RELEASE_VERSION          = "${RELEASE_NUMBER}.RELEASE"
+
+            GIT_URL_MODIFIED         = env.GIT_URL.replace('https://', 'git@').replace('com/', 'com:')
 
             AWS_DOCKER_TAG           = "${DOCKER_REPO}/${ORG}/${IMAGE_NAME}"
             DOCKER_ORG_IMAGE         = "${ORG}/${IMAGE_NAME}"
@@ -67,7 +58,6 @@ def call(Map pipelineParams) {
             PROD_WESTEUROPE_AZRGNAME_PROP            = cloudEnvironmentProps.getProdWesteuropeAzRgName()
             PROD_WESTEUROPE_AZACRNAME_PROP           = cloudEnvironmentProps.getProdWesteuropeAzAcrName()
             PROD_WESTEUROPE_AZAKSCLUSTERNAME_PROP    = cloudEnvironmentProps.getProdWesteuropeAzAksClusterName()
-//            GIT_URL =               env.GIT_URL.replace('https://', 'git@')
         }
 
         tools {
@@ -103,9 +93,6 @@ def call(Map pipelineParams) {
                         }
                         steps {
                             script {
-//                                AZ_ACR_NAME         = "${params.PROD_WESTEUROPE_AZACRNAME}"
-//                                AZ_AKS_CLUSTER_NAME = "${params.PROD_WESTEUROPE_AZAKSCLUSTERNAME}"
-//                                AZ_RG_NAME          = "${params.PROD_WESTEUROPE_AZRGNAME}"
                                 AZ_ACR_NAME         = "${PROD_WESTEUROPE_AZACRNAME_PROP}"
                                 AZ_AKS_CLUSTER_NAME = "${PROD_WESTEUROPE_AZAKSCLUSTERNAME_PROP}"
                                 AZ_RG_NAME          = "${PROD_WESTEUROPE_AZRGNAME_PROP}"
@@ -124,9 +111,6 @@ def call(Map pipelineParams) {
                         }
                         steps {
                             script {
-//                                AZ_ACR_NAME         = "${params.NONPROD_WESTEUROPE_AZACRNAME}"
-//                                AZ_AKS_CLUSTER_NAME = "${params.NONPROD_WESTEUROPE_AZAKSCLUSTERNAME}"
-//                                AZ_RG_NAME          = "${params.NONPROD_WESTEUROPE_AZRGNAME}"
                                 AZ_ACR_NAME         = "${NONPROD_WESTEUROPE_AZACRNAME_PROP}"
                                 AZ_AKS_CLUSTER_NAME = "${NONPROD_WESTEUROPE_AZAKSCLUSTERNAME_PROP}"
                                 AZ_RG_NAME          = "${NONPROD_WESTEUROPE_AZRGNAME_PROP}"
@@ -145,7 +129,8 @@ def call(Map pipelineParams) {
                     sh 'java -version'
                     sh 'whoami'
 
-                    echo "GIT URL: ${GIT_URL}"
+                    echo "GIT_URL: ${GIT_URL}"
+                    echo "GIT_URL_MODIFIED: ${GIT_URL_MODIFIED}"
                     echo "BUILD_NUMBER ${BUILD_NUMBER}"
                     echo "BUILD_ID ${BUILD_ID}"
                     echo "BUILD_DISPLAY_NAME ${BUILD_DISPLAY_NAME}"
@@ -437,25 +422,24 @@ def call(Map pipelineParams) {
                 }
             }
 
-//             stage('Commit Updated Version') {
-//                 steps {
-//                     withCredentials([sshUserPrivateKey(credentialsId: 'l-apimgt-u-itsehbgATikea.com', keyFileVariable: 'SSH_KEY')]) {
-//                         withEnv(["GIT_SSH_COMMAND=ssh -o StrictHostKeyChecking=no -o User=${GIT_USER} -i ${SSH_KEY}"]) {
-//                             script {
-//                                 sh 'git remote rm origin'
-//                                 sh 'git remote add origin "git@git.build.ingka.ikea.com:IPIM-IP/kafka-rate-consumer.git"'
-// //                                 sh "git remote set-url origin ${GIT_URL}"
-
-//                                 sh 'git config --global user.email "l-apimgt-u-itsehbg@ikea.com"'
-//                                 sh 'git config --global user.name "l-apimgt-u-itsehbg"'
-//                                 sh 'git add package.json'
-//                                 sh 'git commit -am "System - Update Package Version [ci skip]"'
-//                                 sh 'git push origin "${BRANCH_NAME_FULL}"'
-//                             }
-//                         }
-//                     }
-//                 }
-//             }
+             stage('Commit Updated Version') {
+                 steps {
+                     withCredentials([sshUserPrivateKey(credentialsId: 'l-apimgt-u-itsehbgATikea.com', keyFileVariable: 'SSH_KEY')]) {
+                         withEnv(["GIT_SSH_COMMAND=ssh -o StrictHostKeyChecking=no -o User=${GIT_USER} -i ${SSH_KEY}"]) {
+                             script {
+                                 sh 'git remote rm origin'
+                                 //sh "git remote add origin git@git.build.ingka.ikea.com:IPIM-IP/${IMAGE_NAME}.git"
+                                 sh "git remote add origin ${GIT_URL_MODIFIED}"
+                                 sh 'git config --global user.email "l-apimgt-u-itsehbg@ikea.com"'
+                                 sh 'git config --global user.name "l-apimgt-u-itsehbg"'
+                                 sh 'git add pom.xml'
+                                 sh 'git commit -am "System - Update POM Version [ci skip]"'
+                                 sh 'git push origin "${BRANCH_NAME_FULL}"';
+                             }
+                         }
+                     }
+                 }
+             }
 
             stage('Clean Up') {
                 steps {
