@@ -303,7 +303,7 @@ def call(Map pipelineParams) {
                             }
 
                             AZURE_DEV_REGION_MAP = AZURE_DEV_REGION.collectEntries {
-                                ["${it}" : generateAzureDeployStage(it, "test")]
+                                ["${it}" : generateAzureDeployStage(it, "dev")]
                             }
                             AZURE_TEST_REGION_MAP = AZURE_TEST_REGION.collectEntries {
                                 ["${it}" : generateAzureDeployStage(it, "test")]
@@ -435,25 +435,25 @@ def call(Map pipelineParams) {
                 }
             }
 
-//            stage('Commit Updated Version') {
-//                steps {
-//                    withCredentials([sshUserPrivateKey(credentialsId: 'l-apimgt-u-itsehbgATikea.com', keyFileVariable: 'SSH_KEY')]) {
-//                        withEnv(["GIT_SSH_COMMAND=ssh -o StrictHostKeyChecking=no -o User=${GIT_SVC_ACCOUNT_USER_PROP} -i ${SSH_KEY}"]) {
-//                            script {
-//                                sh 'git remote rm origin'
-//                                sh 'git remote add origin "git@git.build.ingka.ikea.com:IPIM-IP/price-service.git"'
-////                                 sh "git remote set-url origin ${GIT_URL}"
-//
-//                                sh 'git config --global user.email "l-apimgt-u-itsehbg@ikea.com"'
-//                                sh 'git config --global user.name "l-apimgt-u-itsehbg"'
-//                                sh 'git add pom.xml'
-//                                sh 'git commit -am "System - Update POM Version [ci skip]"'
-//                                sh 'git push origin "${BRANCH_NAME_FULL}"'
-//                            }
-//                        }
-//                    }
-//                }
-//            }
+            stage('Commit Updated Version') {
+                steps {
+                    withCredentials([sshUserPrivateKey(credentialsId: 'l-apimgt-u-itsehbgATikea.com', keyFileVariable: 'SSH_KEY')]) {
+                        withEnv(["GIT_SSH_COMMAND=ssh -o StrictHostKeyChecking=no -o User=${GIT_SVC_ACCOUNT_USER_PROP} -i ${SSH_KEY}"]) {
+                            script {
+                                sh 'git remote rm origin'
+                                sh 'git remote add origin "git@git.build.ingka.ikea.com:IPIM-IP/price-service.git"'
+//                                 sh "git remote set-url origin ${GIT_URL}"
+
+                                sh 'git config --global user.email "l-apimgt-u-itsehbg@ikea.com"'
+                                sh 'git config --global user.name "l-apimgt-u-itsehbg"'
+                                sh 'git add pom.xml'
+                                sh 'git commit -am "System - Update POM Version [ci skip]"'
+                                sh 'git push origin "${BRANCH_NAME_FULL}"'
+                            }
+                        }
+                    }
+                }
+            }
 
             stage('Clean Up') {
                 steps {

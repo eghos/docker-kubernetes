@@ -305,7 +305,7 @@ def call(Map pipelineParams) {
                             }
 
                             AZURE_DEV_REGION_MAP = AZURE_DEV_REGION.collectEntries {
-                                ["${it}" : generateAzureDeployStage(it, "test")]
+                                ["${it}" : generateAzureDeployStage(it, "dev")]
                             }
                             AZURE_TEST_REGION_MAP = AZURE_TEST_REGION.collectEntries {
                                 ["${it}" : generateAzureDeployStage(it, "test")]
