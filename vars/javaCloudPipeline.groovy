@@ -492,7 +492,7 @@ def generateAzureDeployStage(region, env) {
             withCredentials([azureServicePrincipal('sp-ipim-ip-aks')]) {
                 script {
                     ACRLOGINSERVER = sh(returnStdout: true, script: "az acr show --resource-group ${AZ_RG_NAME} --name ${AZ_ACR_NAME} --query \"loginServer\" --output tsv").trim()
-                    AZ_ENV_REGION_SVC_HOSTNAME = "${AZURE_DEV_WESTEUROPE_DNS_PROPE}".replace('<ENV>', "${env}").replace('<REGION>', "${region}")
+                    AZ_ENV_REGION_SVC_HOSTNAME = "${AZURE_DEV_WESTEUROPE_DNS_PROP}".replace('<ENV>', "${env}").replace('<REGION>', "${region}")
                     sh 'chmod +x ./build/*.yaml'
                     sh """
                         cd build
