@@ -61,6 +61,8 @@ def call(Map pipelineParams) {
             PROD_WESTEUROPE_AZACRNAME_PROP           = cloudEnvironmentProps.getProdWesteuropeAzAcrName()
             PROD_WESTEUROPE_AZAKSCLUSTERNAME_PROP    = cloudEnvironmentProps.getProdWesteuropeAzAksClusterName()
 //            GIT_URL =               env.GIT_URL.replace('https://', 'git@')
+
+            SVC_NAME = "price-service"
         }
 
         stages {
@@ -442,7 +444,7 @@ def call(Map pipelineParams) {
                             script {
                                 sh 'git remote rm origin'
 //                                sh 'git remote add origin "git@git.build.ingka.ikea.com:IPIM-IP/price-service.git"'
-                                sh "git remote add origin git@git.build.ingka.ikea.com:IPIM-IP/price-service.git"
+                                sh "git remote add origin git@git.build.ingka.ikea.com:IPIM-IP/${SVC_NAME}.git"
 //                                 sh "git remote set-url origin ${GIT_URL}"
 
                                 sh 'git config --global user.email "l-apimgt-u-itsehbg@ikea.com"'
