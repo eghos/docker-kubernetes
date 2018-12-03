@@ -322,7 +322,7 @@ def call(Map pipelineParams) {
                         sh """
                           cd ./build
                           export APIARY_API_KEY=890e555a1d3107539c130f23b9494155
-                          apiary fetch --api-name ${APIARY_PROJECT_NAME_VAR} --output ${APIARY_PROJECT_NAME_VAR}.apib
+//                          apiary fetch --api-name ${APIARY_PROJECT_NAME_VAR} --output ${APIARY_PROJECT_NAME_VAR}.apib
                           """
                     }
                 }
