@@ -211,22 +211,22 @@ def call(Map pipelineParams) {
                 }
             }
 
-            stage('Code Build') {
-                when {
-                    anyOf {
-                        branch "develop*";
-                        branch "PR*"
-                        branch "release/*"
-                        branch "hotfix/*"
-                    }
-                }
-                steps {
-                    withCredentials(bindings: [usernamePassword(credentialsId: 'bc608fa5-71e6-4e08-b769-af3ca6024715', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
-                        sh 'chmod +x ./mvnw'
-                        sh './mvnw -B -T 4 -fae -f pom.xml -Dmaven.test.skip=true clean install'
-                    }
-                }
-            }
+//            stage('Code Build') {
+//                when {
+//                    anyOf {
+//                        branch "develop*";
+//                        branch "PR*"
+//                        branch "release/*"
+//                        branch "hotfix/*"
+//                    }
+//                }
+//                steps {
+//                    withCredentials(bindings: [usernamePassword(credentialsId: 'bc608fa5-71e6-4e08-b769-af3ca6024715', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
+//                        sh 'chmod +x ./mvnw'
+//                        sh './mvnw -B -T 4 -fae -f pom.xml -Dmaven.test.skip=true clean install'
+//                    }
+//                }
+//            }
 
         //     stage('Code Test') {
         //         when {
@@ -257,89 +257,89 @@ def call(Map pipelineParams) {
         //         }
         //     }
 
-            stage('Code Deploy to Nexus') {
-                when {
-                    anyOf {
-                        branch "develop*";
-                        branch "release/*"
-                    }
-                }
-                steps {
-                    sh 'chmod +x ./mvnw'
-                    sh './mvnw -f pom.xml -Dmaven.test.skip=true deploy'
-                }
-            }
-
-            stage('Docker Build') {
-                when {
-                    anyOf {
-                        branch "develop*";
-                        branch "release/*";
-                    }
-                }
-                steps {
-                    withCredentials([azureServicePrincipal('sp-ipim-ip-aks')]) {
-                        script {
-                            AWS_DEV_REGION_MAP = AWS_DEV_REGION.collectEntries {
-                                ["${it}" : generateAwsDeployStage(it, "dev")]
-                            }
-                            AWS_TEST_REGION_MAP = AWS_TEST_REGION.collectEntries {
-                                ["${it}" : generateAwsDeployStage(it, "test")]
-                            }
-                            AWS_PROD_REGION_MAP = AWS_PROD_REGION.collectEntries {
-                                ["${it}" : generateAwsDeployStage(it, "prod")]
-                            }
-
-                            AZURE_DEV_REGION_MAP = AZURE_DEV_REGION.collectEntries {
-                                ["${it}" : generateAzureDeployStage(it, "dev")]
-                            }
-                            AZURE_TEST_REGION_MAP = AZURE_TEST_REGION.collectEntries {
-                                ["${it}" : generateAzureDeployStage(it, "test")]
-                            }
-                            AZURE_PROD_REGION_MAP = AZURE_PROD_REGION.collectEntries {
-                                ["${it}" : generateAzureDeployStage(it, "prod")]
-                            }
-
-                            sh "az login --service-principal -u ${AZURE_CLIENT_ID} -p ${AZURE_CLIENT_SECRET} -t ${AZURE_TENANT_ID}"
-                            sh "az account set -s ${AZURE_SUBSCRIPTION_ID}"
-                            sh "az acr login --name ${AZ_ACR_NAME}"
-                            sh "az aks get-credentials --resource-group=${AZ_RG_NAME} --name=${AZ_AKS_CLUSTER_NAME}"
-                            ACR_LOGIN_SERVER = sh(returnStdout: true, script: "az acr show --resource-group ${AZ_RG_NAME} --name ${AZ_ACR_NAME} --query \"loginServer\" --output tsv").trim()
-                            sh "docker build -t ${ACR_LOGIN_SERVER}/${DOCKER_ORG_IMAGE}:${DOCKER_VERSION} ."
-                            sh "docker push ${ACR_LOGIN_SERVER}/${DOCKER_ORG_IMAGE}:${DOCKER_VERSION}"
-
-                        }
-                    }
-                }
-            }
-
-            stage ('DEV Deploy - AWS') {
-                when {
-                    allOf {
-                        branch "develop*";
-                        expression { DEPLOY_TO_AWS == 'true' }
-                    }
-                }
-                steps {
-                    script {
-                        parallel AWS_DEV_REGION_MAP
-                    }
-                }
-            }
-
-            stage ('DEV Deploy - Azure') {
-                when {
-                    allOf {
-                        branch "develop*";
-                        expression { DEPLOY_TO_AZURE == 'true' }
-                    }
-                }
-                steps {
-                    script {
-                        parallel AZURE_DEV_REGION_MAP
-                    }
-                }
-            }
+//            stage('Code Deploy to Nexus') {
+//                when {
+//                    anyOf {
+//                        branch "develop*";
+//                        branch "release/*"
+//                    }
+//                }
+//                steps {
+//                    sh 'chmod +x ./mvnw'
+//                    sh './mvnw -f pom.xml -Dmaven.test.skip=true deploy'
+//                }
+//            }
+//
+//            stage('Docker Build') {
+//                when {
+//                    anyOf {
+//                        branch "develop*";
+//                        branch "release/*";
+//                    }
+//                }
+//                steps {
+//                    withCredentials([azureServicePrincipal('sp-ipim-ip-aks')]) {
+//                        script {
+//                            AWS_DEV_REGION_MAP = AWS_DEV_REGION.collectEntries {
+//                                ["${it}" : generateAwsDeployStage(it, "dev")]
+//                            }
+//                            AWS_TEST_REGION_MAP = AWS_TEST_REGION.collectEntries {
+//                                ["${it}" : generateAwsDeployStage(it, "test")]
+//                            }
+//                            AWS_PROD_REGION_MAP = AWS_PROD_REGION.collectEntries {
+//                                ["${it}" : generateAwsDeployStage(it, "prod")]
+//                            }
+//
+//                            AZURE_DEV_REGION_MAP = AZURE_DEV_REGION.collectEntries {
+//                                ["${it}" : generateAzureDeployStage(it, "dev")]
+//                            }
+//                            AZURE_TEST_REGION_MAP = AZURE_TEST_REGION.collectEntries {
+//                                ["${it}" : generateAzureDeployStage(it, "test")]
+//                            }
+//                            AZURE_PROD_REGION_MAP = AZURE_PROD_REGION.collectEntries {
+//                                ["${it}" : generateAzureDeployStage(it, "prod")]
+//                            }
+//
+//                            sh "az login --service-principal -u ${AZURE_CLIENT_ID} -p ${AZURE_CLIENT_SECRET} -t ${AZURE_TENANT_ID}"
+//                            sh "az account set -s ${AZURE_SUBSCRIPTION_ID}"
+//                            sh "az acr login --name ${AZ_ACR_NAME}"
+//                            sh "az aks get-credentials --resource-group=${AZ_RG_NAME} --name=${AZ_AKS_CLUSTER_NAME}"
+//                            ACR_LOGIN_SERVER = sh(returnStdout: true, script: "az acr show --resource-group ${AZ_RG_NAME} --name ${AZ_ACR_NAME} --query \"loginServer\" --output tsv").trim()
+//                            sh "docker build -t ${ACR_LOGIN_SERVER}/${DOCKER_ORG_IMAGE}:${DOCKER_VERSION} ."
+//                            sh "docker push ${ACR_LOGIN_SERVER}/${DOCKER_ORG_IMAGE}:${DOCKER_VERSION}"
+//
+//                        }
+//                    }
+//                }
+//            }
+//
+//            stage ('DEV Deploy - AWS') {
+//                when {
+//                    allOf {
+//                        branch "develop*";
+//                        expression { DEPLOY_TO_AWS == 'true' }
+//                    }
+//                }
+//                steps {
+//                    script {
+//                        parallel AWS_DEV_REGION_MAP
+//                    }
+//                }
+//            }
+//
+//            stage ('DEV Deploy - Azure') {
+//                when {
+//                    allOf {
+//                        branch "develop*";
+//                        expression { DEPLOY_TO_AZURE == 'true' }
+//                    }
+//                }
+//                steps {
+//                    script {
+//                        parallel AZURE_DEV_REGION_MAP
+//                    }
+//                }
+//            }
 
             stage ('TEST Deploy - AWS') {
                 when {
