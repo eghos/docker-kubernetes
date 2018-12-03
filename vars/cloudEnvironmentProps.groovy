@@ -1,5 +1,6 @@
 //#!/usr/bin/env groovy
 class cloudEnvironmentProps{
+    def APIARY_IO_TOKEN                     = "890e555a1d3107539c130f23b9494155"
     def AZURE_DEV_WESTEUROPE_DNS            = "dev-az-svc.westeurope.cloudapp.azure.com"
     def AZURE_TEST_WESTEUROPE_DNS           = "test-az-svc.westeurope.cloudapp.azure.com"
     def AZURE_PPE_WESTEUROPE_DNS            = "ppe-az-svc.westeurope.cloudapp.azure.com"
@@ -22,6 +23,9 @@ class cloudEnvironmentProps{
     def GIT_SVC_ACOUNT_EMAIL                = "l-apimgt-u-itsehbg@ikea.com"
     def GIT_SVC_ACCOUNT_USER                = "l-apimgt-u-itsehbg"
 
+    def getApiaryIoToken(){
+        return APIARY_IO_TOKEN
+    }
     def getAzureDevWesteuropeDns(){
         return AZURE_DEV_WESTEUROPE_DNS
     }
