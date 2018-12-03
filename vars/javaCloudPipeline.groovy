@@ -315,7 +315,7 @@ def call(Map pipelineParams) {
             stage('Fetch Apiary Definition') {
                 steps {
                     script {
-                        echo "hey!"
+                        echo "${APIARY_PROJECT_NAME}"
 //                        TEST1 = ${APIARY_PROJECT_NAME}
 //                        echo "${TEST1}"
 //                        sh """export APIARY_PROJECT_NAME_VAR=${APIARY_PROJECT_NAME}
