@@ -1,9 +1,10 @@
 //#!/usr/bin/env groovy
 class cloudEnvironmentProps{
-    def AZURE_DEV_WESTEUROPE_DNS            = "test-az-svc.westeurope.cloudapp.azure.com"
+    def AZURE_DEV_WESTEUROPE_DNS            = "dev-az-svc.westeurope.cloudapp.azure.com"
     def AZURE_TEST_WESTEUROPE_DNS           = "test-az-svc.westeurope.cloudapp.azure.com"
     def AZURE_PPE_WESTEUROPE_DNS            = "ppe-az-svc.westeurope.cloudapp.azure.com"
     def AZURE_PROD_WESTEUROPE_DNS           = "prod-az-svc.westeurope.cloudapp.azure.com"
+    def AZURE_PROD_CENTRALUS_DNS            = "prod-az-svc.centralus.cloudapp.azure.com"
 
     def NONPROD_WESTEUROPE_AZRGNAME         = "ipimip-dev-westEurope-rg"
     def NONPROD_WESTEUROPE_AZACRNAME        = "acrwedevgupuy7"
@@ -23,6 +24,18 @@ class cloudEnvironmentProps{
 
     def getAzureDevWesteuropeDns(){
         return AZURE_DEV_WESTEUROPE_DNS
+    }
+    def getAzureTestWesteuropeDns(){
+        return AZURE_TEST_WESTEUROPE_DNS
+    }
+    def getAzurePpeWesteuropeDns(){
+        return AZURE_PPE_WESTEUROPE_DNS
+    }
+    def getAzureProdWesteuropeDns(){
+        return AZURE_PROD_WESTEUROPE_DNS
+    }
+    def getAzureProdCentralUsDns(){
+        return AZURE_PROD_CENTRALUS_DNS
     }
     def getNonProdWesteuropeAzRgName(){
         return NONPROD_WESTEUROPE_AZRGNAME

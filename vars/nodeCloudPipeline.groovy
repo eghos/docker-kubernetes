@@ -7,8 +7,7 @@ def call(Map pipelineParams) {
             string(name: 'DOCKER_ORG',                          defaultValue: 'apimgt',                                   description: 'Docker Repository user e.g. apimgt')
             string(name: 'DOCKER_REPO',                         defaultValue: 'dtrdev.hip.red.cdtapps.com',               description: 'Docker Repo URL e.g. dtrdev.hip.red.cdtapps.com')
             string(name: 'INTERNAL_SVC_HOSTNAME',               defaultValue: 'dev.eu-west-1.svc.hipint.red.cdtapps.com', description: 'AWS Ingress Internal Host Path e.g. dev.eu-west-1.svc.hipint.red.cdtapps.com')
-            string(name: 'AZ_INTERNAL_SVC_HOSTNAME',            defaultValue: '<ENV>-az-svc.<REGION>.cloudapp.azure.com', description: 'Azure Ingress Internal Host Path e.g. dev-az-svc.westeurope.cloudapp.azure.com')
-}
+        }
 
         environment {
 
@@ -49,6 +48,10 @@ def call(Map pipelineParams) {
             AZ_RG_NAME               = ""
 
             AZURE_DEV_WESTEUROPE_DNS_PROP            = cloudEnvironmentProps.getAzureDevWesteuropeDns()
+            AZURE_TEST_WESTEUROPE_DNS_PROP           = cloudEnvironmentProps.getAzureTestWesteuropeDns()
+            AZURE_PPE_WESTEUROPE_DNS_PROP            = cloudEnvironmentProps.getAzurePpeWesteuropeDns()
+            AZURE_PROD_WESTEUROPE_DNS_PROP           = cloudEnvironmentProps.getAzureProdWesteuropeDns()
+            AZURE_PROD_CENTRALUS_DNS_PROP            = cloudEnvironmentProps.getAzureProdCentralUsDns()
             AZURE_SVC_HOSTNAME_PROP                  = cloudEnvironmentProps.getAzureSvcHostname()
             GIT_SVC_ACOUNT_EMAIL_PROP                = cloudEnvironmentProps.getGitSvcAccountEmail()
             GIT_SVC_ACCOUNT_USER_PROP                = cloudEnvironmentProps.getGitSvcAccountUser()
@@ -495,7 +498,7 @@ def generateAzureDeployStage(region, env) {
             withCredentials([azureServicePrincipal('sp-ipim-ip-aks')]) {
                 script {
                     ACRLOGINSERVER = sh(returnStdout: true, script: "az acr show --resource-group ${AZ_RG_NAME} --name ${AZ_ACR_NAME} --query \"loginServer\" --output tsv").trim()
-                    AZ_ENV_REGION_SVC_HOSTNAME = "${AZ_INTERNAL_SVC_HOSTNAME}".replace('<ENV>', "${env}").replace('<REGION>', "${region}")
+                    AZ_ENV_REGION_SVC_HOSTNAME = "${AZURE_DEV_WESTEUROPE_DNS_PROP}".replace('<ENV>', "${env}").replace('<REGION>', "${region}")
                     sh 'chmod +x ./build/*.yaml'
                     sh """
                         cd build
