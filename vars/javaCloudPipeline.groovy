@@ -316,13 +316,13 @@ def call(Map pipelineParams) {
                 steps {
 
                     script {
-                        echo "${APIARY_PROJECT_NAME}"
+//                        echo "${APIARY_PROJECT_NAME}"
 //                        TEST1 = ${APIARY_PROJECT_NAME}
 //                        echo "${TEST1}"
-//                        sh """export APIARY_PROJECT_NAME_VAR=${APIARY_PROJECT_NAME}
-//                          cd ./build
-//                          export APIARY_API_KEY=890e555a1d3107539c130f23b9494155
-//                          apiary fetch --api-name $APIARY_PROJECT_NAME_VAR --output $APIARY_PROJECT_NAME_VAR.apib"""
+                        sh """export APIARY_PROJECT_NAME_VAR=${APIARY_PROJECT_NAME}
+                          cd ./build
+                          export APIARY_API_KEY=890e555a1d3107539c130f23b9494155
+                          apiary fetch --api-name ${APIARY_PROJECT_NAME_VAR} --output ${APIARY_PROJECT_NAME_VAR}.apib"""
                     }
                 }
 
