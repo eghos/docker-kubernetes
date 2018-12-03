@@ -314,8 +314,8 @@ def call(Map pipelineParams) {
 
             stage('Fetch Apiary Definition') {
                 steps {
-                    sh 'export APIARY_API_KEY=890e555a1d3107539c130f23b9494155'
-                    sh 'apiary fetch --api-name saferhomeapi'
+                    sh '''export APIARY_API_KEY=890e555a1d3107539c130f23b9494155'
+                          apiary fetch --api-name saferhomeapi'''
                 }
 
             }
