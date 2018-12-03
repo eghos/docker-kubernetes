@@ -56,22 +56,23 @@ def call(Map pipelineParams) {
 
         stages {
 
-//            stage("Skip CICD?") {
-//                when {
-//                    expression {
-//                        result = sh (script: "git log -1 | grep '.*\\[ci skip\\].*'", returnStatus: true)
-//                        result == 0
-//                    }
-//                }
-//                steps {
+            stage("Skip CICD?") {
+                when {
+                    expression {
+                        result = sh (script: "git log -1 | grep '.*\\[ci skip\\].*'", returnStatus: true)
+                        result == 0
+                    }
+                }
+                steps {
 //                    script {
 //                        echo 'Got ci=skip, aborting build'
 //                        currentBuild.result = 'ABORTED'
 //                        error('CI-Skip')
 //                    }
-//                }
-                stageSkipCICD()
-//            }
+                    stageSkipCICD()
+                }
+
+            }
 
             stage('Setup K8S Config') {
                 parallel {
