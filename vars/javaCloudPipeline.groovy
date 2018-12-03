@@ -316,7 +316,7 @@ def call(Map pipelineParams) {
                 steps {
                     sh """cd ./build
                           export APIARY_API_KEY=890e555a1d3107539c130f23b9494155
-                          apiary fetch --api-name saferhomeapi --output saferhomeapi.apib"""
+                          apiary fetch --api-name priceapi --output priceapi.apib"""
                 }
 
             }
@@ -386,7 +386,7 @@ def call(Map pipelineParams) {
                                 sh 'git config --global user.email "l-apimgt-u-itsehbg@ikea.com"'
                                 sh 'git config --global user.name "l-apimgt-u-itsehbg"'
                                 sh 'git add pom.xml'
-                                sh 'git add ./build/saferhomeapi.apib'
+                                sh 'git add ./build/priceapi.apib'
                                 sh 'git commit -am "System - Update POM Version [ci skip]"'
                                 sh 'git push origin "${BRANCH_NAME_FULL}"'
                             }
