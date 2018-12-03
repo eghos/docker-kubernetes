@@ -38,6 +38,7 @@ def call(Map pipelineParams) {
             AZ_AKS_CLUSTER_NAME      = ""
             AZ_RG_NAME               = ""
 
+            APIARY_IO_TOKEN_PROP                     = cloudEnvironmentProps.getApiaryIoToken()
             AZURE_DEV_WESTEUROPE_DNS_PROP            = cloudEnvironmentProps.getAzureDevWesteuropeDns()
             AZURE_TEST_WESTEUROPE_DNS_PROP           = cloudEnvironmentProps.getAzureTestWesteuropeDns()
             AZURE_PPE_WESTEUROPE_DNS_PROP            = cloudEnvironmentProps.getAzurePpeWesteuropeDns()
@@ -338,12 +339,9 @@ def call(Map pipelineParams) {
             stage('Fetch Apiary Definition') {
                 steps {
                     script {
-//                        echo "${APIARY_PROJECT_NAME}"
-//                        TEST1 = ${APIARY_PROJECT_NAME}
-//                        echo "${TEST1}"
                         sh """
                           cd ./build
-                          export APIARY_API_KEY=890e555a1d3107539c130f23b9494155
+                          export APIARY_API_KEY=${APIARY_IO_TOKEN_PROP}
                           apiary fetch --api-name ${APIARY_PROJECT_NAME} --output ${APIARY_PROJECT_NAME}.apib
                           """
                     }
@@ -410,7 +408,6 @@ def call(Map pipelineParams) {
                         withEnv(["GIT_SSH_COMMAND=ssh -o StrictHostKeyChecking=no -o User=${GIT_SVC_ACCOUNT_USER_PROP} -i ${SSH_KEY}"]) {
                             script {
                                 sh 'git remote rm origin'
-                                //sh "git remote add origin git@git.build.ingka.ikea.com:IPIM-IP/${IMAGE_NAME}.git"
                                 sh "git remote add origin ${GIT_URL_MODIFIED}"
                                 sh 'git config --global user.email "l-apimgt-u-itsehbg@ikea.com"'
                                 sh 'git config --global user.name "l-apimgt-u-itsehbg"'
