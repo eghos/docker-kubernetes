@@ -316,7 +316,7 @@ def call(Map pipelineParams) {
                 steps {
 
                     script {
-                        echo APIARY_PROJECT_NAME
+                        echo "${APIARY_PROJECT_NAME}"
 //                        TEST1 = ${APIARY_PROJECT_NAME}
 //                        echo "${TEST1}"
 //                        sh """export APIARY_PROJECT_NAME_VAR=${APIARY_PROJECT_NAME}
