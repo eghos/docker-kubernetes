@@ -314,10 +314,12 @@ def call(Map pipelineParams) {
 
             stage('Fetch Apiary Definition') {
                 steps {
-                    sh """export APIARY_PROJECT_NAME_VAR=${APIARY_PROJECT_NAME}
+                    script {
+                        sh """export APIARY_PROJECT_NAME_VAR=${APIARY_PROJECT_NAME}
                           cd ./build
                           export APIARY_API_KEY=890e555a1d3107539c130f23b9494155
                           apiary fetch --api-name ${APIARY_PROJECT_NAME_VAR} --output ${APIARY_PROJECT_NAME_VAR}.apib"""
+                    }
                 }
 
             }
