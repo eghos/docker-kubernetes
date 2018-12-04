@@ -69,9 +69,9 @@ def call(Map pipelineParams) {
 
         stages {
 
-            stage('Setup General2') {
+            stage('Setup General') {
                steps {
-                   stageSetupGeneral()
+                //    stageSetupGeneral()
                    script {
                        deploymentProperties = readProperties file:'deployment.properties'
 
@@ -151,11 +151,11 @@ def call(Map pipelineParams) {
                 }
             }
 
-            stage('Setup General') {
-                steps {
-                    stageSetupGeneral()
-                }
-            }
+            // stage('Setup General') {
+            //     steps {
+            //         stageSetupGeneral()
+            //     }
+            // }
 
             stage('Update Versions') {
                 steps {
