@@ -69,7 +69,7 @@ def call(Map pipelineParams) {
 
         stages {
 
-            stage('Setup General') {
+            stage('Setup General2') {
                steps {
                    stageSetupGeneral()
                    script {
