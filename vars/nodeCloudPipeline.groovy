@@ -61,6 +61,7 @@ def call(Map pipelineParams) {
             PROD_WESTEUROPE_AZRGNAME_PROP            = cloudEnvironmentProps.getProdWesteuropeAzRgName()
             PROD_WESTEUROPE_AZACRNAME_PROP           = cloudEnvironmentProps.getProdWesteuropeAzAcrName()
             PROD_WESTEUROPE_AZAKSCLUSTERNAME_PROP    = cloudEnvironmentProps.getProdWesteuropeAzAksClusterName()
+            APIARY_IO_TOKEN_PROP                     = cloudEnvironmentProps.getApiaryIoToken()
         }
 
         tools {
@@ -71,7 +72,7 @@ def call(Map pipelineParams) {
 
             stage('Setup General') {
                steps {
-                //    stageSetupGeneral()
+                   stageSetupGeneral()
                    script {
                        deploymentProperties = readProperties file:'deployment.properties'
 
@@ -408,8 +409,8 @@ def call(Map pipelineParams) {
                                  sh "git remote add origin ${GIT_URL_MODIFIED}"
                                  sh 'git config --global user.email "l-apimgt-u-itsehbg@ikea.com"'
                                  sh 'git config --global user.name "l-apimgt-u-itsehbg"'
-                                 sh 'git add pom.xml'
-                                 sh 'git commit -am "System - Update POM Version [ci skip]"'
+                                 sh 'git add package.json'
+                                 sh 'git commit -am "System - Update Package Version [ci skip]"'
                                  sh 'git push origin "${BRANCH_NAME_FULL}"';
                              }
                          }
