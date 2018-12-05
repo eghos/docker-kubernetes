@@ -210,15 +210,15 @@ def call(Map pipelineParams) {
                          sh './mvnw -f pom.xml test'
                          //sh './mvnw -f pom.xml sonar:sonar -Dsonar.login=$USERNAME -Dsonar.password=$PASSWORD'
 
-                         sh ''' export JAVA_HOME=$JAVA_HOME8
-           cd build
-           ./mvnw -f ../pom.xml sonar:sonar -Dsonar.login=d4e0a890f5606a8df6c5ef32ed480abc611b6a7a   -Dsonar.projectKey=ipimip.${IMAGE_NAME}.dev'''
+//                         sh ''' export JAVA_HOME=$JAVA_HOME8
+//           cd build
+//           ./mvnw -f ../pom.xml sonar:sonar -Dsonar.login=d4e0a890f5606a8df6c5ef32ed480abc611b6a7a   -Dsonar.projectKey=ipimip.${IMAGE_NAME}.dev'''
 
                          //d4e0a890f5606a8df6c5ef32ed480abc611b6a7a = staging2
                          //2af9224b1068533d1c48def794f022f2df1b928e = staging
 
                          //aws instance 7.2
-                         //sh './mvnw -f ../pom.xml sonar:sonar -Dsonar.login=$USERNAME -Dsonar.password=$PASSWORD'
+                         sh './mvnw -f ../pom.xml sonar:sonar -Dsonar.login=$USERNAME -Dsonar.password=$PASSWORD'
 
                      }
                  }
