@@ -218,7 +218,7 @@ def call(Map pipelineParams) {
                          //2af9224b1068533d1c48def794f022f2df1b928e = staging
 
                          //aws instance 7.2
-                         sh './mvnw -f ../pom.xml sonar:sonar -Dsonar.login=$USERNAME -Dsonar.password=$PASSWORD'
+                         sh './mvnw -f pom.xml sonar:sonar -Dsonar.login=$USERNAME -Dsonar.password=$PASSWORD'
 
                      }
                  }
