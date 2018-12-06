@@ -38,6 +38,8 @@ def call(Map pipelineParams) {
             AZ_AKS_CLUSTER_NAME      = ""
             AZ_RG_NAME               = ""
 
+            WEB_OR_LIB               = ""
+
             APIARY_IO_TOKEN_PROP                     = cloudEnvironmentProps.getApiaryIoToken()
             AZURE_DEV_WESTEUROPE_DNS_PROP            = cloudEnvironmentProps.getAzureDevWesteuropeDns()
             AZURE_TEST_WESTEUROPE_DNS_PROP           = cloudEnvironmentProps.getAzureTestWesteuropeDns()
@@ -136,6 +138,8 @@ def call(Map pipelineParams) {
 
                         URI_ROOT_PATH       = deploymentProperties['URI_ROOT_PATH']
 
+                        WEB_OR_LIB          = deploymentProperties['WEB_OR_LIB']
+
                     }
                 }
             }
@@ -147,7 +151,7 @@ def call(Map pipelineParams) {
                         script {
                             if (env.BRANCH_NAME.startsWith("PR")) {
                                 echo 'This is a PR Branch'
-//                                sh './mvnw -B org.codehaus.mojo:versions-maven-plugin:2.5:set -DprocessAllModules -DnewVersion=${DEV_PR_VERSION}'
+                                sh './mvnw -B org.codehaus.mojo:versions-maven-plugin:2.5:set -DprocessAllModules -DnewVersion=${DEV_PR_VERSION}'
                             }
 
                             if (env.BRANCH_NAME.startsWith("develop")) {
