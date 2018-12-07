@@ -445,7 +445,7 @@ def call(Map pipelineParams) {
             }
         }
     }
-}
+}}
 
 def generateAwsDeployStage(region, env) {
     return {
