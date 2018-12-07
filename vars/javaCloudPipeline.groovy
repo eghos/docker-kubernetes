@@ -422,7 +422,7 @@ def call(Map pipelineParams) {
                                 sh 'git add pom.xml'
 //                                sh "git add ./build/${APIARY_PROJECT_NAME}.apib"
                                 sh 'git commit -am "System - CICD Pipeline changes committed. [ci skip]"'
-                                sh 'git push origin "${BRANCH_NAME_FULL}"'
+                                sh 'git push origin "${BRANCH_NAME_FULL}" -f'
                             }
                         }
                     }
