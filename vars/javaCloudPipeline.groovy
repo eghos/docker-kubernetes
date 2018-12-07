@@ -342,8 +342,11 @@ def call(Map pipelineParams) {
 
             stage('Fetch Apiary Definition') {
                 steps {
-                    script {
-                        sh """
+                    when {
+                        expression { IS_API_APPLICATION == 'true'
+                        }
+                        script {
+                            sh """
                           cd ./build
                           export APIARY_API_KEY=${APIARY_IO_TOKEN_PROP}
                           apiary fetch --api-name ${APIARY_PROJECT_NAME} --output ${APIARY_PROJECT_NAME}.apib
@@ -364,6 +367,10 @@ def call(Map pipelineParams) {
                     }
                     stage('Dredd Tests (Contract)') {
                         steps {
+                            when {
+                                expression { IS_API_APPLICATION == 'true'
+                                }
+                            }
                             sh 'echo'
                         }
                     }
