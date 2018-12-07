@@ -163,7 +163,6 @@ def call(Map pipelineParams) {
                                 //Update pom.xml version
                                 sh './mvnw -B org.codehaus.mojo:versions-maven-plugin:2.5:set -DprocessAllModules -DnewVersion=${RELEASE_VERSION}'
                                 DOCKER_VERSION = "${RELEASE_NUMBER}"
-
                             }
 
                             if (env.BRANCH_NAME.startsWith("master")) {

@@ -34,8 +34,6 @@ def call(Map pipelineParams) {
             AWS_DOCKER_TAG           = "${DOCKER_REPO}/${ORG}/${IMAGE_NAME}"
             DOCKER_ORG_IMAGE         = "${ORG}/${IMAGE_NAME}"
 
-            GIT_USER =              "${GIT_SVC_ACCOUNT_USER}"
-
             JAVA_HOME                = "/usr/lib/jvm/java-10-oracle"
             JAVA_HOME8               = "/usr/lib/jvm/java-8-oracle"
 
@@ -46,6 +44,8 @@ def call(Map pipelineParams) {
             AZ_ACR_NAME              = ""
             AZ_AKS_CLUSTER_NAME      = ""
             AZ_RG_NAME               = ""
+
+            IS_API_APPLICATION          = ""
 
             AZURE_DEV_WESTEUROPE_DNS_PROP            = cloudEnvironmentProps.getAzureDevWesteuropeDns()
             AZURE_TEST_WESTEUROPE_DNS_PROP           = cloudEnvironmentProps.getAzureTestWesteuropeDns()
@@ -69,35 +69,6 @@ def call(Map pipelineParams) {
         }
 
         stages {
-
-            stage('Setup General') {
-               steps {
-                   stageSetupGeneral()
-                   script {
-                       deploymentProperties = readProperties file:'deployment.properties'
-
-                       DEPLOY_TO_AWS       = deploymentProperties['DEPLOY_TO_AWS']
-
-                       AWS_DEV_REGION      = deploymentProperties['AWS_DEV_REGION'].split(',').collect{it as String}
-                       AWS_TEST_REGION     = deploymentProperties['AWS_TEST_REGION'].split(',').collect{it as String}
-                       AWS_PROD_REGION     = deploymentProperties['AWS_PROD_REGION'].split(',').collect{it as String}
-
-                       DEPLOY_TO_AZURE     = deploymentProperties['DEPLOY_TO_AZURE']
-
-                       AZURE_DEV_REGION    = deploymentProperties['AZURE_DEV_REGION'].split(',').collect{it as String}
-                       AZURE_TEST_REGION   = deploymentProperties['AZURE_TEST_REGION'].split(',').collect{it as String}
-                       AZURE_PROD_REGION   = deploymentProperties['AZURE_PROD_REGION'].split(',').collect{it as String}
-
-                       DEPLOY_TO_ON_PREM   = deploymentProperties['DEPLOY_TO_ON_PREM']
-                       ON_PREM_REGION      = deploymentProperties['ON_PREM_REGION']
-
-                       APIARY_PROJECT_NAME = deploymentProperties['APIARY_PROJECT_NAME']
-
-                       URI_ROOT_PATH       = deploymentProperties['URI_ROOT_PATH']
-
-                   }
-               }
-           }
 
             stage("Skip CICD?") {
                 when {
@@ -152,11 +123,35 @@ def call(Map pipelineParams) {
                 }
             }
 
-            // stage('Setup General') {
-            //     steps {
-            //         stageSetupGeneral()
-            //     }
-            // }
+            stage('Setup General') {
+                steps {
+                    stageSetupGeneral()
+                    script {
+                        deploymentProperties = readProperties file:'deployment.properties'
+
+                        DEPLOY_TO_AWS       = deploymentProperties['DEPLOY_TO_AWS']
+
+                        AWS_DEV_REGION      = deploymentProperties['AWS_DEV_REGION'].split(',').collect{it as String}
+                        AWS_TEST_REGION     = deploymentProperties['AWS_TEST_REGION'].split(',').collect{it as String}
+                        AWS_PROD_REGION     = deploymentProperties['AWS_PROD_REGION'].split(',').collect{it as String}
+
+                        DEPLOY_TO_AZURE     = deploymentProperties['DEPLOY_TO_AZURE']
+
+                        AZURE_DEV_REGION    = deploymentProperties['AZURE_DEV_REGION'].split(',').collect{it as String}
+                        AZURE_TEST_REGION   = deploymentProperties['AZURE_TEST_REGION'].split(',').collect{it as String}
+                        AZURE_PROD_REGION   = deploymentProperties['AZURE_PROD_REGION'].split(',').collect{it as String}
+
+                        DEPLOY_TO_ON_PREM   = deploymentProperties['DEPLOY_TO_ON_PREM']
+                        ON_PREM_REGION      = deploymentProperties['ON_PREM_REGION']
+
+                        APIARY_PROJECT_NAME = deploymentProperties['APIARY_PROJECT_NAME']
+
+                        URI_ROOT_PATH       = deploymentProperties['URI_ROOT_PATH']
+
+                        IS_API_APPLICATION  = deploymentProperties['IS_API_APPLICATION']
+                    }
+                }
+            }
 
             stage('Update Versions') {
                 steps {
@@ -402,7 +397,7 @@ def call(Map pipelineParams) {
              stage('Commit Updated Version') {
                  steps {
                      withCredentials([sshUserPrivateKey(credentialsId: 'l-apimgt-u-itsehbgATikea.com', keyFileVariable: 'SSH_KEY')]) {
-                         withEnv(["GIT_SSH_COMMAND=ssh -o StrictHostKeyChecking=no -o User=${GIT_USER} -i ${SSH_KEY}"]) {
+                         withEnv(["GIT_SSH_COMMAND=ssh -o StrictHostKeyChecking=no -o User=${GIT_SVC_ACCOUNT_USER_PROP} -i ${SSH_KEY}"]) {
                              script {
                                  sh 'git remote rm origin'
                                  //sh "git remote add origin git@git.build.ingka.ikea.com:IPIM-IP/${IMAGE_NAME}.git"
@@ -411,7 +406,7 @@ def call(Map pipelineParams) {
                                  sh 'git config --global user.name "l-apimgt-u-itsehbg"'
                                  sh 'git add package.json'
                                  sh 'git commit -am "System - Update Package Version [ci skip]"'
-                                 sh 'git push origin "${BRANCH_NAME_FULL}"';
+                                 sh 'git push origin "${BRANCH_NAME_FULL}" -f'
                              }
                          }
                      }

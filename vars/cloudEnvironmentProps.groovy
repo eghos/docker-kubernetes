@@ -6,6 +6,7 @@ class cloudEnvironmentProps{
     def AZURE_PPE_WESTEUROPE_DNS            = "ppe-az-svc.westeurope.cloudapp.azure.com"
     def AZURE_PROD_WESTEUROPE_DNS           = "prod-az-svc.westeurope.cloudapp.azure.com"
     def AZURE_PPE_CENTRALUS_DNS             = "ppe-az-svc.centralus.cloudapp.azure.com"
+    def NPM_NEXUS_REPOSITORY_URL            = "https://nexus.hip.red.cdtapps.com/repository/npm-internal/"
 
 //    def NONPROD_WESTEUROPE_AZRGNAME         = "ipimip-dev-westEurope-rg"
 //    def NONPROD_WESTEUROPE_AZACRNAME        = "acrwedevgupuy7"
