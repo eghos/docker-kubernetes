@@ -50,8 +50,8 @@ class cloudEnvironmentProps{
     def getAzureProdWesteuropeDns(){
         return AZURE_PROD_WESTEUROPE_DNS
     }
-    def getAzureProdCentralUsDns(){
-        return AZURE_PROD_CENTRALUS_DNS
+    def getAzurePpeCentralUsDns(){
+        return AZURE_PPE_CENTRALUS_DNS
     }
     def getNonProdWesteuropeAzRgName(){
         return NONPROD_WESTEUROPE_AZRGNAME
