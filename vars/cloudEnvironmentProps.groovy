@@ -15,9 +15,13 @@ class cloudEnvironmentProps{
 //    def NONPROD_WESTEUROPE_AZACRNAME        = "acrwetest5i4vqq"
 //    def NONPROD_WESTEUROPE_AZAKSCLUSTERNAME = "akswetest5i4vqq"
 
-    def NONPROD_WESTEUROPE_AZRGNAME         = "ipimip-ppe-westEurope-rg"
-    def NONPROD_WESTEUROPE_AZACRNAME        = "acrweppe01"
-    def NONPROD_WESTEUROPE_AZAKSCLUSTERNAME = "aksweppe01"
+//    def NONPROD_WESTEUROPE_AZRGNAME         = "ipimip-ppe-westEurope-rg"
+//    def NONPROD_WESTEUROPE_AZACRNAME        = "acrweppe01"
+//    def NONPROD_WESTEUROPE_AZAKSCLUSTERNAME = "aksweppe01"
+
+    def NONPROD_WESTEUROPE_AZRGNAME         = "ipimip-prod-westEurope-rg"
+    def NONPROD_WESTEUROPE_AZACRNAME        = "acrweprod01"
+    def NONPROD_WESTEUROPE_AZAKSCLUSTERNAME = "aksweprod01"
 
     def PROD_WESTEUROPE_AZRGNAME            = "ipimip-ppe-westEurope-rg"
     def PROD_WESTEUROPE_AZACRNAME           = "acrweppeafsibk"
