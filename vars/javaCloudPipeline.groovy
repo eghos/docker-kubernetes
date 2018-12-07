@@ -341,12 +341,12 @@ def call(Map pipelineParams) {
             }
 
             stage('Fetch Apiary Definition') {
+                when {
+                    expression { IS_API_APPLICATION == 'true' }
+                }
                 steps {
-                    when {
-                        expression { IS_API_APPLICATION == 'true'
-                        }
-                        script {
-                            sh """
+                    script {
+                        sh """
                           cd ./build
                           export APIARY_API_KEY=${APIARY_IO_TOKEN_PROP}
                           apiary fetch --api-name ${APIARY_PROJECT_NAME} --output ${APIARY_PROJECT_NAME}.apib
@@ -357,7 +357,10 @@ def call(Map pipelineParams) {
 
             stage('Service Tests') {
                 when {
-                    branch "release/*"
+                    allOf {
+                        branch "release/*";
+                        expression { IS_API_APPLICATION == 'true' }
+                    }
                 }
                 parallel {
                     stage('API Fortress Tests') {
@@ -367,10 +370,6 @@ def call(Map pipelineParams) {
                     }
                     stage('Dredd Tests (Contract)') {
                         steps {
-                            when {
-                                expression { IS_API_APPLICATION == 'true'
-                                }
-                            }
                             sh 'echo'
                         }
                     }
@@ -445,7 +444,7 @@ def call(Map pipelineParams) {
             }
         }
     }
-}}
+}
 
 def generateAwsDeployStage(region, env) {
     return {
