@@ -38,7 +38,7 @@ def call(Map pipelineParams) {
             AZ_AKS_CLUSTER_NAME      = ""
             AZ_RG_NAME               = ""
 
-            WEB_OR_LIB               = ""
+            IS_API_APPLICATION          = ""
 
             APIARY_IO_TOKEN_PROP                     = cloudEnvironmentProps.getApiaryIoToken()
             AZURE_DEV_WESTEUROPE_DNS_PROP            = cloudEnvironmentProps.getAzureDevWesteuropeDns()
@@ -138,7 +138,7 @@ def call(Map pipelineParams) {
 
                         URI_ROOT_PATH       = deploymentProperties['URI_ROOT_PATH']
 
-                        WEB_OR_LIB          = deploymentProperties['WEB_OR_LIB']
+                        IS_API_APPLICATION  = deploymentProperties['IS_API_APPLICATION']
 
                     }
                 }
