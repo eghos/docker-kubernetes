@@ -351,6 +351,7 @@ def call(Map pipelineParams) {
                           export APIARY_API_KEY=${APIARY_IO_TOKEN_PROP}
                           apiary fetch --api-name ${APIARY_PROJECT_NAME} --output ${APIARY_PROJECT_NAME}.apib
                           """
+                        sh "git add ./build/${APIARY_PROJECT_NAME}.apib"
                     }
                 }
             }
@@ -422,7 +423,7 @@ def call(Map pipelineParams) {
                                 sh 'git config --global user.email "l-apimgt-u-itsehbg@ikea.com"'
                                 sh 'git config --global user.name "l-apimgt-u-itsehbg"'
                                 sh 'git add pom.xml'
-                                sh "git add ./build/${APIARY_PROJECT_NAME}.apib"
+//                                sh "git add ./build/${APIARY_PROJECT_NAME}.apib"
                                 sh 'git commit -am "System - CICD Pipeline changes committed. [ci skip]"'
                                 sh 'git push origin "${BRANCH_NAME_FULL}"'
                             }
