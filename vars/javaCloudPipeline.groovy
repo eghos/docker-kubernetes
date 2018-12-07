@@ -10,7 +10,6 @@ def call(Map pipelineParams) {
         }
 
         environment {
-
             ORG                      = "${params.DOCKER_ORG}"
             DOCKER_REPO              = "${params.DOCKER_REPO}"
             INTERNAL_SVC_HOSTNAME    = "${params.INTERNAL_SVC_HOSTNAME}"
@@ -69,7 +68,6 @@ def call(Map pipelineParams) {
                 steps {
                     stageSkipCICD()
                 }
-
             }
 
             stage('Setup K8S Config') {
@@ -139,7 +137,6 @@ def call(Map pipelineParams) {
                         URI_ROOT_PATH       = deploymentProperties['URI_ROOT_PATH']
 
                         IS_API_APPLICATION  = deploymentProperties['IS_API_APPLICATION']
-
                     }
                 }
             }
@@ -487,6 +484,8 @@ def generateAzureDeployStage(region, env) {
                 script {
                     ACRLOGINSERVER = sh(returnStdout: true, script: "az acr show --resource-group ${AZ_RG_NAME} --name ${AZ_ACR_NAME} --query \"loginServer\" --output tsv").trim()
                     AZ_ENV_REGION_SVC_HOSTNAME = "${AZURE_DEV_WESTEUROPE_DNS_PROP}".replace('<ENV>', "${env}").replace('<REGION>', "${region}")
+                    sh "echo ${ACRLOGINSERVER}"
+                    sh "echo ${AZ_ENV_REGION_SVC_HOSTNAME}"
                     sh 'chmod +x ./build/*.yaml'
                     sh """
                         cd build
