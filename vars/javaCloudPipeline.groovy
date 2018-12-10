@@ -481,12 +481,7 @@ def generateAzureDeployStage(region, env) {
         stage("${region}") {
             withCredentials([azureServicePrincipal('sp-ipim-ip-aks')]) {
                 script {
-                    sh "echo ${region}"
-                    sh "echo ${env}"
                     ACRLOGINSERVER = sh(returnStdout: true, script: "az acr show --resource-group ${AZ_RG_NAME} --name ${AZ_ACR_NAME} --query \"loginServer\" --output tsv").trim()
-                    AZ_ENV_REGION_SVC_HOSTNAME = "${AZURE_DEV_WESTEUROPE_DNS_PROP}".replace('<ENV>', "${env}").replace('<REGION>', "${region}")
-                    sh "echo ${ACRLOGINSERVER}"
-                    sh "echo ${AZ_ENV_REGION_SVC_HOSTNAME}"
                     sh 'chmod +x ./build/*.yaml'
                     sh """
                         cd build
@@ -498,7 +493,8 @@ def generateAzureDeployStage(region, env) {
                         cp \"deploy-service.yaml\" \"deploy-service-azure.yaml\"
                         cp \"ingress.yaml\" \"ingress-azure.yaml\"
                         sed -i -e \"s|IMAGE_NAME_VAR|${ACRLOGINSERVER}/${DOCKER_ORG_IMAGE}:${DOCKER_VERSION}|g\" deploy-service-azure.yaml
-                        sed -i -e \"s|INTERNAL_SVC_HOSTNAME_VAR|${AZ_ENV_REGION_SVC_HOSTNAME}|g\" ingress-azure.yaml
+                        sed -i -e \\"s|INTERNAL_SVC_HOSTNAME_VAR|${AZURE_SVC_HOSTNAME_PROP}|g\\" ingress-azure.yaml
+                        sed -i -e \\"s|<ENV>|${env}|g\\" -e \\"s|<REGION>|${region}|g\\" ingress-azure.yaml
                         . ./deploy.sh
                        """
                     AZ_ENV_REGION_SVC_HOSTNAME = "${AZURE_DEV_WESTEUROPE_DNS_PROP}"
