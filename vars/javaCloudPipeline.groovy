@@ -501,7 +501,7 @@ def generateAzureDeployStage(region, env) {
                         sed -i -e \"s|INTERNAL_SVC_HOSTNAME_VAR|${AZ_ENV_REGION_SVC_HOSTNAME}|g\" ingress-azure.yaml
                         . ./deploy.sh
                        """
-                    AZ_ENV_REGION_SVC_HOSTNAME = ${AZURE_DEV_WESTEUROPE_DNS_PROP}
+                    AZ_ENV_REGION_SVC_HOSTNAME = "${AZURE_DEV_WESTEUROPE_DNS_PROP}"
                 }
             }
         }
