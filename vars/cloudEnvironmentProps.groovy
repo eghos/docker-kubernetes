@@ -1,7 +1,7 @@
 //#!/usr/bin/env groovy
 class cloudEnvironmentProps{
     def APIARY_IO_TOKEN                     = "890e555a1d3107539c130f23b9494155"
-    def AZURE_DEV_WESTEUROPE_DNS            = "ppe-az-svc.centralus.cloudapp.azure.com"
+    def AZURE_DEV_WESTEUROPE_DNS            = "dev-az-svc.centralus.cloudapp.azure.com"
     def AZURE_TEST_WESTEUROPE_DNS           = "test-az-svc.westeurope.cloudapp.azure.com"
     def AZURE_PPE_WESTEUROPE_DNS            = "ppe-az-svc.westeurope.cloudapp.azure.com"
     def AZURE_PROD_WESTEUROPE_DNS           = "prod-az-svc.westeurope.cloudapp.azure.com"

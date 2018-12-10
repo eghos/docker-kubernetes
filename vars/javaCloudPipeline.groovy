@@ -258,7 +258,7 @@ def call(Map pipelineParams) {
                             }
 
                             AZURE_DEV_REGION_MAP = AZURE_DEV_REGION.collectEntries {
-                                ["${it}" : generateAzureDeployStage(it, "ppe")]
+                                ["${it}" : generateAzureDeployStage(it, "dev")]
                             }
                             AZURE_TEST_REGION_MAP = AZURE_TEST_REGION.collectEntries {
                                 ["${it}" : generateAzureDeployStage(it, "test")]
@@ -501,6 +501,7 @@ def generateAzureDeployStage(region, env) {
                         sed -i -e \"s|INTERNAL_SVC_HOSTNAME_VAR|${AZ_ENV_REGION_SVC_HOSTNAME}|g\" ingress-azure.yaml
                         . ./deploy.sh
                        """
+                    AZ_ENV_REGION_SVC_HOSTNAME = ${AZURE_DEV_WESTEUROPE_DNS_PROP}
                 }
             }
         }
