@@ -494,7 +494,7 @@ def generateAzureDeployStage(region, env) {
                         cp \"ingress.yaml\" \"ingress-azure.yaml\"
                         sed -i -e \"s|IMAGE_NAME_VAR|${ACRLOGINSERVER}/${DOCKER_ORG_IMAGE}:${DOCKER_VERSION}|g\" deploy-service-azure.yaml
                         sed -i -e \"s|INTERNAL_SVC_HOSTNAME_VAR|${AZURE_SVC_HOSTNAME_PROP}|g\" ingress-azure.yaml
-                        sed -i -e \\"s|<ENV>|${env}|g\\" -e \\"s|<REGION>|${region}|g\\" ingress-azure.yaml
+                        sed -i -e \"s|<ENV>|${env}|g\\" -e \\"s|<REGION>|${region}|g\\" ingress-azure.yaml
                         . ./deploy.sh
                        """
                 }
