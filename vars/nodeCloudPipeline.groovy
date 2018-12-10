@@ -252,6 +252,9 @@ def call(Map pipelineParams) {
                             AWS_TEST_REGION_MAP = AWS_TEST_REGION.collectEntries {
                                 ["${it}" : generateAwsDeployStage(it, "test")]
                             }
+//                            AWS_PPE_REGION_MAP = AWS_PPE_REGION.collectEntries {
+//                                ["${it}" : generateAwsDeployStage(it, "ppe")]
+//                            }
                             AWS_PROD_REGION_MAP = AWS_PROD_REGION.collectEntries {
                                 ["${it}" : generateAwsDeployStage(it, "prod")]
                             }
@@ -262,6 +265,9 @@ def call(Map pipelineParams) {
                             AZURE_TEST_REGION_MAP = AZURE_TEST_REGION.collectEntries {
                                 ["${it}" : generateAzureDeployStage(it, "test")]
                             }
+//                            AWS_PPE_REGION_MAP = AWS_PPE_REGION.collectEntries {
+//                                ["${it}" : generateAzureDeployStage(it, "ppe")]
+//                            }
                             AZURE_PROD_REGION_MAP = AZURE_PROD_REGION.collectEntries {
                                 ["${it}" : generateAzureDeployStage(it, "prod")]
                             }

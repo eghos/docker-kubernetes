@@ -248,6 +248,9 @@ def call(Map pipelineParams) {
                             AWS_TEST_REGION_MAP = AWS_TEST_REGION.collectEntries {
                                 ["${it}" : generateAwsDeployStage(it, "test")]
                             }
+//                            AWS_PPE_REGION_MAP = AWS_PPE_REGION.collectEntries {
+//                                ["${it}" : generateAwsDeployStage(it, "ppe")]
+//                            }
                             AWS_PROD_REGION_MAP = AWS_PROD_REGION.collectEntries {
                                 ["${it}" : generateAwsDeployStage(it, "prod")]
                             }
@@ -258,6 +261,9 @@ def call(Map pipelineParams) {
                             AZURE_TEST_REGION_MAP = AZURE_TEST_REGION.collectEntries {
                                 ["${it}" : generateAzureDeployStage(it, "test")]
                             }
+//                            AWS_PPE_REGION_MAP = AWS_PPE_REGION.collectEntries {
+//                                ["${it}" : generateAzureDeployStage(it, "ppe")]
+//                            }
                             AZURE_PROD_REGION_MAP = AZURE_PROD_REGION.collectEntries {
                                 ["${it}" : generateAzureDeployStage(it, "prod")]
                             }
@@ -333,7 +339,10 @@ def call(Map pipelineParams) {
 
             stage('Fetch Apiary Definition') {
                 when {
-                    expression { IS_API_APPLICATION == 'true' }
+                    allOf {
+                        branch "release/*";
+                        expression { IS_API_APPLICATION == 'true' }
+                    }
                 }
                 steps {
                     script {
@@ -414,7 +423,6 @@ def call(Map pipelineParams) {
                                 sh 'git config --global user.email "l-apimgt-u-itsehbg@ikea.com"'
                                 sh 'git config --global user.name "l-apimgt-u-itsehbg"'
                                 sh 'git add pom.xml'
-//                                sh "git add ./build/${APIARY_PROJECT_NAME}.apib"
                                 sh 'git commit -am "System - CICD Pipeline changes committed. [ci skip]"'
                                 sh 'git push origin "${BRANCH_NAME_FULL}" -f'
                             }
