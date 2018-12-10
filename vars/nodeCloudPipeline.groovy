@@ -395,24 +395,24 @@ def call(Map pipelineParams) {
                 }
             }
 
-             stage('Commit Updated Version') {
-                 steps {
-                     withCredentials([sshUserPrivateKey(credentialsId: 'l-apimgt-u-itsehbgATikea.com', keyFileVariable: 'SSH_KEY')]) {
-                         withEnv(["GIT_SSH_COMMAND=ssh -o StrictHostKeyChecking=no -o User=${GIT_SVC_ACCOUNT_USER_PROP} -i ${SSH_KEY}"]) {
-                             script {
-                                 sh 'git remote rm origin'
-                                 //sh "git remote add origin git@git.build.ingka.ikea.com:IPIM-IP/${IMAGE_NAME}.git"
-                                 sh "git remote add origin ${GIT_URL_MODIFIED}"
-                                 sh 'git config --global user.email "l-apimgt-u-itsehbg@ikea.com"'
-                                 sh 'git config --global user.name "l-apimgt-u-itsehbg"'
-                                 sh 'git add package.json'
-                                 sh 'git commit -am "System - Update Package Version [ci skip]"'
-                                 sh 'git push origin "${BRANCH_NAME_FULL}" -f'
-                             }
-                         }
-                     }
-                 }
-             }
+            //  stage('Commit Updated Version') {
+            //      steps {
+            //          withCredentials([sshUserPrivateKey(credentialsId: 'l-apimgt-u-itsehbgATikea.com', keyFileVariable: 'SSH_KEY')]) {
+            //              withEnv(["GIT_SSH_COMMAND=ssh -o StrictHostKeyChecking=no -o User=${GIT_SVC_ACCOUNT_USER_PROP} -i ${SSH_KEY}"]) {
+            //                  script {
+            //                      sh 'git remote rm origin'
+            //                      //sh "git remote add origin git@git.build.ingka.ikea.com:IPIM-IP/${IMAGE_NAME}.git"
+            //                      sh "git remote add origin ${GIT_URL_MODIFIED}"
+            //                      sh 'git config --global user.email "l-apimgt-u-itsehbg@ikea.com"'
+            //                      sh 'git config --global user.name "l-apimgt-u-itsehbg"'
+            //                      sh 'git add package.json'
+            //                      sh 'git commit -am "System - Update Package Version [ci skip]"'
+            //                      sh 'git push origin "${BRANCH_NAME_FULL}" -f'
+            //                  }
+            //              }
+            //          }
+            //      }
+            //  }
 
             stage('Clean Up') {
                 steps {
@@ -476,7 +476,7 @@ def generateAzureDeployStage(region, env) {
                     sh """
                         cd build
                         export CONFIGMAP=configmap-${region}-${env}
-                        AZ_ENV_REGION_SVC_HOSTNAME="$(echo ${AZURE_SVC_HOSTNAME_PROP} | tr <ENV> ${env} | tr <REGION> ${region})"
+                        AZ_ENV_REGION_SVC_HOSTNAME=$(echo ${AZURE_SVC_HOSTNAME_PROP} | tr <ENV> ${env} | tr <REGION> ${region})
                         export TARGET_HOST=azure
                         export DOCKER_VERSION=${DOCKER_VERSION}
                         export URI_ROOT_PATH_VAR=${URI_ROOT_PATH}
