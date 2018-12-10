@@ -8,9 +8,9 @@ class cloudEnvironmentProps{
     def AZURE_PPE_CENTRALUS_DNS             = "ppe-az-svc.centralus.cloudapp.azure.com"
     def NPM_NEXUS_REPOSITORY_URL            = "https://nexus.hip.red.cdtapps.com/repository/npm-internal/"
 
-//    def NONPROD_WESTEUROPE_AZRGNAME         = "ipimip-dev-westEurope-rg"
-//    def NONPROD_WESTEUROPE_AZACRNAME        = "acrwedevgupuy7"
-//    def NONPROD_WESTEUROPE_AZAKSCLUSTERNAME = "akswedevgupuy7"
+    def NONPROD_WESTEUROPE_AZRGNAME         = "ipimip-dev-westEurope-rg"
+    def NONPROD_WESTEUROPE_AZACRNAME        = "acrwedevgupuy7"
+    def NONPROD_WESTEUROPE_AZAKSCLUSTERNAME = "akswedevgupuy7"
 
 //    def NONPROD_WESTEUROPE_AZRGNAME         = "ipimip-test-westEurope-rg"
 //    def NONPROD_WESTEUROPE_AZACRNAME        = "acrwetest5i4vqq"
@@ -24,9 +24,9 @@ class cloudEnvironmentProps{
 //    def NONPROD_WESTEUROPE_AZACRNAME        = "acrweprod01"
 //    def NONPROD_WESTEUROPE_AZAKSCLUSTERNAME = "aksweprod01"
 
-    def NONPROD_WESTEUROPE_AZRGNAME         = "ipimip-ppe-CentralUS-rg"
-    def NONPROD_WESTEUROPE_AZACRNAME        = "acrcusppe01"
-    def NONPROD_WESTEUROPE_AZAKSCLUSTERNAME = "akscusppe01"
+//    def NONPROD_WESTEUROPE_AZRGNAME         = "ipimip-ppe-CentralUS-rg"
+//    def NONPROD_WESTEUROPE_AZACRNAME        = "acrcusppe01"
+//    def NONPROD_WESTEUROPE_AZAKSCLUSTERNAME = "akscusppe01"
 
     def PROD_WESTEUROPE_AZRGNAME            = "ipimip-ppe-westEurope-rg"
     def PROD_WESTEUROPE_AZACRNAME           = "acrweppeafsibk"
