@@ -258,7 +258,7 @@ def call(Map pipelineParams) {
                             }
 
                             AZURE_DEV_REGION_MAP = AZURE_DEV_REGION.collectEntries {
-                                ["${it}" : generateAzureDeployStage(it, "ppe")]
+                                ["${it}" : generateAzureDeployStage(it, "dev")]
                             }
                             AZURE_TEST_REGION_MAP = AZURE_TEST_REGION.collectEntries {
                                 ["${it}" : generateAzureDeployStage(it, "test")]
@@ -492,7 +492,7 @@ def generateAzureDeployStage(region, env) {
                         cp \"configmap-${region}-${env}.yaml\" \"configmap-${region}-${env}-azure.yaml\"
                         cp \"deploy-service.yaml\" \"deploy-service-azure.yaml\"
                         cp \"ingress.yaml\" \"ingress-azure.yaml\"
-                        sed -i -e \"s|IMAGE_NAME_VAR|${ACRLOGINSERVER}/${DOCKER_ORG_IMAGE}:${DOCKER_VERSION}|g\" deploy-service-azure.yaml
+                        sed -i -e \\"s|IMAGE_NAME_VAR|${ACRLOGINSERVER}/${DOCKER_ORG_IMAGE}:${DOCKER_VERSION}|g\\" deploy-service-azure.yaml
                         sed -i -e \\"s|INTERNAL_SVC_HOSTNAME_VAR|${AZURE_SVC_HOSTNAME_PROP}|g\\" ingress-azure.yaml
                         sed -i -e \\"s|<ENV>|${env}|g\\" -e \\"s|<REGION>|${region}|g\\" ingress-azure.yaml
                         . ./deploy.sh
