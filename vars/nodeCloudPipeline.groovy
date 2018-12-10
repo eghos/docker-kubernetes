@@ -476,7 +476,6 @@ def generateAzureDeployStage(region, env) {
                     sh """
                         cd build
                         export CONFIGMAP=configmap-${region}-${env}
-                        AZ_ENV_REGION_SVC_HOSTNAME=\"\$(echo ${AZURE_SVC_HOSTNAME_PROP} | tr <ENV> ${env} | tr <REGION> ${region})\"
                         export TARGET_HOST=azure
                         export DOCKER_VERSION=${DOCKER_VERSION}
                         export URI_ROOT_PATH_VAR=${URI_ROOT_PATH}
@@ -484,7 +483,9 @@ def generateAzureDeployStage(region, env) {
                         cp \"deploy-service.yaml\" \"deploy-service-azure.yaml\"
                         cp \"ingress.yaml\" \"ingress-azure.yaml\"
                         sed -i -e \"s|IMAGE_NAME_VAR|${ACRLOGINSERVER}/${DOCKER_ORG_IMAGE}:${DOCKER_VERSION}|g\" deploy-service-azure.yaml
-                        sed -i -e \"s|INTERNAL_SVC_HOSTNAME_VAR|${AZ_ENV_REGION_SVC_HOSTNAME}|g\" ingress-azure.yaml
+                        sed -i -e \"s|INTERNAL_SVC_HOSTNAME_VAR|${AZURE_SVC_HOSTNAME_PROP}|g\" ingress-azure.yaml
+                        sed -i -e \"s|<ENV>|${env}|g\" \"s|<REGION>|${region}|g\" ingress-azure.yaml
+                        cat ingress-azure.yaml
                         . ./deploy.sh
                        """
                 }
