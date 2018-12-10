@@ -472,7 +472,7 @@ def generateAzureDeployStage(region, env) {
                     sh 'chmod +x ./build/*.yaml'
                     sh """
                         cd build
-                        export AZ_ENV_REGION_SVC_HOSTNAME = "${AZURE_SVC_HOSTNAME_PROP}".replace('<ENV>', "${env}").replace('<REGION>', "${region}")
+                        export AZ_ENV_REGION_SVC_HOSTNAME="${AZURE_SVC_HOSTNAME_PROP}".replace('<ENV>', "${env}").replace('<REGION>', "${region}")
                         export CONFIGMAP=configmap-${region}-${env}
                         export TARGET_HOST=azure
                         export DOCKER_VERSION=${DOCKER_VERSION}
