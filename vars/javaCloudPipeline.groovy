@@ -37,14 +37,9 @@ def call(Map pipelineParams) {
             AZ_AKS_CLUSTER_NAME      = ""
             AZ_RG_NAME               = ""
 
-            IS_API_APPLICATION          = ""
+            IS_API_APPLICATION       = ""
 
             APIARY_IO_TOKEN_PROP                     = cloudEnvironmentProps.getApiaryIoToken()
-            AZURE_DEV_WESTEUROPE_DNS_PROP            = cloudEnvironmentProps.getAzureDevWesteuropeDns()
-            AZURE_TEST_WESTEUROPE_DNS_PROP           = cloudEnvironmentProps.getAzureTestWesteuropeDns()
-            AZURE_PPE_WESTEUROPE_DNS_PROP            = cloudEnvironmentProps.getAzurePpeWesteuropeDns()
-            AZURE_PROD_WESTEUROPE_DNS_PROP           = cloudEnvironmentProps.getAzureProdWesteuropeDns()
-            AZURE_PPE_CENTRALUS_DNS_PROP             = cloudEnvironmentProps.getAzurePpeCentralUsDns()
             AZURE_SVC_HOSTNAME_PROP                  = cloudEnvironmentProps.getAzureSvcHostname()
             GIT_SVC_ACOUNT_EMAIL_PROP                = cloudEnvironmentProps.getGitSvcAccountEmail()
             GIT_SVC_ACCOUNT_USER_PROP                = cloudEnvironmentProps.getGitSvcAccountUser()
