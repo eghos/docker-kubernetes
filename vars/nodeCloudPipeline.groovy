@@ -470,11 +470,13 @@ def generateAzureDeployStage(region, env) {
                     ACRLOGINSERVER = sh(returnStdout: true, script: "az acr show --resource-group ${AZ_RG_NAME} --name ${AZ_ACR_NAME} --query \"loginServer\" --output tsv").trim()
 //                    AZ_ENV_REGION_SVC_HOSTNAME = "${AZURE_DEV_WESTEUROPE_DNS_PROP}".replace('<ENV>', "${env}").replace('<REGION>', "${region}")
                     echo "${AZURE_SVC_HOSTNAME_PROP}"
-                    AZ_ENV_REGION_SVC_HOSTNAME = "${AZURE_SVC_HOSTNAME_PROP}".replace('<ENV>', "${env}").replace('<REGION>', "${region}")
+                    // AZ_ENV_REGION_SVC_HOSTNAME = "${AZURE_SVC_HOSTNAME_PROP}".replace('<ENV>', "${env}").replace('<REGION>', "${region}")
+                    // echo "${AZ_ENV_REGION_SVC_HOSTNAME}"
                     sh 'chmod +x ./build/*.yaml'
                     sh """
                         cd build
                         export CONFIGMAP=configmap-${region}-${env}
+                        AZ_ENV_REGION_SVC_HOSTNAME="$(echo ${AZURE_SVC_HOSTNAME_PROP} | tr <ENV> ${env} | tr <REGION> ${region})"
                         export TARGET_HOST=azure
                         export DOCKER_VERSION=${DOCKER_VERSION}
                         export URI_ROOT_PATH_VAR=${URI_ROOT_PATH}
