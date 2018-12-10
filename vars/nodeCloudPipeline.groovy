@@ -476,7 +476,6 @@ def generateAzureDeployStage(region, env) {
                     sh """
                         cd build
                         export CONFIGMAP=configmap-${region}-${env}
-                        export AZ_ENV_REGION_SVC_HOSTNAME=\"$(echo ${AZURE_SVC_HOSTNAME_PROP} | tr <ENV> ${env} | tr <REGION> ${region})\"
                         export TARGET_HOST=azure
                         export DOCKER_VERSION=${DOCKER_VERSION}
                         export URI_ROOT_PATH_VAR=${URI_ROOT_PATH}
