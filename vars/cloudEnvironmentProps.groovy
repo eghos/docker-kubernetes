@@ -6,7 +6,6 @@ class cloudEnvironmentProps{
     def AZURE_PPE_WESTEUROPE_DNS            = "ppe-az-svc.westeurope.cloudapp.azure.com"
     def AZURE_PROD_WESTEUROPE_DNS           = "prod-az-svc.westeurope.cloudapp.azure.com"
     def AZURE_PPE_CENTRALUS_DNS             = "ppe-az-svc.centralus.cloudapp.azure.com"
-    def NPM_NEXUS_REPOSITORY_URL            = "https://nexus.hip.red.cdtapps.com/repository/npm-internal/"
 
 //    def NONPROD_WESTEUROPE_AZRGNAME         = "ipimip-dev-westEurope-rg"
 //    def NONPROD_WESTEUROPE_AZACRNAME        = "acrwedevgupuy7"
@@ -35,6 +34,7 @@ class cloudEnvironmentProps{
     def AZURE_SVC_HOSTNAME                  = "<ENV>-az-svc.<REGION>.cloudapp.azure.com"
     def GIT_SVC_ACOUNT_EMAIL                = "l-apimgt-u-itsehbg@ikea.com"
     def GIT_SVC_ACCOUNT_USER                = "l-apimgt-u-itsehbg"
+    def NPM_NEXUS_REPOSITORY_URL            = "https://nexus.hip.red.cdtapps.com/repository/npm-internal/"
 
     def getApiaryIoToken(){
         return APIARY_IO_TOKEN
@@ -81,5 +81,8 @@ class cloudEnvironmentProps{
     }
     def getGitSvcAccountUser(){
         return GIT_SVC_ACCOUNT_USER
+    }
+    def getNpmNexusRepositoryUrl(){
+        return NPM_NEXUS_REPOSITORY_URL
     }
 }

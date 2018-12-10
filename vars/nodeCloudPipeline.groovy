@@ -62,6 +62,7 @@ def call(Map pipelineParams) {
             PROD_WESTEUROPE_AZACRNAME_PROP           = cloudEnvironmentProps.getProdWesteuropeAzAcrName()
             PROD_WESTEUROPE_AZAKSCLUSTERNAME_PROP    = cloudEnvironmentProps.getProdWesteuropeAzAksClusterName()
             APIARY_IO_TOKEN_PROP                     = cloudEnvironmentProps.getApiaryIoToken()
+            NPM_NEXUS_REPOSITORY_URL_PROP            = cloudEnvironmentProps.getNpmNexusRepositoryUrl()
         }
 
         tools {
@@ -468,11 +469,10 @@ def generateAzureDeployStage(region, env) {
                 script {
                     ACRLOGINSERVER = sh(returnStdout: true, script: "az acr show --resource-group ${AZ_RG_NAME} --name ${AZ_ACR_NAME} --query \"loginServer\" --output tsv").trim()
 //                    AZ_ENV_REGION_SVC_HOSTNAME = "${AZURE_DEV_WESTEUROPE_DNS_PROP}".replace('<ENV>', "${env}").replace('<REGION>', "${region}")
-//                    AZ_ENV_REGION_SVC_HOSTNAME = "${AZURE_SVC_HOSTNAME_PROP}".replace('<ENV>', "${env}").replace('<REGION>', "${region}")
+                    AZ_ENV_REGION_SVC_HOSTNAME = "${AZURE_SVC_HOSTNAME_PROP}".replace('<ENV>', "${env}").replace('<REGION>', "${region}")
                     sh 'chmod +x ./build/*.yaml'
                     sh """
                         cd build
-                        export AZ_ENV_REGION_SVC_HOSTNAME="${AZURE_SVC_HOSTNAME_PROP}".replace('<ENV>', "${env}").replace('<REGION>', "${region}")
                         export CONFIGMAP=configmap-${region}-${env}
                         export TARGET_HOST=azure
                         export DOCKER_VERSION=${DOCKER_VERSION}
