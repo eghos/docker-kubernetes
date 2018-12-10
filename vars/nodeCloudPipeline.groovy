@@ -395,24 +395,24 @@ def call(Map pipelineParams) {
                 }
             }
 
-            //  stage('Commit Updated Version') {
-            //      steps {
-            //          withCredentials([sshUserPrivateKey(credentialsId: 'l-apimgt-u-itsehbgATikea.com', keyFileVariable: 'SSH_KEY')]) {
-            //              withEnv(["GIT_SSH_COMMAND=ssh -o StrictHostKeyChecking=no -o User=${GIT_SVC_ACCOUNT_USER_PROP} -i ${SSH_KEY}"]) {
-            //                  script {
-            //                      sh 'git remote rm origin'
-            //                      //sh "git remote add origin git@git.build.ingka.ikea.com:IPIM-IP/${IMAGE_NAME}.git"
-            //                      sh "git remote add origin ${GIT_URL_MODIFIED}"
-            //                      sh 'git config --global user.email "l-apimgt-u-itsehbg@ikea.com"'
-            //                      sh 'git config --global user.name "l-apimgt-u-itsehbg"'
-            //                      sh 'git add package.json'
-            //                      sh 'git commit -am "System - Update Package Version [ci skip]"'
-            //                      sh 'git push origin "${BRANCH_NAME_FULL}" -f'
-            //                  }
-            //              }
-            //          }
-            //      }
-            //  }
+            stage('Commit Updated Version') {
+                steps {
+                    withCredentials([sshUserPrivateKey(credentialsId: 'l-apimgt-u-itsehbgATikea.com', keyFileVariable: 'SSH_KEY')]) {
+                        withEnv(["GIT_SSH_COMMAND=ssh -o StrictHostKeyChecking=no -o User=${GIT_SVC_ACCOUNT_USER_PROP} -i ${SSH_KEY}"]) {
+                            script {
+                                sh 'git remote rm origin'
+                                //sh "git remote add origin git@git.build.ingka.ikea.com:IPIM-IP/${IMAGE_NAME}.git"
+                                sh "git remote add origin ${GIT_URL_MODIFIED}"
+                                sh 'git config --global user.email "l-apimgt-u-itsehbg@ikea.com"'
+                                sh 'git config --global user.name "l-apimgt-u-itsehbg"'
+                                sh 'git add package.json'
+                                sh 'git commit -am "System - Update Package Version [ci skip]"'
+                                sh 'git push origin "${BRANCH_NAME_FULL}" -f'
+                            }
+                        }
+                    }
+                }
+            }
 
             stage('Clean Up') {
                 steps {
@@ -468,10 +468,6 @@ def generateAzureDeployStage(region, env) {
             withCredentials([azureServicePrincipal('sp-ipim-ip-aks')]) {
                 script {
                     ACRLOGINSERVER = sh(returnStdout: true, script: "az acr show --resource-group ${AZ_RG_NAME} --name ${AZ_ACR_NAME} --query \"loginServer\" --output tsv").trim()
-//                    AZ_ENV_REGION_SVC_HOSTNAME = "${AZURE_DEV_WESTEUROPE_DNS_PROP}".replace('<ENV>', "${env}").replace('<REGION>', "${region}")
-                    echo "${AZURE_SVC_HOSTNAME_PROP}"
-                    // AZ_ENV_REGION_SVC_HOSTNAME = "${AZURE_SVC_HOSTNAME_PROP}".replace('<ENV>', "${env}").replace('<REGION>', "${region}")
-                    // echo "${AZ_ENV_REGION_SVC_HOSTNAME}"
                     sh 'chmod +x ./build/*.yaml'
                     sh """
                         cd build
@@ -485,7 +481,6 @@ def generateAzureDeployStage(region, env) {
                         sed -i -e \"s|IMAGE_NAME_VAR|${ACRLOGINSERVER}/${DOCKER_ORG_IMAGE}:${DOCKER_VERSION}|g\" deploy-service-azure.yaml
                         sed -i -e \"s|INTERNAL_SVC_HOSTNAME_VAR|${AZURE_SVC_HOSTNAME_PROP}|g\" ingress-azure.yaml
                         sed -i -e \"s|<ENV>|${env}|g\" -e \"s|<REGION>|${region}|g\" ingress-azure.yaml
-                        cat ingress-azure.yaml
                         . ./deploy.sh
                        """
                 }
