@@ -31,12 +31,6 @@ class cloudEnvironmentProps{
     def GIT_SVC_ACCOUNT_USER                = "l-apimgt-u-itsehbg"
     def NPM_NEXUS_REPOSITORY_URL            = "https://nexus.hip.red.cdtapps.com/repository/npm-internal/"
 
-    def getResourceGroupName(region, env) {
-        for () {
-
-        }
-    }
-
     def getApiaryIoToken(){
         return APIARY_IO_TOKEN
     }
