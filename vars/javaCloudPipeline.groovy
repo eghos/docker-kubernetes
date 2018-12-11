@@ -309,10 +309,10 @@ def call(Map pipelineParams) {
                 }
             }
 
-            stage ('TEST Deploy - AWS') {
+            allOf {
+                stage ('TEST Deploy - AWS') {
                 when {
-                    allOf {
-                        branch "release/*";
+                       branch "release/*";
                         expression { DEPLOY_TO_AWS == 'true' }
                     }
                 }
