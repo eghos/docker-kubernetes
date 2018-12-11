@@ -40,21 +40,13 @@ def call(Map pipelineParams) {
             DEPLOY_TO_AZURE          = ""
             DEPLOY_TO_ON_PREM        = ""
 
-            AZ_ACR_NAME              = ""
-            AZ_AKS_CLUSTER_NAME      = ""
-            AZ_RG_NAME               = ""
-
             IS_API_APPLICATION       = ""
 
             AZURE_SVC_HOSTNAME_PROP                  = cloudEnvironmentProps.getAzureSvcHostname()
             GIT_SVC_ACOUNT_EMAIL_PROP                = cloudEnvironmentProps.getGitSvcAccountEmail()
             GIT_SVC_ACCOUNT_USER_PROP                = cloudEnvironmentProps.getGitSvcAccountUser()
-            NONPROD_WESTEUROPE_AZRGNAME_PROP         = cloudEnvironmentProps.getNonProdWesteuropeAzRgName()
-            NONPROD_WESTEUROPE_AZACRNAME_PROP        = cloudEnvironmentProps.getNonProdWesteuropeAzAcrName()
-            NONPROD_WESTEUROPE_AZAKSCLUSTERNAME_PROP = cloudEnvironmentProps.getNonProdWesteuropeAzAksClusterName()
             PROD_WESTEUROPE_AZRGNAME_PROP            = cloudEnvironmentProps.getProdWesteuropeAzRgName()
             PROD_WESTEUROPE_AZACRNAME_PROP           = cloudEnvironmentProps.getProdWesteuropeAzAcrName()
-            PROD_WESTEUROPE_AZAKSCLUSTERNAME_PROP    = cloudEnvironmentProps.getProdWesteuropeAzAksClusterName()
             APIARY_IO_TOKEN_PROP                     = cloudEnvironmentProps.getApiaryIoToken()
             NPM_NEXUS_REPOSITORY_URL_PROP            = cloudEnvironmentProps.getNpmNexusRepositoryUrl()
         }
@@ -77,47 +69,6 @@ def call(Map pipelineParams) {
                 }
             }
 
-            stage('Setup K8S Config') {
-                parallel {
-                    stage('PROD') {
-                        when {
-                            anyOf {
-                                branch "master"
-                                changeRequest target: 'master'
-                            }
-                        }
-                        steps {
-                            script {
-                                AZ_ACR_NAME         = "${PROD_WESTEUROPE_AZACRNAME_PROP}"
-                                AZ_AKS_CLUSTER_NAME = "${PROD_WESTEUROPE_AZAKSCLUSTERNAME_PROP}"
-                                AZ_RG_NAME          = "${PROD_WESTEUROPE_AZRGNAME_PROP}"
-                            }
-                            echo "AZ_ACR_NAME (PROD_WESTEUROPE_AZACRNAME_PROP): ${AZ_ACR_NAME}"
-                            echo "AZ_AKS_CLUSTER_NAME (PROD_WESTEUROPE_AZAKSCLUSTERNAME_PROP): ${AZ_AKS_CLUSTER_NAME}"
-                            echo "AZ_RG_NAME (PROD_WESTEUROPE_AZRGNAME_PROP): ${AZ_RG_NAME}"
-                        }
-                    }
-                    stage('NON-PROD') {
-                        when {
-                            anyOf {
-                                branch "develop*"
-                                branch "release/*"
-                            }
-                        }
-                        steps {
-                            script {
-                                AZ_ACR_NAME         = "${NONPROD_WESTEUROPE_AZACRNAME_PROP}"
-                                AZ_AKS_CLUSTER_NAME = "${NONPROD_WESTEUROPE_AZAKSCLUSTERNAME_PROP}"
-                                AZ_RG_NAME          = "${NONPROD_WESTEUROPE_AZRGNAME_PROP}"
-                            }
-                            echo "AZ_ACR_NAME (NONPROD_WESTEUROPE_AZACRNAME_PROP): ${AZ_ACR_NAME}"
-                            echo "AZ_AKS_CLUSTER_NAME (NONPROD_WESTEUROPE_AZAKSCLUSTERNAME_PROP): ${AZ_AKS_CLUSTER_NAME}"
-                            echo "AZ_RG_NAME (NONPROD_WESTEUROPE_AZRGNAME_PROP): ${AZ_RG_NAME}"
-                        }
-                    }
-                }
-            }
-
             stage('Setup General') {
                 steps {
                     stageSetupGeneral()
@@ -128,12 +79,14 @@ def call(Map pipelineParams) {
 
                         AWS_DEV_REGION      = deploymentProperties['AWS_DEV_REGION'].split(',').collect{it as String}
                         AWS_TEST_REGION     = deploymentProperties['AWS_TEST_REGION'].split(',').collect{it as String}
+                        AWS_PPE_REGION      = deploymentProperties['AWS_PPE_REGION'].split(',').collect{it as String}
                         AWS_PROD_REGION     = deploymentProperties['AWS_PROD_REGION'].split(',').collect{it as String}
 
                         DEPLOY_TO_AZURE     = deploymentProperties['DEPLOY_TO_AZURE']
 
                         AZURE_DEV_REGION    = deploymentProperties['AZURE_DEV_REGION'].split(',').collect{it as String}
                         AZURE_TEST_REGION   = deploymentProperties['AZURE_TEST_REGION'].split(',').collect{it as String}
+                        AZURE_PPE_REGION    = deploymentProperties['AZURE_PPE_REGION'].split(',').collect{it as String}
                         AZURE_PROD_REGION   = deploymentProperties['AZURE_PROD_REGION'].split(',').collect{it as String}
 
                         DEPLOY_TO_ON_PREM   = deploymentProperties['DEPLOY_TO_ON_PREM']
@@ -252,9 +205,9 @@ def call(Map pipelineParams) {
                             AWS_TEST_REGION_MAP = AWS_TEST_REGION.collectEntries {
                                 ["${it}" : generateAwsDeployStage(it, "test")]
                             }
-//                            AWS_PPE_REGION_MAP = AWS_PPE_REGION.collectEntries {
-//                                ["${it}" : generateAwsDeployStage(it, "ppe")]
-//                            }
+                            AWS_PPE_REGION_MAP = AWS_PPE_REGION.collectEntries {
+                                ["${it}" : generateAwsDeployStage(it, "ppe")]
+                            }
                             AWS_PROD_REGION_MAP = AWS_PROD_REGION.collectEntries {
                                 ["${it}" : generateAwsDeployStage(it, "prod")]
                             }
@@ -265,17 +218,17 @@ def call(Map pipelineParams) {
                             AZURE_TEST_REGION_MAP = AZURE_TEST_REGION.collectEntries {
                                 ["${it}" : generateAzureDeployStage(it, "test")]
                             }
-//                            AWS_PPE_REGION_MAP = AWS_PPE_REGION.collectEntries {
-//                                ["${it}" : generateAzureDeployStage(it, "ppe")]
-//                            }
+                            AZURE_PPE_REGION_MAP = AZURE_PPE_REGION.collectEntries {
+                                ["${it}" : generateAzureDeployStage(it, "ppe")]
+                            }
                             AZURE_PROD_REGION_MAP = AZURE_PROD_REGION.collectEntries {
                                 ["${it}" : generateAzureDeployStage(it, "prod")]
                             }
 
                             sh "az login --service-principal -u ${AZURE_CLIENT_ID} -p ${AZURE_CLIENT_SECRET} -t ${AZURE_TENANT_ID}"
                             sh "az account set -s ${AZURE_SUBSCRIPTION_ID}"
-                            sh "az acr login --name ${AZ_ACR_NAME}"
-                            ACRLOGINSERVER = sh(returnStdout: true, script: "az acr show --resource-group ${AZ_RG_NAME} --name ${AZ_ACR_NAME} --query \"loginServer\" --output tsv").trim()
+                            sh "az acr login --name ${PROD_WESTEUROPE_AZACRNAME_PROP}"
+                            ACRLOGINSERVER = sh(returnStdout: true, script: "az acr show --resource-group ${PROD_WESTEUROPE_AZRGNAME_PROP} --name ${PROD_WESTEUROPE_AZACRNAME_PROP} --query \"loginServer\" --output tsv").trim()
                             sh "docker build -t ${ACRLOGINSERVER}/${DOCKER_ORG_IMAGE}:${DOCKER_VERSION} ."
                             sh "docker push ${ACRLOGINSERVER}/${DOCKER_ORG_IMAGE}:${DOCKER_VERSION}"
 
@@ -292,9 +245,7 @@ def call(Map pipelineParams) {
                     }
                 }
                 steps {
-                    script {
-                        parallel AWS_DEV_REGION_MAP
-                    }
+                    executeDeploy(AWS_DEV_REGION_MAP)
                 }
             }
 
@@ -306,7 +257,7 @@ def call(Map pipelineParams) {
                     }
                 }
                 steps {
-                    executeAzureDeploy(AZURE_DEV_REGION_MAP)
+                    executeDeploy(AZURE_DEV_REGION_MAP)
                 }
             }
 
@@ -318,9 +269,7 @@ def call(Map pipelineParams) {
                     }
                 }
                 steps {
-                    script {
-                        parallel AWS_TEST_REGION_MAP
-                    }
+                    executeDeploy(AWS_TEST_REGION_MAP)
                 }
             }
 
@@ -332,9 +281,7 @@ def call(Map pipelineParams) {
                     }
                 }
                 steps {
-                    script {
-                        parallel AZURE_TEST_REGION_MAP
-                    }
+                    executeDeploy(AZURE_TEST_REGION_MAP)
                 }
             }
 
@@ -392,24 +339,24 @@ def call(Map pipelineParams) {
                 }
             }
 
-            // stage('Commit Updated Version') {
-            //     steps {
-            //         withCredentials([sshUserPrivateKey(credentialsId: 'l-apimgt-u-itsehbgATikea.com', keyFileVariable: 'SSH_KEY')]) {
-            //             withEnv(["GIT_SSH_COMMAND=ssh -o StrictHostKeyChecking=no -o User=${GIT_SVC_ACCOUNT_USER_PROP} -i ${SSH_KEY}"]) {
-            //                 script {
-            //                     sh 'git remote rm origin'
-            //                     //sh "git remote add origin git@git.build.ingka.ikea.com:IPIM-IP/${IMAGE_NAME}.git"
-            //                     sh "git remote add origin ${GIT_URL_MODIFIED}"
-            //                     sh 'git config --global user.email "l-apimgt-u-itsehbg@ikea.com"'
-            //                     sh 'git config --global user.name "l-apimgt-u-itsehbg"'
-            //                     sh 'git add package.json'
-            //                     sh 'git commit -am "System - Update Package Version [ci skip]"'
-            //                     sh 'git push origin "${BRANCH_NAME_FULL}" -f'
-            //                 }
-            //             }
-            //         }
-            //     }
-            // }
+            stage('Commit Updated Version') {
+                steps {
+                    withCredentials([sshUserPrivateKey(credentialsId: 'l-apimgt-u-itsehbgATikea.com', keyFileVariable: 'SSH_KEY')]) {
+                        withEnv(["GIT_SSH_COMMAND=ssh -o StrictHostKeyChecking=no -o User=${GIT_SVC_ACCOUNT_USER_PROP} -i ${SSH_KEY}"]) {
+                            script {
+                                sh 'git remote rm origin'
+                                //sh "git remote add origin git@git.build.ingka.ikea.com:IPIM-IP/${IMAGE_NAME}.git"
+                                sh "git remote add origin ${GIT_URL_MODIFIED}"
+                                sh 'git config --global user.email "l-apimgt-u-itsehbg@ikea.com"'
+                                sh 'git config --global user.name "l-apimgt-u-itsehbg"'
+                                sh 'git add package.json'
+                                sh 'git commit -am "System - Update Package Version [ci skip]"'
+                                sh 'git push origin "${BRANCH_NAME_FULL}" -f'
+                            }
+                        }
+                    }
+                }
+            }
 
             stage('Clean Up') {
                 steps {
@@ -464,10 +411,10 @@ def generateAzureDeployStage(region, env) {
         stage("${env} - ${region}") {
             withCredentials([azureServicePrincipal('sp-ipim-ip-aks')]) {
                 script {
-                    AZ_RG_NAME = sh(returnStdout: true, script: "az group list --tag Env=${env} --tag Region=${region} --query \"[].{name:name}\" --output tsv").trim()
-                    // AZ_AKS_CLUSTER_NAME = sh(returnStdout: true, script: "az group list --tag Env=${env} --tag Region=${region} --query \"[].{name:name}\" --output tsv").trim()
-                    sh "az aks get-credentials --resource-group=${AZ_RG_NAME} --name=akswedevgupuy7"
-                    // ACRLOGINSERVER = sh(returnStdout: true, script: "az acr show --resource-group ${AZ_RG_NAME} --name ${AZ_ACR_NAME} --query \"loginServer\" --output tsv").trim()
+                    AZ_DEPLOY_RG_NAME = sh(returnStdout: true, script: "az group list --tag Env=${env} --tag Region=${region} --query \"[].{name:name}\" --output tsv").trim()
+                    AZ_DEPLOY_AKS_CLUSTER_NAME = sh(returnStdout: true, script: "az resource list --tag Env=${env} --tag Region=${region} --tag Cluster=default --tag ServiceType=aks --query "[].{name:name}" --output tsv").trim()
+                    AZ_ENV_REGION_SVC_HOSTNAME = "${AZURE_SVC_HOSTNAME_PROP}".replace('<ENV>', "${env}").replace('<REGION>', "${region}")
+                    sh "az aks get-credentials --resource-group=${AZ_DEPLOY_RG_NAME} --name=${AZ_DEPLOY_AKS_CLUSTER_NAME}"
                     sh 'chmod +x ./build/*.yaml'
                     sh """
                         cd build
@@ -479,8 +426,7 @@ def generateAzureDeployStage(region, env) {
                         cp \"deploy-service.yaml\" \"deploy-service-azure.yaml\"
                         cp \"ingress.yaml\" \"ingress-azure.yaml\"
                         sed -i -e \"s|IMAGE_NAME_VAR|${ACRLOGINSERVER}/${DOCKER_ORG_IMAGE}:${DOCKER_VERSION}|g\" deploy-service-azure.yaml
-                        sed -i -e \"s|INTERNAL_SVC_HOSTNAME_VAR|${AZURE_SVC_HOSTNAME_PROP}|g\" ingress-azure.yaml
-                        sed -i -e \"s|<ENV>|${env}|g\" -e \"s|<REGION>|${region}|g\" ingress-azure.yaml
+                        sed -i -e \"s|INTERNAL_SVC_HOSTNAME_VAR|${AZ_ENV_REGION_SVC_HOSTNAME}|g\" ingress-azure.yaml
                         . ./deploy.sh
                        """
                 }
@@ -489,12 +435,12 @@ def generateAzureDeployStage(region, env) {
     }
 }
 
-void executeAzureDeploy(Map inboundMap) {
+void executeDeploy(Map inboundMap) {
 
     def mapValues = inboundMap.values();
 
-    for (method in mapValues) {
-        script method
+    for (customStage in mapValues) {
+        script customStage
     }
 
 }
