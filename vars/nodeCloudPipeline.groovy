@@ -275,10 +275,9 @@ def call(Map pipelineParams) {
                             sh "az login --service-principal -u ${AZURE_CLIENT_ID} -p ${AZURE_CLIENT_SECRET} -t ${AZURE_TENANT_ID}"
                             sh "az account set -s ${AZURE_SUBSCRIPTION_ID}"
                             sh "az acr login --name ${AZ_ACR_NAME}"
-                            sh "az aks get-credentials --resource-group=${AZ_RG_NAME} --name=${AZ_AKS_CLUSTER_NAME}"
-                            ACR_LOGIN_SERVER = sh(returnStdout: true, script: "az acr show --resource-group ${AZ_RG_NAME} --name ${AZ_ACR_NAME} --query \"loginServer\" --output tsv").trim()
-                            sh "docker build -t ${ACR_LOGIN_SERVER}/${DOCKER_ORG_IMAGE}:${DOCKER_VERSION} ."
-                            sh "docker push ${ACR_LOGIN_SERVER}/${DOCKER_ORG_IMAGE}:${DOCKER_VERSION}"
+                            ACRLOGINSERVER = sh(returnStdout: true, script: "az acr show --resource-group ${AZ_RG_NAME} --name ${AZ_ACR_NAME} --query \"loginServer\" --output tsv").trim()
+                            sh "docker build -t ${ACRLOGINSERVER}/${DOCKER_ORG_IMAGE}:${DOCKER_VERSION} ."
+                            sh "docker push ${ACRLOGINSERVER}/${DOCKER_ORG_IMAGE}:${DOCKER_VERSION}"
 
                         }
                     }
@@ -299,19 +298,21 @@ def call(Map pipelineParams) {
                 }
             }
 
-            stage ('DEV Deploy - Azure') {
-                when {
-                    allOf {
-                        branch "develop*";
-                        expression { DEPLOY_TO_AZURE == 'true' }
-                    }
-                }
-                steps {
-                    script {
-                        parallel AZURE_DEV_REGION_MAP
-                    }
-                }
-            }
+            AZURE_DEV_REGION_MAP
+
+            // stage ('DEV Deploy - Azure') {
+            //     when {
+            //         allOf {
+            //             branch "develop*";
+            //             expression { DEPLOY_TO_AZURE == 'true' }
+            //         }
+            //     }
+            //     steps {
+            //         script {
+            //             parallel AZURE_DEV_REGION_MAP
+            //         }
+            //     }
+            // }
 
             stage ('TEST Deploy - AWS') {
                 when {
@@ -431,7 +432,7 @@ def call(Map pipelineParams) {
 
 def generateAwsDeployStage(region, env) {
     return {
-        stage("${region}") {
+        stage("${env} - ${region}") {
             withCredentials(bindings: [usernamePassword(credentialsId: 'bc608fa5-71e6-4e08-b769-af3ca6024715', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
                 sh "docker login -u ${USERNAME} -p ${PASSWORD} ${DOCKER_REPO}"
                 script {
@@ -464,10 +465,13 @@ def generateAwsDeployStage(region, env) {
 
 def generateAzureDeployStage(region, env) {
     return {
-        stage("${region}") {
+        stage("${env} - ${region}") {
             withCredentials([azureServicePrincipal('sp-ipim-ip-aks')]) {
                 script {
-                    ACRLOGINSERVER = sh(returnStdout: true, script: "az acr show --resource-group ${AZ_RG_NAME} --name ${AZ_ACR_NAME} --query \"loginServer\" --output tsv").trim()
+                    AZ_RG_NAME = sh(returnStdout: true, script: "az group list --tag Env=${env} --tag Region=${region} --query \"[].{name:name}\" --output tsv").trim()
+                    // AZ_AKS_CLUSTER_NAME = sh(returnStdout: true, script: "az group list --tag Env=${env} --tag Region=${region} --query \"[].{name:name}\" --output tsv").trim()
+                    sh "az aks get-credentials --resource-group=${AZ_RG_NAME} --name=akswedevgupuy7"
+                    // ACRLOGINSERVER = sh(returnStdout: true, script: "az acr show --resource-group ${AZ_RG_NAME} --name ${AZ_ACR_NAME} --query \"loginServer\" --output tsv").trim()
                     sh 'chmod +x ./build/*.yaml'
                     sh """
                         cd build
