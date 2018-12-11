@@ -411,11 +411,9 @@ def generateAzureDeployStage(region, env) {
         stage("${env} - ${region}") {
             withCredentials([azureServicePrincipal('sp-ipim-ip-aks')]) {
                 script {
-                    AZ_DEPLOY_RG_NAME = sh(returnStdout: true, script: "az group list --tag Env=${env} --tag Region=${region} --query \"[].{name:name}\" --output tsv").trim()
-                    AZ_DEPLOY_AKS_CLUSTER_NAME = sh(returnStdout: true, script: "az resource list --tag Env=${env} --tag Region=${region} --tag Cluster=default --tag ServiceType=aks --query \"[].{name:name}\" --output tsv").trim()
+                    AZ_DEPLOY_RG_NAME = sh(returnStdout: true, script: "az group list --query \"[?tags.Env=='${env}' && tags.Region=='${region}'].{name:name}\" --output tsv").trim()
+                    AZ_DEPLOY_AKS_CLUSTER_NAME = sh(returnStdout: true, script: "az resource list --query \"[?tags.Env=='${env}' && tags.Region=='${region}' && tags.Cluster=='default' && tags.ServiceType=='aks'].{name:name}\" --output tsv").trim()
                     AZ_ENV_REGION_SVC_HOSTNAME = "${AZURE_SVC_HOSTNAME_PROP}".replace('<ENV>', "${env}").replace('<REGION>', "${region}")
-                    echo "AKS Region Name: ${AZ_DEPLOY_RG_NAME}"
-                    echo "AKS Cluster Name: ${AZ_DEPLOY_AKS_CLUSTER_NAME}"
                     sh "az aks get-credentials --resource-group=${AZ_DEPLOY_RG_NAME} --name=${AZ_DEPLOY_AKS_CLUSTER_NAME}"
                     sh 'chmod +x ./build/*.yaml'
                     sh """
