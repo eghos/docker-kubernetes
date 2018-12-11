@@ -412,7 +412,7 @@ def generateAzureDeployStage(region, env) {
             withCredentials([azureServicePrincipal('sp-ipim-ip-aks')]) {
                 script {
                     AZ_DEPLOY_RG_NAME = sh(returnStdout: true, script: "az group list --tag Env=${env} --tag Region=${region} --query \"[].{name:name}\" --output tsv").trim()
-                    AZ_DEPLOY_AKS_CLUSTER_NAME = sh(returnStdout: true, script: "az resource list --tag Env=${env} --tag Region=${region} --tag Cluster=default --tag ServiceType=aks --query "[].{name:name}" --output tsv").trim()
+                    AZ_DEPLOY_AKS_CLUSTER_NAME = sh(returnStdout: true, script: "az resource list --tag Env=${env} --tag Region=${region} --tag Cluster=default --tag ServiceType=aks --query \"[].{name:name}\" --output tsv").trim()
                     AZ_ENV_REGION_SVC_HOSTNAME = "${AZURE_SVC_HOSTNAME_PROP}".replace('<ENV>', "${env}").replace('<REGION>', "${region}")
                     sh "az aks get-credentials --resource-group=${AZ_DEPLOY_RG_NAME} --name=${AZ_DEPLOY_AKS_CLUSTER_NAME}"
                     sh 'chmod +x ./build/*.yaml'
