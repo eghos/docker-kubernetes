@@ -2,9 +2,9 @@
 class cloudEnvironmentProps{
     def APIARY_IO_TOKEN                     = "890e555a1d3107539c130f23b9494155"
 
-    def NONPROD_WESTEUROPE_AZRGNAME         = "ipimip-dev-westEurope-rg"
-    def NONPROD_WESTEUROPE_AZACRNAME        = "acrwedevgupuy7"
-    def NONPROD_WESTEUROPE_AZAKSCLUSTERNAME = "akswedevgupuy7"
+    // def NONPROD_WESTEUROPE_AZRGNAME         = "ipimip-dev-westEurope-rg"
+    // def NONPROD_WESTEUROPE_AZACRNAME        = "acrwedevgupuy7"
+    // def NONPROD_WESTEUROPE_AZAKSCLUSTERNAME = "akswedevgupuy7"
 
 //    def NONPROD_WESTEUROPE_AZRGNAME         = "ipimip-test-westEurope-rg"
 //    def NONPROD_WESTEUROPE_AZACRNAME        = "acrwetest5i4vqq"
@@ -18,9 +18,9 @@ class cloudEnvironmentProps{
 //    def NONPROD_WESTEUROPE_AZACRNAME        = "acrweprod01"
 //    def NONPROD_WESTEUROPE_AZAKSCLUSTERNAME = "aksweprod01"
 
-//    def NONPROD_WESTEUROPE_AZRGNAME         = "ipimip-ppe-CentralUS-rg"
-//    def NONPROD_WESTEUROPE_AZACRNAME        = "acrcusppe01"
-//    def NONPROD_WESTEUROPE_AZAKSCLUSTERNAME = "akscusppe01"
+   def NONPROD_WESTEUROPE_AZRGNAME         = "ipimip-ppe-CentralUS-rg"
+   def NONPROD_WESTEUROPE_AZACRNAME        = "acrcusppe01"
+   def NONPROD_WESTEUROPE_AZAKSCLUSTERNAME = "akscusppe01"
 
     def PROD_WESTEUROPE_AZRGNAME            = "ipimip-prod-westEurope-rg"
     def PROD_WESTEUROPE_AZACRNAME           = "acrweprod01"
