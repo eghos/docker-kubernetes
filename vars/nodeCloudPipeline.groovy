@@ -298,21 +298,15 @@ def call(Map pipelineParams) {
                 }
             }
 
-            AZURE_DEV_REGION_MAP
-
-            // stage ('DEV Deploy - Azure') {
-            //     when {
-            //         allOf {
-            //             branch "develop*";
-            //             expression { DEPLOY_TO_AZURE == 'true' }
-            //         }
-            //     }
-            //     steps {
-            //         script {
-            //             parallel AZURE_DEV_REGION_MAP
-            //         }
-            //     }
-            // }
+            stage ('DEV Deploy - Azure') {
+                when {
+                    allOf {
+                        branch "develop*";
+                        expression { DEPLOY_TO_AZURE == 'true' }
+                    }
+                }
+                stages AZURE_DEV_REGION_MAP
+            }
 
             stage ('TEST Deploy - AWS') {
                 when {
