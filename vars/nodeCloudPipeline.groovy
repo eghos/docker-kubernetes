@@ -306,9 +306,7 @@ def call(Map pipelineParams) {
                     }
                 }
                 steps {
-                    script {
-                        stages AZURE_DEV_REGION_MAP
-                    }
+                    executeAzureDeploy(AZURE_DEV_REGION_MAP)
                 }
             }
 
@@ -489,4 +487,14 @@ def generateAzureDeployStage(region, env) {
             }
         }
     }
+}
+
+void executeAzureDeploy(Map inboundMap) {
+
+    def mapValues = inboundMap.values();
+
+    for (method in mapValues) {
+        script method
+    }
+
 }
