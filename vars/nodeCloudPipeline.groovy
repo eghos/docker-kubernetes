@@ -305,7 +305,9 @@ def call(Map pipelineParams) {
                         expression { DEPLOY_TO_AZURE == 'true' }
                     }
                 }
-                stages AZURE_DEV_REGION_MAP
+                scrip {
+                    stages AZURE_DEV_REGION_MAP
+                }
             }
 
             stage ('TEST Deploy - AWS') {
