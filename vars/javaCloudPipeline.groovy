@@ -93,7 +93,8 @@ def call(Map pipelineParams) {
             stage('Update Versions') {
                 steps {
                     withCredentials([sshUserPrivateKey(credentialsId: 'l-apimgt-u-itsehbgATikea.com', keyFileVariable: 'SSH_KEY')]) {
-                        sh 'chmod +x ./build/mvnw'
+//                        sh 'chmod +x ./build/mvnw'
+                        sh 'chmod 777 ./build/mvnw'
                         script {
                             if (env.BRANCH_NAME.startsWith("PR")) {
                                 echo 'This is a PR Branch'
