@@ -104,8 +104,7 @@ def call(Map pipelineParams) {
                             if (env.BRANCH_NAME.startsWith("develop")) {
                                 echo 'This is a develop Branch'
                                 //Update pom.xml version
-                                sh '''chmod +x ./build/mvnw
-                                ./build/mvnw -B org.codehaus.mojo:versions-maven-plugin:2.5:set -DprocessAllModules -DnewVersion=1.0.${BUILD_NUMBER}-SNAPSHOT'''
+                                sh './build/mvnw -B org.codehaus.mojo:versions-maven-plugin:2.5:set -DprocessAllModules -DnewVersion=1.0.${BUILD_NUMBER}-SNAPSHOT'
                                 DOCKER_VERSION = "${DEV_SNAPSHOT_VERSION}"
                             }
 
@@ -446,10 +445,10 @@ def generateAzureDeployStage(region, env) {
                         cp \"configmap-${region}-${env}.yaml\" \"configmap-${region}-${env}-azure.yaml\"
                         cp \"deploy-service.yaml\" \"deploy-service-azure.yaml\"
                         cp \"virtualservice.yaml\" \"virtualservice-azure.yaml\"
-                        sed -i -e \"s|KUBERNETES_NAMESPACE_VAR|${KUBERNETES_NAMESPACE_VAR}|g\" virtualservice-azure.yaml
+                        sed -i -e \"s|KUBERNETES_NAMESPACE_VAR|${KUBERNETES_NAMESPACE}|g\" virtualservice-azure.yaml
                         sed -i -e \"s|IMAGE_NAME_VAR|${ACRLOGINSERVER}/${DOCKER_ORG_IMAGE}:${DOCKER_VERSION}|g\" deploy-service-azure.yaml
                         sed -i -e \"s|INTERNAL_SVC_HOSTNAME_VAR|${AZ_ENV_REGION_SVC_HOSTNAME}|g\" virtualservice-azure.yaml
-                        sed -i -e \"s|KUBERNETES_NAMESPACE_VAR|${KUBERNETES_NAMESPACE_VAR}|g\" virtualservice-azure.yaml
+                        sed -i -e \"s|KUBERNETES_NAMESPACE_VAR|${KUBERNETES_NAMESPACE}|g\" virtualservice-azure.yaml
                         . ./deploy.sh
                        """
                 }
