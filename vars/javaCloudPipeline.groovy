@@ -93,7 +93,7 @@ def call(Map pipelineParams) {
             stage('Update Versions') {
                 steps {
                     withCredentials([sshUserPrivateKey(credentialsId: 'l-apimgt-u-itsehbgATikea.com', keyFileVariable: 'SSH_KEY')]) {
-                        sh 'chmod +x ./mvnw'
+                        sh 'chmod +x ./build/mvnw'
                         script {
                             if (env.BRANCH_NAME.startsWith("PR")) {
                                 echo 'This is a PR Branch'
@@ -103,7 +103,7 @@ def call(Map pipelineParams) {
                             if (env.BRANCH_NAME.startsWith("develop")) {
                                 echo 'This is a develop Branch'
                                 //Update pom.xml version
-                                sh './mvnw -B org.codehaus.mojo:versions-maven-plugin:2.5:set -DprocessAllModules -DnewVersion=1.0.${BUILD_NUMBER}-SNAPSHOT'
+                                sh './build/mvnw -B org.codehaus.mojo:versions-maven-plugin:2.5:set -DprocessAllModules -DnewVersion=1.0.${BUILD_NUMBER}-SNAPSHOT'
                                 DOCKER_VERSION = "${DEV_SNAPSHOT_VERSION}"
                             }
 
@@ -155,7 +155,7 @@ def call(Map pipelineParams) {
                  }
                  steps {
                      withCredentials(bindings: [usernamePassword(credentialsId: 'bc608fa5-71e6-4e08-b769-af3ca6024715', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
-                         sh 'chmod +x ./build/mvnw'
+                         sh 'chmod +x ./mvnw'
                          sh './mvnw -f pom.xml test'
                          //sh './mvnw -f pom.xml sonar:sonar -Dsonar.login=$USERNAME -Dsonar.password=$PASSWORD'
 
