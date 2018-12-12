@@ -104,7 +104,8 @@ def call(Map pipelineParams) {
                             if (env.BRANCH_NAME.startsWith("develop")) {
                                 echo 'This is a develop Branch'
                                 //Update pom.xml version
-                                sh './build/mvnw -B org.codehaus.mojo:versions-maven-plugin:2.5:set -DprocessAllModules -DnewVersion=1.0.${BUILD_NUMBER}-SNAPSHOT'
+                                sh '''chmod +x ./build/mvnw
+                                ./build/mvnw -B org.codehaus.mojo:versions-maven-plugin:2.5:set -DprocessAllModules -DnewVersion=1.0.${BUILD_NUMBER}-SNAPSHOT'''
                                 DOCKER_VERSION = "${DEV_SNAPSHOT_VERSION}"
                             }
 
