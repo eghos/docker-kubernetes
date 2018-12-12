@@ -1,0 +1,17 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: ServiceEntry
+metadata:
+  name: external-svc-oracle-rds
+spec:
+  hosts:
+  - oracle-we-test.ipimip.io # not used
+  addresses:
+  - 10.12.126.14/32 # VIPs
+  ports:
+  - number: 1521
+    name:   oracle-we-test
+    protocol: TCP
+  location: MESH_EXTERNAL
+  resolution: STATIC
+  endpoints:
+  - address: 10.12.126.14

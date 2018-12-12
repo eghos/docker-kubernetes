@@ -1,0 +1,13 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: ServiceEntry
+metadata:
+  name: external-svc-mongo-db
+spec:
+  hosts:
+  - cdbwedevgupuy7.documents.azure.com
+  ports:
+  - number: 10255
+    name:   mongo-we-dev
+    protocol: MONGO
+  location: MESH_INTERNAL
+  resolution: DNS

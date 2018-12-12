@@ -1,0 +1,31 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: productservice
+  labels:
+    app: product-service
+    version: v1
+spec:
+  hosts:
+  - retail-app.mvp-development.svc.cluster.local
+  - 137.117.162.13
+  - ingressgateway
+  gateways:
+  - dev-gateway-controller
+  - mesh
+  http:
+  - match:
+    - uri:
+       prefix: /products
+    - uri:
+       prefix: /ipimip/products
+    - uri:
+        prefix: /ipim-ip/v2/products
+    - uri:
+        prefix: /ipim-ip/v1/products
+    route:
+    - destination:
+        port:
+          number: 8080
+        host: product-service.mvp-development.svc.cluster.local
+    timeout: 3s

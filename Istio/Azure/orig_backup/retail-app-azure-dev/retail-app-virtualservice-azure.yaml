@@ -1,0 +1,24 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: retail-app
+  labels:
+    app: retail-app
+    version: v1
+spec:
+  hosts:
+  - 137.117.162.13
+  - ingressgateway
+  gateways:
+  - dev-gateway-controller
+  - mesh
+  http:
+  - match:
+    - uri:
+        prefix: /
+    route:
+    - destination:
+        port:
+          number: 8080
+        host: retail-app.mvp-development.svc.cluster.local
+    timeout: 3s
