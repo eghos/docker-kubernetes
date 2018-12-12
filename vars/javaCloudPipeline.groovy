@@ -145,47 +145,47 @@ def call(Map pipelineParams) {
                 }
             }
 
-             stage('Code Test') {
-                 when {
-                     anyOf {
-                         branch "develop*";
-                         branch "PR*"
-                         branch "release/*"
-                         branch "hotfix/*"
-                     }
-                 }
-                 steps {
-                     withCredentials(bindings: [usernamePassword(credentialsId: 'bc608fa5-71e6-4e08-b769-af3ca6024715', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
-                         sh 'chmod +x ./mvnw'
-                         sh './mvnw -f pom.xml test'
-                         //sh './mvnw -f pom.xml sonar:sonar -Dsonar.login=$USERNAME -Dsonar.password=$PASSWORD'
+//             stage('Code Test') {
+//                 when {
+//                     anyOf {
+//                         branch "develop*";
+//                         branch "PR*"
+//                         branch "release/*"
+//                         branch "hotfix/*"
+//                     }
+//                 }
+//                 steps {
+//                     withCredentials(bindings: [usernamePassword(credentialsId: 'bc608fa5-71e6-4e08-b769-af3ca6024715', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
+//                         sh 'chmod +x ./mvnw'
+//                         sh './mvnw -f pom.xml test'
+//                         //sh './mvnw -f pom.xml sonar:sonar -Dsonar.login=$USERNAME -Dsonar.password=$PASSWORD'
+//
+////                         sh ''' export JAVA_HOME=$JAVA_HOME8
+////           cd build
+////           ./mvnw -f ../pom.xml sonar:sonar -Dsonar.login=d4e0a890f5606a8df6c5ef32ed480abc611b6a7a   -Dsonar.projectKey=ipimip.${IMAGE_NAME}.dev'''
+//
+//                         //d4e0a890f5606a8df6c5ef32ed480abc611b6a7a = staging2
+//                         //2af9224b1068533d1c48def794f022f2df1b928e = staging
+//
+//                         //aws instance 7.2
+//                         sh './mvnw -f pom.xml sonar:sonar -Dsonar.login=$USERNAME -Dsonar.password=$PASSWORD'
+//
+//                     }
+//                 }
+//             }
 
-//                         sh ''' export JAVA_HOME=$JAVA_HOME8
-//           cd build
-//           ./mvnw -f ../pom.xml sonar:sonar -Dsonar.login=d4e0a890f5606a8df6c5ef32ed480abc611b6a7a   -Dsonar.projectKey=ipimip.${IMAGE_NAME}.dev'''
-
-                         //d4e0a890f5606a8df6c5ef32ed480abc611b6a7a = staging2
-                         //2af9224b1068533d1c48def794f022f2df1b928e = staging
-
-                         //aws instance 7.2
-                         sh './mvnw -f pom.xml sonar:sonar -Dsonar.login=$USERNAME -Dsonar.password=$PASSWORD'
-
-                     }
-                 }
-             }
-
-            stage('Code Deploy to Nexus') {
-                when {
-                    anyOf {
-                        branch "develop*";
-                        branch "release/*"
-                    }
-                }
-                steps {
-                    sh 'chmod +x ./mvnw'
-                    sh './mvnw -f pom.xml -Dmaven.test.skip=true deploy'
-                }
-            }
+//            stage('Code Deploy to Nexus') {
+//                when {
+//                    anyOf {
+//                        branch "develop*";
+//                        branch "release/*"
+//                    }
+//                }
+//                steps {
+//                    sh 'chmod +x ./mvnw'
+//                    sh './mvnw -f pom.xml -Dmaven.test.skip=true deploy'
+//                }
+//            }
 
             stage('Docker Build') {
                 when {
@@ -443,12 +443,12 @@ def generateAzureDeployStage(region, env) {
                         export URI_ROOT_PATH_VAR=${URI_ROOT_PATH}
                         cp \"configmap-${region}-${env}.yaml\" \"configmap-${region}-${env}-azure.yaml\"
                         cp \"deploy-service.yaml\" \"deploy-service-azure.yaml\"
-                        cp \"virtualservice.yaml\" \"virtualservice-azure.yaml\"
+                        cp \"virtual-service.yaml\" \"virtual-service-azure.yaml\"
                         sed -i -e \"s|KUBERNETES_NAMESPACE_VAR|$KUBERNETES_NAMESPACE|g\" configmap-${region}-${env}-azure.yaml
-                        sed -i -e \"s|KUBERNETES_NAMESPACE_VAR|${KUBERNETES_NAMESPACE}|g\" virtualservice-azure.yaml
+                        sed -i -e \"s|KUBERNETES_NAMESPACE_VAR|${KUBERNETES_NAMESPACE}|g\" virtual-service-azure.yaml
                         sed -i -e \"s|IMAGE_NAME_VAR|${ACRLOGINSERVER}/${DOCKER_ORG_IMAGE}:${DOCKER_VERSION}|g\" deploy-service-azure.yaml
-                        sed -i -e \"s|INTERNAL_SVC_HOSTNAME_VAR|${AZ_ENV_REGION_SVC_HOSTNAME}|g\" virtualservice-azure.yaml
-                        sed -i -e \"s|KUBERNETES_NAMESPACE_VAR|${KUBERNETES_NAMESPACE}|g\" virtualservice-azure.yaml
+                        sed -i -e \"s|INTERNAL_SVC_HOSTNAME_VAR|${AZ_ENV_REGION_SVC_HOSTNAME}|g\" virtual-service-azure.yaml
+                        sed -i -e \"s|KUBERNETES_NAMESPACE_VAR|${KUBERNETES_NAMESPACE}|g\" virtual-service-azure.yaml
                         . ./deploy.sh
                        """
                 }
