@@ -95,7 +95,7 @@ def call(Map pipelineParams) {
                         APIARY_PROJECT_NAME = deploymentProperties['APIARY_PROJECT_NAME']
 
                         URI_ROOT_PATH       = deploymentProperties['URI_ROOT_PATH']
-
+                        KUBERNETES_NAMESPACE = deploymentProperties['KUBERNETES_NAMESPACE']
                         IS_API_APPLICATION  = deploymentProperties['IS_API_APPLICATION']
                     }
                 }

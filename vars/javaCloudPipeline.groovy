@@ -64,28 +64,28 @@ def call(Map pipelineParams) {
                     script {
                         deploymentProperties = readProperties file:'deployment.properties'
 
-                        DEPLOY_TO_AWS       = deploymentProperties['DEPLOY_TO_AWS']
+                        DEPLOY_TO_AWS        = deploymentProperties['DEPLOY_TO_AWS']
 
-                        AWS_DEV_REGION      = deploymentProperties['AWS_DEV_REGION'].split(',').collect{it as String}
-                        AWS_TEST_REGION     = deploymentProperties['AWS_TEST_REGION'].split(',').collect{it as String}
-                        AWS_PPE_REGION      = deploymentProperties['AWS_PPE_REGION'].split(',').collect{it as String}
-                        AWS_PROD_REGION     = deploymentProperties['AWS_PROD_REGION'].split(',').collect{it as String}
+                        AWS_DEV_REGION       = deploymentProperties['AWS_DEV_REGION'].split(',').collect{it as String}
+                        AWS_TEST_REGION      = deploymentProperties['AWS_TEST_REGION'].split(',').collect{it as String}
+                        AWS_PPE_REGION       = deploymentProperties['AWS_PPE_REGION'].split(',').collect{it as String}
+                        AWS_PROD_REGION      = deploymentProperties['AWS_PROD_REGION'].split(',').collect{it as String}
 
-                        DEPLOY_TO_AZURE     = deploymentProperties['DEPLOY_TO_AZURE']
+                        DEPLOY_TO_AZURE      = deploymentProperties['DEPLOY_TO_AZURE']
 
-                        AZURE_DEV_REGION    = deploymentProperties['AZURE_DEV_REGION'].split(',').collect{it as String}
-                        AZURE_TEST_REGION   = deploymentProperties['AZURE_TEST_REGION'].split(',').collect{it as String}
-                        AZURE_PPE_REGION    = deploymentProperties['AZURE_PPE_REGION'].split(',').collect{it as String}
-                        AZURE_PROD_REGION   = deploymentProperties['AZURE_PROD_REGION'].split(',').collect{it as String}
+                        AZURE_DEV_REGION     = deploymentProperties['AZURE_DEV_REGION'].split(',').collect{it as String}
+                        AZURE_TEST_REGION    = deploymentProperties['AZURE_TEST_REGION'].split(',').collect{it as String}
+                        AZURE_PPE_REGION     = deploymentProperties['AZURE_PPE_REGION'].split(',').collect{it as String}
+                        AZURE_PROD_REGION    = deploymentProperties['AZURE_PROD_REGION'].split(',').collect{it as String}
 
-                        DEPLOY_TO_ON_PREM   = deploymentProperties['DEPLOY_TO_ON_PREM']
-                        ON_PREM_REGION      = deploymentProperties['ON_PREM_REGION']
+                        DEPLOY_TO_ON_PREM    = deploymentProperties['DEPLOY_TO_ON_PREM']
+                        ON_PREM_REGION       = deploymentProperties['ON_PREM_REGION']
 
-                        APIARY_PROJECT_NAME = deploymentProperties['APIARY_PROJECT_NAME']
+                        APIARY_PROJECT_NAME  = deploymentProperties['APIARY_PROJECT_NAME']
 
-                        URI_ROOT_PATH       = deploymentProperties['URI_ROOT_PATH']
-
-                        IS_API_APPLICATION  = deploymentProperties['IS_API_APPLICATION']
+                        URI_ROOT_PATH        = deploymentProperties['URI_ROOT_PATH']
+                        KUBERNETES_NAMESPACE = deploymentProperties['KUBERNETES_NAMESPACE']
+                        IS_API_APPLICATION   = deploymentProperties['IS_API_APPLICATION']
                     }
                 }
             }
