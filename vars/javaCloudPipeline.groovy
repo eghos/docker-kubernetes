@@ -441,14 +441,13 @@ def generateAzureDeployStage(region, env) {
                         export TARGET_HOST=azure
                         export DOCKER_VERSION=${DOCKER_VERSION}
                         export URI_ROOT_PATH_VAR=${URI_ROOT_PATH}
-                        export KUBERNETES_NAMESPACE_VAR=${KUBERNETES_NAMESPACE}
                         cp \"configmap-${region}-${env}.yaml\" \"configmap-${region}-${env}-azure.yaml\"
                         cp \"deploy-service.yaml\" \"deploy-service-azure.yaml\"
                         cp \"virtualservice.yaml\" \"virtualservice-azure.yaml\"
-                        sed -i -e \"s|KUBERNETES_NAMESPACE_VAR|${KUBERNETES_NAMESPACE_VAR}|g\" virtualservice-azure.yaml
+                        sed -i -e \"s|KUBERNETES_NAMESPACE_VAR|${KUBERNETES_NAMESPACE}|g\" virtualservice-azure.yaml
                         sed -i -e \"s|IMAGE_NAME_VAR|${ACRLOGINSERVER}/${DOCKER_ORG_IMAGE}:${DOCKER_VERSION}|g\" deploy-service-azure.yaml
                         sed -i -e \"s|INTERNAL_SVC_HOSTNAME_VAR|${AZ_ENV_REGION_SVC_HOSTNAME}|g\" virtualservice-azure.yaml
-                        sed -i -e \"s|KUBERNETES_NAMESPACE_VAR|${KUBERNETES_NAMESPACE_VAR}|g\" virtualservice-azure.yaml
+                        sed -i -e \"s|KUBERNETES_NAMESPACE_VAR|${KUBERNETES_NAMESPACE}|g\" virtualservice-azure.yaml
                         . ./deploy.sh
                        """
                 }
