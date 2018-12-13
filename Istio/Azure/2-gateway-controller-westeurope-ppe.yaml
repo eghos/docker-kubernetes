@@ -15,9 +15,11 @@ spec:
       protocol: HTTP
     hosts:
      - ppe-az-svc.westeurope.cloudapp.azure.com
+     - ppe.westeurope.ui.hip.red.cdtapps.com
   - port:
       number: 443
       name: https
       protocol: HTTP
     hosts:
       - ppe-az-svc.westeurope.cloudapp.azure.com
+      - ppe.westeurope.ui.hip.red.cdtapps.com

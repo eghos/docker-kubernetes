@@ -15,9 +15,11 @@ spec:
       protocol: HTTP
     hosts:
      - ppe-az-svc.centralus.cloudapp.azure.com
+     - ppe.centralus.ui.hip.red.cdtapps.com
   - port:
       number: 443
       name: https
       protocol: HTTP
     hosts:
       - ppe-az-svc.centralus.cloudapp.azure.com
+      - ppe.centralus.ui.hip.red.cdtapps.com
