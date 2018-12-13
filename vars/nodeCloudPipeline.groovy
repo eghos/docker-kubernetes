@@ -213,7 +213,7 @@ def call(Map pipelineParams) {
                             }
 
                             AZURE_DEV_REGION_MAP = AZURE_DEV_REGION.collectEntries {
-                                ["${it}" : generateAzureDeployStage(it, "test")]
+                                ["${it}" : generateAzureDeployStage(it, "ppe")]
                             }
                             AZURE_TEST_REGION_MAP = AZURE_TEST_REGION.collectEntries {
                                 ["${it}" : generateAzureDeployStage(it, "test")]
@@ -439,6 +439,8 @@ def generateAzureDeployStage(region, env) {
                         sed -i -e \"s|KUBERNETES_NAMESPACE_VAR|${KUBERNETES_NAMESPACE}|g\" virtual-service-azure.yaml
                         sed -i -e \"s|SERVICE_NAME_VAR|${IMAGE_NAME}|g\" virtual-service-azure.yaml
                         sed -i -e \"s|SVC_PATH_VAR|${URI_ROOT_PATH}|g\" virtual-service-azure.yaml
+                        sed -i -e \"s|ENV_VAR|${env}|g\" virtual-service-azure.yaml
+                        sed -i -e \"s|REGION_VAR|${region}|g\" virtual-service-azure.yaml
                         kubectl apply -f virtual-service-azure.yaml
                        """
                 }
