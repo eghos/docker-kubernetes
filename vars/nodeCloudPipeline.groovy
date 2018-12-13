@@ -213,7 +213,7 @@ def call(Map pipelineParams) {
                             }
 
                             AZURE_DEV_REGION_MAP = AZURE_DEV_REGION.collectEntries {
-                                ["${it}" : generateAzureDeployStage(it, "prod")]
+                                ["${it}" : generateAzureDeployStage(it, "dev")]
                             }
                             AZURE_TEST_REGION_MAP = AZURE_TEST_REGION.collectEntries {
                                 ["${it}" : generateAzureDeployStage(it, "test")]
@@ -424,10 +424,21 @@ def generateAzureDeployStage(region, env) {
                         export URI_ROOT_PATH_VAR=${URI_ROOT_PATH}
                         cp \"configmap-${region}-${env}.yaml\" \"configmap-${region}-${env}-azure.yaml\"
                         cp \"deploy-service.yaml\" \"deploy-service-azure.yaml\"
-                        cp \"ingress.yaml\" \"ingress-azure.yaml\"
+                        cp \"virtual-service.yaml\" \"virtual-service-azure.yaml\"
+                        sed -i -e \"s|KUBERNETES_NAMESPACE_VAR|${KUBERNETES_NAMESPACE}|g\" configmap-${region}-${env}-azure.yaml
+                        sed -i -e \"s|KUBERNETES_NAMESPACE_VAR|${KUBERNETES_NAMESPACE}|g\" virtual-service-azure.yaml
                         sed -i -e \"s|IMAGE_NAME_VAR|${ACRLOGINSERVER}/${DOCKER_ORG_IMAGE}:${DOCKER_VERSION}|g\" deploy-service-azure.yaml
-                        sed -i -e \"s|INTERNAL_SVC_HOSTNAME_VAR|${AZ_ENV_REGION_SVC_HOSTNAME}|g\" ingress-azure.yaml
-                        . ./deploy.sh
+                        sed -i -e \"s|INTERNAL_SVC_HOSTNAME_VAR|${AZ_ENV_REGION_SVC_HOSTNAME}|g\" virtual-service-azure.yaml
+                        sed -i -e \"s|KUBERNETES_NAMESPACE_VAR|${KUBERNETES_NAMESPACE}|g\" virtual-service-azure.yaml
+                        kubectl apply -f configmap-${region}-${env}-azure.yaml
+                        sed -i -e \"s|SERVICE_NAME_VAR|${IMAGE_NAME}|g\" deploy-service-azure.yaml
+                        sed -i -e \"s|KUBERNETES_NAMESPACE_VAR|${KUBERNETES_NAMESPACE}|g\" deploy-service-azure.yaml
+                        sed -i -e \"s|CONFIGMAP_NAME_VAR|${IMAGE_NAME}-configmap|g\" deploy-service-azure.yaml
+                        sed -i -e \"s|VERSION_VAR|${DOCKER_VERSION}|g\" deploy-service-azure.yaml
+                        kubectl apply -f deploy-service-azure.yaml
+                        sed -i -e \"s|SERVICE_NAME_VAR|${IMAGE_NAME}|g\" virtual-service-azure.yaml
+                        sed -i -e \"s|SVC_PATH_VAR|${URI_ROOT_PATH}|g\" virtual-service-azure.yaml
+                        kubectl apply -f virtual-service-azure.yaml
                        """
                 }
             }
