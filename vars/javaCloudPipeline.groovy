@@ -306,7 +306,7 @@ def call(Map pipelineParams) {
                            sed -i -e \"s|SERVICE_GATEWAY_DNS_VAR|${SERVICE_GATEWAY_DNS_PROP}${URI_ROOT_PATH}|g\" dredd.yml"""
 
                         try {
-                            sh 'docker run -i -v ./build:/api -w /api apimgt/dredd'
+                            sh 'docker run -i -v ${WORKSPACE}/build:/api -w /api apimgt/dredd'
                         } catch (err) {
 
 //                            sh 'chmod +x ./build/results.xml'
