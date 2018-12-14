@@ -299,24 +299,6 @@ def call(Map pipelineParams) {
                           apiary fetch --api-name ${APIARY_PROJECT_NAME} --output ${APIARY_PROJECT_NAME}.apib
                           """
                         sh "git add ./build/${APIARY_PROJECT_NAME}.apib"
-
-                        sh 'cp ./build/dredd-template.yml ./build/dredd.yml'
-
-                        sh """
-                           cd build
-                           sed -i -e \"s|APIARY_PROJECT_VAR|${APIARY_PROJECT_NAME}.apib|g\" dredd.yml
-                           sed -i -e \"s|SERVICE_GATEWAY_DNS_VAR|${SERVICE_GATEWAY_DNS_PROP}${URI_ROOT_PATH}|g\" dredd.yml"""
-
-                        try {
-                            sh 'docker run -i -v ${WORKSPACE}/build:/api -w /api apiaryio/dredd'
-                        } catch (err) {
-
-//                            sh 'chmod +x ./build/results.xml'
-                            sh 'cd ./build && ls -lart'
-                            sh "git add ./build/results.xml"
-                            echo 'Get XUnit/JUnit Results if available'
-//                            junit './build/results.xml'
-                        }
                     }
                 }
             }
@@ -334,9 +316,26 @@ def call(Map pipelineParams) {
                             sh 'echo'
                         }
                     }
-                    stage('Dredd Tests (Contract)') {
+                    stage('Dredd Tests (API Contract)') {
                         steps {
-                            sh 'echo'
+                            sh 'cp ./build/dredd-template.yml ./build/dredd.yml'
+
+                            sh """
+                               cd build
+                               sed -i -e \"s|APIARY_PROJECT_VAR|${APIARY_PROJECT_NAME}.apib|g\" dredd.yml
+                               sed -i -e \"s|SERVICE_GATEWAY_DNS_VAR|${SERVICE_GATEWAY_DNS_PROP}${URI_ROOT_PATH}|g\" dredd.yml
+                               """
+
+                            try {
+                                sh 'docker run -i -v ${WORKSPACE}/build:/api -w /api apiaryio/dredd'
+                                sh "git add ./build/results.xml"
+                            } catch (err) {
+                                //sh 'chmod +x ./build/results.xml'
+                                sh 'cd ./build && ls -lart'
+                                sh "git add ./build/results.xml"
+                                echo 'Get XUnit/JUnit Results if available'
+                                //junit './build/results.xml'
+                            }
                         }
                     }
                     stage('Functional-Test') {

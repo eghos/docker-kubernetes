@@ -358,15 +358,11 @@ def call(Map pipelineParams) {
                 }
             }
 
-            stage('Clean Up') {
-                steps {
-                    cleanWs()
-                }
-            }
         }
 
         post {
             always {
+                cleanWs()
                 slackNotifier(currentBuild.currentResult)
             }
         }
