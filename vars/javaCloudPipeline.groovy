@@ -300,7 +300,7 @@ def call(Map pipelineParams) {
                           """
                         sh "git add ./build/${APIARY_PROJECT_NAME}.apib"
 
-                        sh 'cp dredd-template.yml dredd.yml'
+                        sh 'cp ./build/dredd-template.yml ./build/dredd.yml'
 
                         sh """
                            cd build
