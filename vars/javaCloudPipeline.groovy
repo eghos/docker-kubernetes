@@ -187,53 +187,53 @@ def call(Map pipelineParams) {
 //                }
 //            }
 
-//            stage('Docker Build') {
-//                when {
-//                    anyOf {
-//                        branch "develop*";
-//                        branch "release/*";
-//                    }
-//                }
-//                steps {
-//                    withCredentials([azureServicePrincipal('sp-ipim-ip-aks')]) {
-//                        script {
-//                            AWS_DEV_REGION_MAP = AWS_DEV_REGION.collectEntries {
-//                                ["${it}" : generateAwsDeployStage(it, "test")]
-//                            }
-//                            AWS_TEST_REGION_MAP = AWS_TEST_REGION.collectEntries {
-//                                ["${it}" : generateAwsDeployStage(it, "test")]
-//                            }
-//                            AWS_PPE_REGION_MAP = AWS_PPE_REGION.collectEntries {
-//                                ["${it}" : generateAwsDeployStage(it, "ppe")]
-//                            }
-//                            AWS_PROD_REGION_MAP = AWS_PROD_REGION.collectEntries {
-//                                ["${it}" : generateAwsDeployStage(it, "prod")]
-//                            }
-//
-//                            AZURE_DEV_REGION_MAP = AZURE_DEV_REGION.collectEntries {
-//                                ["${it}" : generateAzureDeployStage(it, "dev")]
-//                            }
-//                            AZURE_TEST_REGION_MAP = AZURE_TEST_REGION.collectEntries {
-//                                ["${it}" : generateAzureDeployStage(it, "test")]
-//                            }
-//                            AZURE_PPE_REGION_MAP = AZURE_PPE_REGION.collectEntries {
-//                                ["${it}" : generateAzureDeployStage(it, "ppe")]
-//                            }
-//                            AZURE_PROD_REGION_MAP = AZURE_PROD_REGION.collectEntries {
-//                                ["${it}" : generateAzureDeployStage(it, "prod")]
-//                            }
-//
-//                            sh "az login --service-principal -u ${AZURE_CLIENT_ID} -p ${AZURE_CLIENT_SECRET} -t ${AZURE_TENANT_ID}"
-//                            sh "az account set -s ${AZURE_SUBSCRIPTION_ID}"
-//                            sh "az acr login --name ${PROD_WESTEUROPE_AZACRNAME_PROP}"
-//                            ACRLOGINSERVER = sh(returnStdout: true, script: "az acr show --resource-group ${PROD_WESTEUROPE_AZRGNAME_PROP} --name ${PROD_WESTEUROPE_AZACRNAME_PROP} --query \"loginServer\" --output tsv").trim()
-//                            sh "docker build -t ${ACRLOGINSERVER}/${DOCKER_ORG_IMAGE}:${DOCKER_VERSION} ."
-//                            sh "docker push ${ACRLOGINSERVER}/${DOCKER_ORG_IMAGE}:${DOCKER_VERSION}"
-//
-//                        }
-//                    }
-//                }
-//            }
+            stage('Docker Build') {
+                when {
+                    anyOf {
+                        branch "develop*";
+                        branch "release/*";
+                    }
+                }
+                steps {
+                    withCredentials([azureServicePrincipal('sp-ipim-ip-aks')]) {
+                        script {
+                            AWS_DEV_REGION_MAP = AWS_DEV_REGION.collectEntries {
+                                ["${it}" : generateAwsDeployStage(it, "test")]
+                            }
+                            AWS_TEST_REGION_MAP = AWS_TEST_REGION.collectEntries {
+                                ["${it}" : generateAwsDeployStage(it, "test")]
+                            }
+                            AWS_PPE_REGION_MAP = AWS_PPE_REGION.collectEntries {
+                                ["${it}" : generateAwsDeployStage(it, "ppe")]
+                            }
+                            AWS_PROD_REGION_MAP = AWS_PROD_REGION.collectEntries {
+                                ["${it}" : generateAwsDeployStage(it, "prod")]
+                            }
+
+                            AZURE_DEV_REGION_MAP = AZURE_DEV_REGION.collectEntries {
+                                ["${it}" : generateAzureDeployStage(it, "dev")]
+                            }
+                            AZURE_TEST_REGION_MAP = AZURE_TEST_REGION.collectEntries {
+                                ["${it}" : generateAzureDeployStage(it, "test")]
+                            }
+                            AZURE_PPE_REGION_MAP = AZURE_PPE_REGION.collectEntries {
+                                ["${it}" : generateAzureDeployStage(it, "ppe")]
+                            }
+                            AZURE_PROD_REGION_MAP = AZURE_PROD_REGION.collectEntries {
+                                ["${it}" : generateAzureDeployStage(it, "prod")]
+                            }
+
+                            sh "az login --service-principal -u ${AZURE_CLIENT_ID} -p ${AZURE_CLIENT_SECRET} -t ${AZURE_TENANT_ID}"
+                            sh "az account set -s ${AZURE_SUBSCRIPTION_ID}"
+                            sh "az acr login --name ${PROD_WESTEUROPE_AZACRNAME_PROP}"
+                            ACRLOGINSERVER = sh(returnStdout: true, script: "az acr show --resource-group ${PROD_WESTEUROPE_AZRGNAME_PROP} --name ${PROD_WESTEUROPE_AZACRNAME_PROP} --query \"loginServer\" --output tsv").trim()
+                            sh "docker build -t ${ACRLOGINSERVER}/${DOCKER_ORG_IMAGE}:${DOCKER_VERSION} ."
+                            sh "docker push ${ACRLOGINSERVER}/${DOCKER_ORG_IMAGE}:${DOCKER_VERSION}"
+
+                        }
+                    }
+                }
+            }
 
             stage ('DEV Deploy - AWS') {
                 when {
@@ -308,9 +308,10 @@ def call(Map pipelineParams) {
                         try {
                             sh 'docker run -i -v ./build:/api -w /api apimgt/dredd:1.0'
                         } catch (err) {
-                            sh "git add ./build/latest-dredd-run-results.xml"
+
 //                            sh 'chmod +x ./build/results.xml'
                             sh 'cd ./build && ls -lart'
+                            sh "git add ./build/results.xml"
                             echo 'Get XUnit/JUnit Results if available'
 //                            junit './build/results.xml'
                         }
