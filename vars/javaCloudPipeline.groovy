@@ -286,8 +286,7 @@ def call(Map pipelineParams) {
             stage('Fetch Apiary Definition') {
                 when {
                     allOf {
-//                        branch "release/*";
-                        branch "develop*";
+                        branch "release/*";
                         expression { IS_API_APPLICATION == 'true' }
                     }
                 }
