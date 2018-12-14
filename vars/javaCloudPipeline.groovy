@@ -305,10 +305,13 @@ def call(Map pipelineParams) {
                            sed -i -e \"s|APIARY_PROJECT_VAR|${APIARY_PROJECT_NAME}.apib|g\" dredd.yml
                            sed -i -e \"s|SERVICE_GATEWAY_DNS_VAR|${SERVICE_GATEWAY_DNS_PROP}/ipimip/prices|g\" dredd.yml"""
 
-                        sh 'docker run -i -v ${WORKSPACE}/build:/api -w /api apimgt/dredd'
-                        sh 'cd ${WORKSPACE}/build && ls -lart'
-                        echo 'Get XUnit/JUnit Results if available'
-                        junit '${WORKSPACE}/build/results.xml'
+                        try {
+                            sh 'docker run -i -v ${WORKSPACE}/build:/api -w /api apimgt/dredd'
+                        } catch (err) {
+                            sh 'cd ${WORKSPACE}/build && ls -lart'
+                            echo 'Get XUnit/JUnit Results if available'
+                            junit '${WORKSPACE}/build/results.xml'
+                        }
                     }
                 }
             }
@@ -388,18 +391,21 @@ def call(Map pipelineParams) {
                 }
             }
 
-            stage('Clean Up') {
-                steps {
-                    cleanWs()
-                }
-            }
+//            stage('Clean Up') {
+//                steps {
+//                    cleanWs()
+//                }
+//            }
+
         }
 
         post {
             always {
+                cleanWs()
                 slackNotifier(currentBuild.currentResult)
             }
         }
+
     }
 }
 
