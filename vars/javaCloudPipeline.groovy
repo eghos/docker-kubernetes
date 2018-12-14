@@ -300,8 +300,10 @@ def call(Map pipelineParams) {
                           """
                         sh "git add ./build/${APIARY_PROJECT_NAME}.apib"
 
-                        sh "sed -i -e \"s|APIARY_PROJECT_VAR|${APIARY_PROJECT_NAME}|g\" dredd.yaml"
-                        sh "sed -i -e \"s|SERVICE_GATEWAY_DNS_VAR|${SERVICE_GATEWAY_DNS_PROP}|g\" dredd.yaml"
+                        sh """
+                           cd build
+                           sed -i -e \"s|APIARY_PROJECT_VAR|${APIARY_PROJECT_NAME}.apib|g\" dredd.yaml
+                           sed -i -e \"s|SERVICE_GATEWAY_DNS_VAR|${SERVICE_GATEWAY_DNS_PROP}|g\" dredd.yaml"""
 
                         sh 'docker run -i -v ${WORKSPACE}/build:/api -w /api apimgt/dredd'
                         sh 'cd ${WORKSPACE}/build && ls -lart'
