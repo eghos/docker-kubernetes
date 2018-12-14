@@ -308,6 +308,7 @@ def call(Map pipelineParams) {
                         try {
                             sh 'docker run -i -v ${WORKSPACE}/build:/api -w /api apimgt/dredd'
                         } catch (err) {
+                            sh "git add ./build/results.xml"
 //                            sh 'chmod +x ./build/results.xml'
 //                            sh 'cd ./build && ls -lart'
                             echo 'Get XUnit/JUnit Results if available'
@@ -385,6 +386,7 @@ def call(Map pipelineParams) {
                                 sh 'git config --global user.name "l-apimgt-u-itsehbg"'
                                 sh 'git add pom.xml'
                                 sh 'git commit -am "System - CICD Pipeline changes committed. [ci skip]"'
+                                sh 'git status'
                                 sh 'git push origin "${BRANCH_NAME_FULL}" -f'
                             }
                         }
