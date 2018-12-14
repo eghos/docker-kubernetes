@@ -300,6 +300,8 @@ def call(Map pipelineParams) {
                           """
                         sh "git add ./build/${APIARY_PROJECT_NAME}.apib"
 
+                        sh 'cp dredd-template.yml dredd.yml'
+
                         sh """
                            cd build
                            sed -i -e \"s|APIARY_PROJECT_VAR|${APIARY_PROJECT_NAME}.apib|g\" dredd.yml
@@ -387,7 +389,7 @@ def call(Map pipelineParams) {
                                 sh 'git config --global user.name "l-apimgt-u-itsehbg"'
                                 sh 'git add pom.xml'
                                 sh 'git status'
-                                sh 'git commit -am "System - CICD Pipeline changes committed. [ci skip]"'
+                                sh 'git commit -m "System - CICD Pipeline changes committed. [ci skip]"'
                                 sh 'git push origin "${BRANCH_NAME_FULL}" -f'
                             }
                         }
