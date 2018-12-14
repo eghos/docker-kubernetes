@@ -308,6 +308,7 @@ def call(Map pipelineParams) {
                         try {
                             sh 'docker run -i -v ${WORKSPACE}/build:/api -w /api apimgt/dredd'
                         } catch (err) {
+                            sh 'chmod +x ./build/results.xml'
                             sh 'cd ./build && ls -lart'
                             echo 'Get XUnit/JUnit Results if available'
                             junit './build/results.xml'
