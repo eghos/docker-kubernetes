@@ -210,7 +210,7 @@ def call(Map pipelineParams) {
                             }
 
                             AZURE_DEV_REGION_MAP = AZURE_DEV_REGION.collectEntries {
-                                ["${it}" : generateAzureDeployStage(it, "prod")]
+                                ["${it}" : generateAzureDeployStage(it, "dev")]
                             }
                             AZURE_TEST_REGION_MAP = AZURE_TEST_REGION.collectEntries {
                                 ["${it}" : generateAzureDeployStage(it, "test")]
@@ -285,7 +285,8 @@ def call(Map pipelineParams) {
             stage('Fetch Apiary Definition') {
                 when {
                     allOf {
-                        branch "release/*";
+//                        branch "release/*";
+                        branch "develop*";
                         expression { IS_API_APPLICATION == 'true' }
                     }
                 }
@@ -297,6 +298,12 @@ def call(Map pipelineParams) {
                           apiary fetch --api-name ${APIARY_PROJECT_NAME} --output ${APIARY_PROJECT_NAME}.apib
                           """
                         sh "git add ./build/${APIARY_PROJECT_NAME}.apib"
+
+
+                        sh 'docker run -i -v ${WORKSPACE}/build:/api -w /api apimgt/dredd'
+                        sh 'cd ${WORKSPACE}/build && ls -lart'
+                        echo 'Get XUnit/JUnit Results if available'
+                        junit '${WORKSPACE}/build/results.xml'
                     }
                 }
             }
