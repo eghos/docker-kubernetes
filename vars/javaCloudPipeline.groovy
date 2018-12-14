@@ -306,11 +306,11 @@ def call(Map pipelineParams) {
                            sed -i -e \"s|SERVICE_GATEWAY_DNS_VAR|${SERVICE_GATEWAY_DNS_PROP}${URI_ROOT_PATH}|g\" dredd.yml"""
 
                         try {
-                            sh 'docker run -i -v ${WORKSPACE}/build:/api -w /api apimgt/dredd'
+                            sh 'docker run -i -v ./build:/api -w /api apimgt/dredd:1.0'
                         } catch (err) {
-                            sh "git add ./build/results.xml"
+                            sh "git add ./build/latest-dredd-run-results.xml"
 //                            sh 'chmod +x ./build/results.xml'
-//                            sh 'cd ./build && ls -lart'
+                            sh 'cd ./build && ls -lart'
                             echo 'Get XUnit/JUnit Results if available'
 //                            junit './build/results.xml'
                         }
@@ -385,20 +385,14 @@ def call(Map pipelineParams) {
                                 sh 'git config --global user.email "l-apimgt-u-itsehbg@ikea.com"'
                                 sh 'git config --global user.name "l-apimgt-u-itsehbg"'
                                 sh 'git add pom.xml'
-                                sh 'git commit -am "System - CICD Pipeline changes committed. [ci skip]"'
                                 sh 'git status'
+                                sh 'git commit -am "System - CICD Pipeline changes committed. [ci skip]"'
                                 sh 'git push origin "${BRANCH_NAME_FULL}" -f'
                             }
                         }
                     }
                 }
             }
-
-//            stage('Clean Up') {
-//                steps {
-//                    cleanWs()
-//                }
-//            }
 
         }
 
