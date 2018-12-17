@@ -20,6 +20,7 @@ def call(Map pipelineParams) {
             DEV_SNAPSHOT_VERSION     = "1.0.${BUILD_NUMBER}-SNAPSHOT"
             RELEASE_NUMBER           = env.BRANCH_NAME.replace('release/', '')
             RELEASE_VERSION          = "${RELEASE_NUMBER}.RELEASE"
+            PROD_RELEASE_NUMBER      = readMavenPom().getVersion().replace('release/', '')
 
             GIT_URL_MODIFIED         = env.GIT_URL.replace('https://', 'git@').replace('com/', 'com:')
 
@@ -183,10 +184,13 @@ def call(Map pipelineParams) {
 
                             if (env.BRANCH_NAME.startsWith("master")) {
                                 echo 'This is a master Branch'
+                                DOCKER_VERSION = "${PROD_RELEASE_NUMBER}"
                             }
 
                             if (env.BRANCH_NAME.startsWith("hotfix")) {
                                 echo 'This is a hotfix Branch - TODO Inc Hotfix PATCH'
+                                sh './mvnw -B org.codehaus.mojo:versions-maven-plugin:2.5:set -DprocessAllModules -DnewVersion=${RELEASE_VERSION}'
+                                DOCKER_VERSION = "${RELEASE_NUMBER}"
                             }
                         }
                         echo readMavenPom().getVersion()
@@ -433,6 +437,10 @@ def call(Map pipelineParams) {
                 }
                 steps {
                     echo "PR created to Master Branch. PPE Deployment will be performed in this stage."
+                    script {
+                        DOCKER_VERSION "${PROD_RELEASE_NUMBER}"
+                    }
+
                     executeDeploy(AZURE_PPE_REGION_MAP)
                 }
             }
