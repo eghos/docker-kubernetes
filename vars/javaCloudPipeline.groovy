@@ -111,12 +111,12 @@ def call(Map pipelineParams) {
 
             stage('Update Versions') {
                 steps {
-                    withCredentials([sshUserPrivateKey(credentialsId: 'l-apimgt-u-itsehbgATikea.com', keyFileVariable: 'SSH_KEY')]) {
+//                    withCredentials([sshUserPrivateKey(credentialsId: 'l-apimgt-u-itsehbgATikea.com', keyFileVariable: 'SSH_KEY')]) {
                         sh 'chmod +x ./mvnw'
                         script {
                             if (env.BRANCH_NAME.startsWith("PR")) {
                                 echo 'This is a PR Branch'
-                                sh './mvnw -B org.codehaus.mojo:versions-maven-plugin:2.5:set -DprocessAllModules -DnewVersion=${DEV_PR_VERSION}'
+//                                sh './mvnw -B org.codehaus.mojo:versions-maven-plugin:2.5:set -DprocessAllModules -DnewVersion=${DEV_PR_VERSION}'
                             }
 
                             if (env.BRANCH_NAME.startsWith("develop")) {
@@ -142,7 +142,7 @@ def call(Map pipelineParams) {
                             }
                         }
                         echo readMavenPom().getVersion()
-                    }
+//                    }
                 }
             }
 
