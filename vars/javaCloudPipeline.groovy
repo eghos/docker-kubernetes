@@ -50,6 +50,7 @@ def call(Map pipelineParams) {
             stage("Skip CICD?") {
                 when {
                     expression {
+                        branch "develop*";
                         result = sh (script: "git log -1 | grep '.*\\[ci skip\\].*'", returnStatus: true)
                         result == 0
                     }
@@ -247,17 +248,17 @@ def call(Map pipelineParams) {
                 }
             }
 
-//            stage ('DEV Deploy - Azure') {
-//                when {
-//                    allOf {
-//                        branch "develop*";
-//                        expression { DEPLOY_TO_AZURE == 'true' }
-//                    }
-//                }
-//                steps {
-//                    executeDeploy(AZURE_DEV_REGION_MAP)
-//                }
-//            }
+            stage ('DEV Deploy - Azure') {
+                when {
+                    allOf {
+                        branch "develop*";
+                        expression { DEPLOY_TO_AZURE == 'true' }
+                    }
+                }
+                steps {
+                    executeDeploy(AZURE_DEV_REGION_MAP)
+                }
+            }
 
             stage ('TEST Deploy - AWS') {
                 when {
@@ -379,6 +380,13 @@ def call(Map pipelineParams) {
             }
 
             stage('Commit Changes') {
+                when {
+                    anyOf {
+                        branch 'develop*';
+                        branch "release/*"
+                        branch "hotfix/*"
+                    }
+                }
                 steps {
                     withCredentials([sshUserPrivateKey(credentialsId: 'l-apimgt-u-itsehbgATikea.com', keyFileVariable: 'SSH_KEY')]) {
                         withEnv(["GIT_SSH_COMMAND=ssh -o StrictHostKeyChecking=no -o User=${GIT_SVC_ACCOUNT_USER_PROP} -i ${SSH_KEY}"]) {

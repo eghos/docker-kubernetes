@@ -350,7 +350,7 @@ def call(Map pipelineParams) {
                                 sh 'git config --global user.email "l-apimgt-u-itsehbg@ikea.com"'
                                 sh 'git config --global user.name "l-apimgt-u-itsehbg"'
                                 sh 'git add package.json'
-                                sh 'git commit -am "System - Update Package Version [ci skip]"'
+                                sh 'git commit -m "System - Update Package Version [ci skip]"'
                                 sh 'git push origin "${BRANCH_NAME_FULL}" -f'
                             }
                         }
