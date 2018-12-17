@@ -65,7 +65,7 @@ def call(Map pipelineParams) {
             stage("Skip CICD Release?") {
                 when {
                     allOf {
-                        branch "release*";
+                        branch "release/*";
                         expression {
                             result = sh(script: "git log -1 | grep '.*\\[ci skip release\\].*'", returnStatus: true)
                             result == 0
