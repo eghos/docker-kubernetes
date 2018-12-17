@@ -301,6 +301,7 @@ def call(Map pipelineParams) {
                 }
             }
 
+            //TODO move contents to Dredd Test in service test
             stage('Fetch Apiary Definition') {
                 when {
                     allOf {
@@ -350,7 +351,7 @@ def call(Map pipelineParams) {
                                 } catch (err) {
                                     //sh 'chmod +x ./build/results.xml'
                                     sh 'cd ./build && ls -lart'
-                                    sh "git add ./build/results.xml"
+//                                    sh "git add ./build/results.xml"
                                     echo 'Get XUnit/JUnit Results if available'
                                     //junit './build/results.xml'
                                 }
@@ -441,7 +442,6 @@ def call(Map pipelineParams) {
                                     sh 'git commit -m "System - CICD Pipeline changes committed for Release. [ci skip release]"'
                                 }
 
-//                                sh 'git commit -m "System - CICD Pipeline changes committed. [ci skip]"'
                                 sh 'git push origin "${BRANCH_NAME_FULL}" -f'
                             }
                         }
