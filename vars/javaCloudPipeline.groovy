@@ -49,10 +49,12 @@ def call(Map pipelineParams) {
 
             stage("Skip CICD?") {
                 when {
-                    expression {
+                    allOf {
                         branch "develop*";
-                        result = sh (script: "git log -1 | grep '.*\\[ci skip\\].*'", returnStatus: true)
-                        result == 0
+                        expression {
+                            result = sh(script: "git log -1 | grep '.*\\[ci skip\\].*'", returnStatus: true)
+                            result == 0
+                        }
                     }
                 }
                 steps {
