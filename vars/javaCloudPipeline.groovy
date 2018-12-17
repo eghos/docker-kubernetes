@@ -105,6 +105,35 @@ def call(Map pipelineParams) {
                         URI_ROOT_PATH        = deploymentProperties['URI_ROOT_PATH']
                         KUBERNETES_NAMESPACE = deploymentProperties['KUBERNETES_NAMESPACE']
                         IS_API_APPLICATION   = deploymentProperties['IS_API_APPLICATION']
+
+
+
+                        AWS_DEV_REGION_MAP = AWS_DEV_REGION.collectEntries {
+                            ["${it}" : generateAwsDeployStage(it, "dev")]
+                        }
+                        AWS_TEST_REGION_MAP = AWS_TEST_REGION.collectEntries {
+                            ["${it}" : generateAwsDeployStage(it, "test")]
+                        }
+                        AWS_PPE_REGION_MAP = AWS_PPE_REGION.collectEntries {
+                            ["${it}" : generateAwsDeployStage(it, "ppe")]
+                        }
+                        AWS_PROD_REGION_MAP = AWS_PROD_REGION.collectEntries {
+                            ["${it}" : generateAwsDeployStage(it, "prod")]
+                        }
+
+                        AZURE_DEV_REGION_MAP = AZURE_DEV_REGION.collectEntries {
+                            ["${it}" : generateAzureDeployStage(it, "dev")]
+                        }
+                        AZURE_TEST_REGION_MAP = AZURE_TEST_REGION.collectEntries {
+                            ["${it}" : generateAzureDeployStage(it, "test")]
+                        }
+                        AZURE_PPE_REGION_MAP = AZURE_PPE_REGION.collectEntries {
+                            ["${it}" : generateAzureDeployStage(it, "ppe")]
+                        }
+                        AZURE_PROD_REGION_MAP = AZURE_PROD_REGION.collectEntries {
+                            ["${it}" : generateAzureDeployStage(it, "prod")]
+                        }
+                        
                     }
                 }
             }
@@ -215,31 +244,31 @@ def call(Map pipelineParams) {
                 steps {
                     withCredentials([azureServicePrincipal('sp-ipim-ip-aks')]) {
                         script {
-                            AWS_DEV_REGION_MAP = AWS_DEV_REGION.collectEntries {
-                                ["${it}" : generateAwsDeployStage(it, "dev")]
-                            }
-                            AWS_TEST_REGION_MAP = AWS_TEST_REGION.collectEntries {
-                                ["${it}" : generateAwsDeployStage(it, "test")]
-                            }
-                            AWS_PPE_REGION_MAP = AWS_PPE_REGION.collectEntries {
-                                ["${it}" : generateAwsDeployStage(it, "ppe")]
-                            }
-                            AWS_PROD_REGION_MAP = AWS_PROD_REGION.collectEntries {
-                                ["${it}" : generateAwsDeployStage(it, "prod")]
-                            }
-
-                            AZURE_DEV_REGION_MAP = AZURE_DEV_REGION.collectEntries {
-                                ["${it}" : generateAzureDeployStage(it, "dev")]
-                            }
-                            AZURE_TEST_REGION_MAP = AZURE_TEST_REGION.collectEntries {
-                                ["${it}" : generateAzureDeployStage(it, "test")]
-                            }
-                            AZURE_PPE_REGION_MAP = AZURE_PPE_REGION.collectEntries {
-                                ["${it}" : generateAzureDeployStage(it, "ppe")]
-                            }
-                            AZURE_PROD_REGION_MAP = AZURE_PROD_REGION.collectEntries {
-                                ["${it}" : generateAzureDeployStage(it, "prod")]
-                            }
+//                                AWS_DEV_REGION_MAP = AWS_DEV_REGION.collectEntries {
+//                                    ["${it}" : generateAwsDeployStage(it, "dev")]
+//                                }
+//                                AWS_TEST_REGION_MAP = AWS_TEST_REGION.collectEntries {
+//                                    ["${it}" : generateAwsDeployStage(it, "test")]
+//                                }
+//                                AWS_PPE_REGION_MAP = AWS_PPE_REGION.collectEntries {
+//                                    ["${it}" : generateAwsDeployStage(it, "ppe")]
+//                                }
+//                                AWS_PROD_REGION_MAP = AWS_PROD_REGION.collectEntries {
+//                                    ["${it}" : generateAwsDeployStage(it, "prod")]
+//                                }
+//
+//                                AZURE_DEV_REGION_MAP = AZURE_DEV_REGION.collectEntries {
+//                                    ["${it}" : generateAzureDeployStage(it, "dev")]
+//                                }
+//                                AZURE_TEST_REGION_MAP = AZURE_TEST_REGION.collectEntries {
+//                                    ["${it}" : generateAzureDeployStage(it, "test")]
+//                                }
+//                                AZURE_PPE_REGION_MAP = AZURE_PPE_REGION.collectEntries {
+//                                    ["${it}" : generateAzureDeployStage(it, "ppe")]
+//                                }
+//                                AZURE_PROD_REGION_MAP = AZURE_PROD_REGION.collectEntries {
+//                                    ["${it}" : generateAzureDeployStage(it, "prod")]
+//                                }
 
                             sh "az login --service-principal -u ${AZURE_CLIENT_ID} -p ${AZURE_CLIENT_SECRET} -t ${AZURE_TENANT_ID}"
                             sh "az account set -s ${AZURE_SUBSCRIPTION_ID}"
