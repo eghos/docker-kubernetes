@@ -438,7 +438,7 @@ def call(Map pipelineParams) {
                 steps {
                     echo "PR created to Master Branch. PPE Deployment will be performed in this stage."
                     script {
-                        DOCKER_VERSION "${PROD_RELEASE_NUMBER}"
+                        DOCKER_VERSION = "${PROD_RELEASE_NUMBER}"
                     }
 
                     executeDeploy(AZURE_PPE_REGION_MAP)
