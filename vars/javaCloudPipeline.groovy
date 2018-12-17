@@ -83,44 +83,33 @@ def call(Map pipelineParams) {
                     withCredentials([azureServicePrincipal('sp-ipim-ip-aks')]) {
                         stageSetupGeneral()
                         script {
+                            //Get variables from project deployment.properties
                             deploymentProperties = readProperties file: 'deployment.properties'
 
+                            //Collect AWS Deployment variables
                             DEPLOY_TO_AWS = deploymentProperties['DEPLOY_TO_AWS']
+                            AWS_DEV_REGION    = deploymentProperties['AWS_DEV_REGION'].split(',').collect { it as String }
+                            AWS_TEST_REGION   = deploymentProperties['AWS_TEST_REGION'].split(',').collect { it as String }
+                            AWS_PPE_REGION    = deploymentProperties['AWS_PPE_REGION'].split(',').collect { it as String }
+                            AWS_PROD_REGION   = deploymentProperties['AWS_PROD_REGION'].split(',').collect { it as String }
 
-                            AWS_DEV_REGION = deploymentProperties['AWS_DEV_REGION'].split(',').collect { it as String }
-                            AWS_TEST_REGION = deploymentProperties['AWS_TEST_REGION'].split(',').collect {
-                                it as String
-                            }
-                            AWS_PPE_REGION = deploymentProperties['AWS_PPE_REGION'].split(',').collect { it as String }
-                            AWS_PROD_REGION = deploymentProperties['AWS_PROD_REGION'].split(',').collect {
-                                it as String
-                            }
+                            //Collect Azure Deployment variables
+                            DEPLOY_TO_AZURE   = deploymentProperties['DEPLOY_TO_AZURE']
+                            AZURE_DEV_REGION  = deploymentProperties['AZURE_DEV_REGION'].split(',').collect { it as String }
+                            AZURE_TEST_REGION = deploymentProperties['AZURE_TEST_REGION'].split(',').collect {it as String }
+                            AZURE_PPE_REGION  = deploymentProperties['AZURE_PPE_REGION'].split(',').collect { it as String }
+                            AZURE_PROD_REGION = deploymentProperties['AZURE_PROD_REGION'].split(',').collect { it as String }
 
-                            DEPLOY_TO_AZURE = deploymentProperties['DEPLOY_TO_AZURE']
-
-                            AZURE_DEV_REGION = deploymentProperties['AZURE_DEV_REGION'].split(',').collect {
-                                it as String
-                            }
-                            AZURE_TEST_REGION = deploymentProperties['AZURE_TEST_REGION'].split(',').collect {
-                                it as String
-                            }
-                            AZURE_PPE_REGION = deploymentProperties['AZURE_PPE_REGION'].split(',').collect {
-                                it as String
-                            }
-                            AZURE_PROD_REGION = deploymentProperties['AZURE_PROD_REGION'].split(',').collect {
-                                it as String
-                            }
-
+                            //Collect On Prem Deployment variables
                             DEPLOY_TO_ON_PREM = deploymentProperties['DEPLOY_TO_ON_PREM']
-                            ON_PREM_REGION = deploymentProperties['ON_PREM_REGION']
+                            ON_PREM_REGION    = deploymentProperties['ON_PREM_REGION']
 
                             APIARY_PROJECT_NAME = deploymentProperties['APIARY_PROJECT_NAME']
-
                             URI_ROOT_PATH = deploymentProperties['URI_ROOT_PATH']
                             KUBERNETES_NAMESPACE = deploymentProperties['KUBERNETES_NAMESPACE']
                             IS_API_APPLICATION = deploymentProperties['IS_API_APPLICATION']
 
-//Set up deployment region map properties
+                            //Set up AWS deployment region map properties
                             AWS_DEV_REGION_MAP = AWS_DEV_REGION.collectEntries {
                                 ["${it}": generateAwsDeployStage(it, "dev")]
                             }
@@ -134,6 +123,7 @@ def call(Map pipelineParams) {
                                 ["${it}": generateAwsDeployStage(it, "prod")]
                             }
 
+                            //Set up Azure deployment region map properties
                             AZURE_DEV_REGION_MAP = AZURE_DEV_REGION.collectEntries {
                                 ["${it}": generateAzureDeployStage(it, "dev")]
                             }
@@ -490,15 +480,19 @@ def call(Map pipelineParams) {
                                 sh 'git add pom.xml'
                                 sh 'git status'
 
-                                if (env.BRANCH_NAME.startsWith("develop")) {
-                                    sh 'git commit -m "System - CICD Pipeline changes committed for Development. [ci skip dev]"'
-                                }
+                                try {
+                                    if (env.BRANCH_NAME.startsWith("develop")) {
+                                        sh 'git commit -m "System - CICD Pipeline changes committed for Development. [ci skip dev]"'
+                                    }
 
-                                if (env.BRANCH_NAME.startsWith("release/")) {
-                                    sh 'git commit -m "System - CICD Pipeline changes committed for Release. [ci skip release]"'
-                                }
+                                    if (env.BRANCH_NAME.startsWith("release/")) {
+                                        sh 'git commit -m "System - CICD Pipeline changes committed for Release. [ci skip release]"'
+                                    }
 
-                                sh 'git push origin "${BRANCH_NAME_FULL}" -f'
+                                    sh 'git push origin "${BRANCH_NAME_FULL}" -f'
+                                } catch (err){
+                                    echo 'Git Commit/Push was not successful (Nothing to Commit and Push)'
+                                }
                             }
                         }
                     }
@@ -588,6 +582,14 @@ def generateAzureDeployStage(region, env) {
             }
         }
     }
+}
+
+def logIntoAzure(){
+    //Log into ACR/ECR etc
+    sh "az login --service-principal -u ${AZURE_CLIENT_ID} -p ${AZURE_CLIENT_SECRET} -t ${AZURE_TENANT_ID}"
+    sh "az account set -s ${AZURE_SUBSCRIPTION_ID}"
+    sh "az acr login --name ${PROD_WESTEUROPE_AZACRNAME_PROP}"
+    ACRLOGINSERVER = sh(returnStdout: true, script: "az acr show --resource-group ${PROD_WESTEUROPE_AZRGNAME_PROP} --name ${PROD_WESTEUROPE_AZACRNAME_PROP} --query \"loginServer\" --output tsv").trim()
 }
 
 void executeDeploy(Map inboundMap) {
