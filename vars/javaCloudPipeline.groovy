@@ -375,24 +375,42 @@ def call(Map pipelineParams) {
                 }
             }
 
-            stage('Docker Deploy to PPE') {
+            stage('PPE Deploy - Azure') {
                 when {
-                    changeRequest target: 'master'
+                    allOf {
+                        changeRequest target: 'master'
+                        expression { DEPLOY_TO_AZURE == 'true' }
+                    }
                 }
                 steps {
                     echo "PR created to Master Branch. PPE Deployment will be performed in this stage."
+                    executeDeploy(AZURE_PPE_REGION_MAP)
                 }
             }
 
-            stage('Docker Deploy to PROD') {
+            stage('PROD Deploy Release - Azure') {
                 when {
-                    anyOf {
+                    allOf {
                         branch 'master';
-                        branch "hotfix/*"
+                        expression {DEPLOY_TO_AZURE == 'true'}
                     }
                 }
                 steps {
                     echo 'Merge request to Master Branch has been approved. PROD Deployment will be performed in this stage.'
+                    executeDeploy(AZURE_PROD_REGION_MAP)
+                }
+            }
+
+            stage('PROD Deploy HotFix - Azure') {
+                when {
+                    allOf {
+                        branch "hotfix/*"
+                        expression {DEPLOY_TO_AZURE == 'true'}
+                    }
+                }
+                steps {
+                    echo 'HotFix change has been implemented. PROD Deployment will be performed in this stage.'
+                    executeDeploy(AZURE_PROD_REGION_MAP)
                 }
             }
 
