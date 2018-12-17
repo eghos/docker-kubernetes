@@ -133,7 +133,12 @@ def call(Map pipelineParams) {
                         AZURE_PROD_REGION_MAP = AZURE_PROD_REGION.collectEntries {
                             ["${it}" : generateAzureDeployStage(it, "prod")]
                         }
-                        
+
+                        sh "az login --service-principal -u ${AZURE_CLIENT_ID} -p ${AZURE_CLIENT_SECRET} -t ${AZURE_TENANT_ID}"
+                        sh "az account set -s ${AZURE_SUBSCRIPTION_ID}"
+                        sh "az acr login --name ${PROD_WESTEUROPE_AZACRNAME_PROP}"
+                        ACRLOGINSERVER = sh(returnStdout: true, script: "az acr show --resource-group ${PROD_WESTEUROPE_AZRGNAME_PROP} --name ${PROD_WESTEUROPE_AZACRNAME_PROP} --query \"loginServer\" --output tsv").trim()
+
                     }
                 }
             }
@@ -270,10 +275,10 @@ def call(Map pipelineParams) {
 //                                    ["${it}" : generateAzureDeployStage(it, "prod")]
 //                                }
 
-                            sh "az login --service-principal -u ${AZURE_CLIENT_ID} -p ${AZURE_CLIENT_SECRET} -t ${AZURE_TENANT_ID}"
-                            sh "az account set -s ${AZURE_SUBSCRIPTION_ID}"
-                            sh "az acr login --name ${PROD_WESTEUROPE_AZACRNAME_PROP}"
-                            ACRLOGINSERVER = sh(returnStdout: true, script: "az acr show --resource-group ${PROD_WESTEUROPE_AZRGNAME_PROP} --name ${PROD_WESTEUROPE_AZACRNAME_PROP} --query \"loginServer\" --output tsv").trim()
+//                            sh "az login --service-principal -u ${AZURE_CLIENT_ID} -p ${AZURE_CLIENT_SECRET} -t ${AZURE_TENANT_ID}"
+//                            sh "az account set -s ${AZURE_SUBSCRIPTION_ID}"
+//                            sh "az acr login --name ${PROD_WESTEUROPE_AZACRNAME_PROP}"
+//                            ACRLOGINSERVER = sh(returnStdout: true, script: "az acr show --resource-group ${PROD_WESTEUROPE_AZRGNAME_PROP} --name ${PROD_WESTEUROPE_AZACRNAME_PROP} --query \"loginServer\" --output tsv").trim()
                             sh "docker build -t ${ACRLOGINSERVER}/${DOCKER_ORG_IMAGE}:${DOCKER_VERSION} ."
                             sh "docker push ${ACRLOGINSERVER}/${DOCKER_ORG_IMAGE}:${DOCKER_VERSION}"
 
