@@ -47,12 +47,27 @@ def call(Map pipelineParams) {
 
         stages {
 
-            stage("Skip CICD?") {
+            stage("Skip CICD Dev?") {
                 when {
                     allOf {
                         branch "develop*";
                         expression {
-                            result = sh(script: "git log -1 | grep '.*\\[ci skip\\].*'", returnStatus: true)
+                            result = sh(script: "git log -1 | grep '.*\\[ci skip dev\\].*'", returnStatus: true)
+                            result == 0
+                        }
+                    }
+                }
+                steps {
+                    stageSkipCICD()
+                }
+            }
+
+            stage("Skip CICD Release?") {
+                when {
+                    allOf {
+                        branch "release*";
+                        expression {
+                            result = sh(script: "git log -1 | grep '.*\\[ci skip release\\].*'", returnStatus: true)
                             result == 0
                         }
                     }
@@ -201,7 +216,7 @@ def call(Map pipelineParams) {
                     withCredentials([azureServicePrincipal('sp-ipim-ip-aks')]) {
                         script {
                             AWS_DEV_REGION_MAP = AWS_DEV_REGION.collectEntries {
-                                ["${it}" : generateAwsDeployStage(it, "test")]
+                                ["${it}" : generateAwsDeployStage(it, "dev")]
                             }
                             AWS_TEST_REGION_MAP = AWS_TEST_REGION.collectEntries {
                                 ["${it}" : generateAwsDeployStage(it, "test")]
@@ -399,7 +414,16 @@ def call(Map pipelineParams) {
                                 sh 'git config --global user.name "l-apimgt-u-itsehbg"'
                                 sh 'git add pom.xml'
                                 sh 'git status'
-                                sh 'git commit -m "System - CICD Pipeline changes committed. [ci skip]"'
+
+                                if (env.BRANCH_NAME.startsWith("develop")) {
+                                    sh 'git commit -m "System - CICD Pipeline changes committed for Development. [ci skip dev]"'
+                                }
+
+                                if (env.BRANCH_NAME.startsWith("release/")) {
+                                    sh 'git commit -m "System - CICD Pipeline changes committed for Release. [ci skip release]"'
+                                }
+
+//                                sh 'git commit -m "System - CICD Pipeline changes committed. [ci skip]"'
                                 sh 'git push origin "${BRANCH_NAME_FULL}" -f'
                             }
                         }
