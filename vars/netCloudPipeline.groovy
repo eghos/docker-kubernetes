@@ -46,11 +46,14 @@ def call(Map pipelineParams) {
 
         stages {
 
-            stage("Skip CICD?") {
+            stage("Skip CICD Dev?") {
                 when {
-                    expression {
-                        result = sh (script: "git log -1 | grep '.*\\[ci skip\\].*'", returnStatus: true)
-                        result == 0
+                    allOf {
+                        branch "develop*";
+                        expression {
+                            result = sh(script: "git log -1 | grep '.*\\[ci skip dev\\].*'", returnStatus: true)
+                            result == 0
+                        }
                     }
                 }
                 steps {
@@ -58,34 +61,88 @@ def call(Map pipelineParams) {
                 }
             }
 
+            stage("Skip CICD Release?") {
+                when {
+                    allOf {
+                        branch "release/*";
+                        expression {
+                            result = sh(script: "git log -1 | grep '.*\\[ci skip release\\].*'", returnStatus: true)
+                            result == 0
+                        }
+                    }
+                }
+                steps {
+                    stageSkipCICD()
+                }
+            }
+
+
             stage('Setup General') {
                 steps {
-                    stageSetupGeneral()
-                    script {
-                        deploymentProperties = readProperties file:'deployment.properties'
+                    withCredentials([azureServicePrincipal('sp-ipim-ip-aks')]) {
+                        stageSetupGeneral()
+                        script {
+                            //Get variables from project deployment.properties
+                            deploymentProperties = readProperties file: 'deployment.properties'
 
-                        DEPLOY_TO_AWS       = deploymentProperties['DEPLOY_TO_AWS']
+                            //Collect AWS Deployment variables
+                            DEPLOY_TO_AWS = deploymentProperties['DEPLOY_TO_AWS']
+                            AWS_DEV_REGION    = deploymentProperties['AWS_DEV_REGION'].split(',').collect { it as String }
+                            AWS_TEST_REGION   = deploymentProperties['AWS_TEST_REGION'].split(',').collect { it as String }
+                            AWS_PPE_REGION    = deploymentProperties['AWS_PPE_REGION'].split(',').collect { it as String }
+                            AWS_PROD_REGION   = deploymentProperties['AWS_PROD_REGION'].split(',').collect { it as String }
 
-                        AWS_DEV_REGION      = deploymentProperties['AWS_DEV_REGION'].split(',').collect{it as String}
-                        AWS_TEST_REGION     = deploymentProperties['AWS_TEST_REGION'].split(',').collect{it as String}
-                        AWS_PPE_REGION      = deploymentProperties['AWS_PPE_REGION'].split(',').collect{it as String}
-                        AWS_PROD_REGION     = deploymentProperties['AWS_PROD_REGION'].split(',').collect{it as String}
+                            //Collect Azure Deployment variables
+                            DEPLOY_TO_AZURE   = deploymentProperties['DEPLOY_TO_AZURE']
+                            AZURE_DEV_REGION  = deploymentProperties['AZURE_DEV_REGION'].split(',').collect { it as String }
+                            AZURE_TEST_REGION = deploymentProperties['AZURE_TEST_REGION'].split(',').collect {it as String }
+                            AZURE_PPE_REGION  = deploymentProperties['AZURE_PPE_REGION'].split(',').collect { it as String }
+                            AZURE_PROD_REGION = deploymentProperties['AZURE_PROD_REGION'].split(',').collect { it as String }
 
-                        DEPLOY_TO_AZURE     = deploymentProperties['DEPLOY_TO_AZURE']
+                            //Collect On Prem Deployment variables
+                            DEPLOY_TO_ON_PREM = deploymentProperties['DEPLOY_TO_ON_PREM']
+                            ON_PREM_REGION    = deploymentProperties['ON_PREM_REGION']
 
-                        AZURE_DEV_REGION    = deploymentProperties['AZURE_DEV_REGION'].split(',').collect{it as String}
-                        AZURE_TEST_REGION   = deploymentProperties['AZURE_TEST_REGION'].split(',').collect{it as String}
-                        AZURE_PPE_REGION    = deploymentProperties['AZURE_PPE_REGION'].split(',').collect{it as String}
-                        AZURE_PROD_REGION   = deploymentProperties['AZURE_PROD_REGION'].split(',').collect{it as String}
+                            APIARY_PROJECT_NAME = deploymentProperties['APIARY_PROJECT_NAME']
+                            URI_ROOT_PATH = deploymentProperties['URI_ROOT_PATH']
+                            KUBERNETES_NAMESPACE = deploymentProperties['KUBERNETES_NAMESPACE']
+                            IS_API_APPLICATION = deploymentProperties['IS_API_APPLICATION']
 
-                        DEPLOY_TO_ON_PREM   = deploymentProperties['DEPLOY_TO_ON_PREM']
-                        ON_PREM_REGION      = deploymentProperties['ON_PREM_REGION']
+                            //Set up AWS deployment region map properties
+                            AWS_DEV_REGION_MAP = AWS_DEV_REGION.collectEntries {
+                                ["${it}": generateAwsDeployStage(it, "dev")]
+                            }
+                            AWS_TEST_REGION_MAP = AWS_TEST_REGION.collectEntries {
+                                ["${it}": generateAwsDeployStage(it, "test")]
+                            }
+                            AWS_PPE_REGION_MAP = AWS_PPE_REGION.collectEntries {
+                                ["${it}": generateAwsDeployStage(it, "ppe")]
+                            }
+                            AWS_PROD_REGION_MAP = AWS_PROD_REGION.collectEntries {
+                                ["${it}": generateAwsDeployStage(it, "prod")]
+                            }
 
-                        APIARY_PROJECT_NAME = deploymentProperties['APIARY_PROJECT_NAME']
+                            //Set up Azure deployment region map properties
+                            AZURE_DEV_REGION_MAP = AZURE_DEV_REGION.collectEntries {
+                                ["${it}": generateAzureDeployStage(it, "dev")]
+                            }
+                            AZURE_TEST_REGION_MAP = AZURE_TEST_REGION.collectEntries {
+                                ["${it}": generateAzureDeployStage(it, "test")]
+                            }
+                            AZURE_PPE_REGION_MAP = AZURE_PPE_REGION.collectEntries {
+                                ["${it}": generateAzureDeployStage(it, "ppe")]
+                            }
+                            AZURE_PROD_REGION_MAP = AZURE_PROD_REGION.collectEntries {
+                                ["${it}": generateAzureDeployStage(it, "prod")]
+                            }
 
-                        URI_ROOT_PATH       = deploymentProperties['URI_ROOT_PATH']
+                            //Log into ACR/ECR etc
+                            sh "az login --service-principal -u ${AZURE_CLIENT_ID} -p ${AZURE_CLIENT_SECRET} -t ${AZURE_TENANT_ID}"
+                            sh "az account set -s ${AZURE_SUBSCRIPTION_ID}"
+                            sh "az acr login --name ${PROD_WESTEUROPE_AZACRNAME_PROP}"
+                            ACRLOGINSERVER = sh(returnStdout: true, script: "az acr show --resource-group ${PROD_WESTEUROPE_AZRGNAME_PROP} --name ${PROD_WESTEUROPE_AZACRNAME_PROP} --query \"loginServer\" --output tsv").trim()
 
-                        IS_API_APPLICATION  = deploymentProperties['IS_API_APPLICATION']
+                        }
                     }
                 }
             }
@@ -176,36 +233,36 @@ def call(Map pipelineParams) {
                 steps {
                     withCredentials([azureServicePrincipal('sp-ipim-ip-aks')]) {
                         script {
-                            AWS_DEV_REGION_MAP = AWS_DEV_REGION.collectEntries {
-                                ["${it}" : generateAwsDeployStage(it, "dev")]
-                            }
-                            AWS_TEST_REGION_MAP = AWS_TEST_REGION.collectEntries {
-                                ["${it}" : generateAwsDeployStage(it, "test")]
-                            }
-                            AWS_PPE_REGION_MAP = AWS_PPE_REGION.collectEntries {
-                                ["${it}" : generateAwsDeployStage(it, "ppe")]
-                            }
-                            AWS_PROD_REGION_MAP = AWS_PROD_REGION.collectEntries {
-                                ["${it}" : generateAwsDeployStage(it, "prod")]
-                            }
+//                                AWS_DEV_REGION_MAP = AWS_DEV_REGION.collectEntries {
+//                                    ["${it}" : generateAwsDeployStage(it, "dev")]
+//                                }
+//                                AWS_TEST_REGION_MAP = AWS_TEST_REGION.collectEntries {
+//                                    ["${it}" : generateAwsDeployStage(it, "test")]
+//                                }
+//                                AWS_PPE_REGION_MAP = AWS_PPE_REGION.collectEntries {
+//                                    ["${it}" : generateAwsDeployStage(it, "ppe")]
+//                                }
+//                                AWS_PROD_REGION_MAP = AWS_PROD_REGION.collectEntries {
+//                                    ["${it}" : generateAwsDeployStage(it, "prod")]
+//                                }
+//
+//                                AZURE_DEV_REGION_MAP = AZURE_DEV_REGION.collectEntries {
+//                                    ["${it}" : generateAzureDeployStage(it, "dev")]
+//                                }
+//                                AZURE_TEST_REGION_MAP = AZURE_TEST_REGION.collectEntries {
+//                                    ["${it}" : generateAzureDeployStage(it, "test")]
+//                                }
+//                                AZURE_PPE_REGION_MAP = AZURE_PPE_REGION.collectEntries {
+//                                    ["${it}" : generateAzureDeployStage(it, "ppe")]
+//                                }
+//                                AZURE_PROD_REGION_MAP = AZURE_PROD_REGION.collectEntries {
+//                                    ["${it}" : generateAzureDeployStage(it, "prod")]
+//                                }
 
-                            AZURE_DEV_REGION_MAP = AZURE_DEV_REGION.collectEntries {
-                                ["${it}" : generateAzureDeployStage(it, "ppe")]
-                            }
-                            AZURE_TEST_REGION_MAP = AZURE_TEST_REGION.collectEntries {
-                                ["${it}" : generateAzureDeployStage(it, "test")]
-                            }
-                            AZURE_PPE_REGION_MAP = AZURE_PPE_REGION.collectEntries {
-                                ["${it}" : generateAzureDeployStage(it, "ppe")]
-                            }
-                            AZURE_PROD_REGION_MAP = AZURE_PROD_REGION.collectEntries {
-                                ["${it}" : generateAzureDeployStage(it, "prod")]
-                            }
-
-                            sh "az login --service-principal -u ${AZURE_CLIENT_ID} -p ${AZURE_CLIENT_SECRET} -t ${AZURE_TENANT_ID}"
-                            sh "az account set -s ${AZURE_SUBSCRIPTION_ID}"
-                            sh "az acr login --name ${PROD_WESTEUROPE_AZACRNAME_PROP}"
-                            ACRLOGINSERVER = sh(returnStdout: true, script: "az acr show --resource-group ${PROD_WESTEUROPE_AZRGNAME_PROP} --name ${PROD_WESTEUROPE_AZACRNAME_PROP} --query \"loginServer\" --output tsv").trim()
+//                            sh "az login --service-principal -u ${AZURE_CLIENT_ID} -p ${AZURE_CLIENT_SECRET} -t ${AZURE_TENANT_ID}"
+//                            sh "az account set -s ${AZURE_SUBSCRIPTION_ID}"
+//                            sh "az acr login --name ${PROD_WESTEUROPE_AZACRNAME_PROP}"
+//                            ACRLOGINSERVER = sh(returnStdout: true, script: "az acr show --resource-group ${PROD_WESTEUROPE_AZRGNAME_PROP} --name ${PROD_WESTEUROPE_AZACRNAME_PROP} --query \"loginServer\" --output tsv").trim()
                             sh "docker build -t ${ACRLOGINSERVER}/${DOCKER_ORG_IMAGE}:${DOCKER_VERSION} ."
                             sh "docker push ${ACRLOGINSERVER}/${DOCKER_ORG_IMAGE}:${DOCKER_VERSION}"
 
@@ -295,27 +352,48 @@ def call(Map pipelineParams) {
                 }
             }
 
-            stage('Docker Deploy to PPE') {
+            stage('PPE Deploy - Azure') {
                 when {
-                    changeRequest target: 'master'
+                    allOf {
+                        changeRequest target: 'master'
+                        expression { DEPLOY_TO_AZURE == 'true' }
+                    }
                 }
                 steps {
                     echo "PR created to Master Branch. PPE Deployment will be performed in this stage."
+                    script {
+                        DOCKER_VERSION = "${PROD_RELEASE_NUMBER}"
+                    }
+
+                    executeDeploy(AZURE_PPE_REGION_MAP)
                 }
             }
 
-            stage('Docker Deploy to PROD') {
+            stage('PROD Deploy Release - Azure') {
                 when {
-                    anyOf {
+                    allOf {
                         branch 'master';
-                        branch "hotfix/*"
+                        expression {DEPLOY_TO_AZURE == 'true'}
                     }
                 }
                 steps {
                     echo 'Merge request to Master Branch has been approved. PROD Deployment will be performed in this stage.'
+                    executeDeploy(AZURE_PROD_REGION_MAP)
                 }
             }
 
+            stage('PROD Deploy HotFix - Azure') {
+                when {
+                    allOf {
+                        branch "hotfix/*"
+                        expression {DEPLOY_TO_AZURE == 'true'}
+                    }
+                }
+                steps {
+                    echo 'HotFix change has been implemented. PROD Deployment will be performed in this stage.'
+                    executeDeploy(AZURE_PROD_REGION_MAP)
+                }
+            }
             stage('Commit Updated Version') {
                 steps {
                     withCredentials([sshUserPrivateKey(credentialsId: 'l-apimgt-u-itsehbgATikea.com', keyFileVariable: 'SSH_KEY')]) {
@@ -335,17 +413,12 @@ def call(Map pipelineParams) {
                     }
                 }
             }
-
-            stage('Clean Up') {
-                steps {
-                    cleanWs()
-                }
-            }
         }
 
         post {
             always {
                 slackNotifier(currentBuild.currentResult)
+                cleanWs()
             }
         }
     }
