@@ -138,11 +138,11 @@ def call(Map pipelineParams) {
                             }
 
                             //Log into ACR/ECR etc
-                            sh "az login --service-principal -u ${AZURE_CLIENT_ID} -p ${AZURE_CLIENT_SECRET} -t ${AZURE_TENANT_ID}"
-                            sh "az account set -s ${AZURE_SUBSCRIPTION_ID}"
-                            sh "az acr login --name ${PROD_WESTEUROPE_AZACRNAME_PROP}"
-                            ACRLOGINSERVER = sh(returnStdout: true, script: "az acr show --resource-group ${PROD_WESTEUROPE_AZRGNAME_PROP} --name ${PROD_WESTEUROPE_AZACRNAME_PROP} --query \"loginServer\" --output tsv").trim()
-
+//                            sh "az login --service-principal -u ${AZURE_CLIENT_ID} -p ${AZURE_CLIENT_SECRET} -t ${AZURE_TENANT_ID}"
+//                            sh "az account set -s ${AZURE_SUBSCRIPTION_ID}"
+//                            sh "az acr login --name ${PROD_WESTEUROPE_AZACRNAME_PROP}"
+//                            ACRLOGINSERVER = sh(returnStdout: true, script: "az acr show --resource-group ${PROD_WESTEUROPE_AZRGNAME_PROP} --name ${PROD_WESTEUROPE_AZACRNAME_PROP} --query \"loginServer\" --output tsv").trim()
+                            logIntoAzure()
                         }
                     }
                 }
@@ -150,18 +150,16 @@ def call(Map pipelineParams) {
 
             stage('Update Versions') {
                 steps {
-//                    withCredentials([sshUserPrivateKey(credentialsId: 'l-apimgt-u-itsehbgATikea.com', keyFileVariable: 'SSH_KEY')]) {
                         sh 'chmod +x ./mvnw'
                         script {
-//                            if (env.BRANCH_NAME.startsWith("PR")) {
-//                                echo 'This is a PR Branch'
-//                                sh './mvnw -B org.codehaus.mojo:versions-maven-plugin:2.5:set -DprocessAllModules -DnewVersion=${DEV_PR_VERSION}'
-//                            }
+                            if (env.BRANCH_NAME.startsWith("PR")) {
+                                echo 'This is a PR Branch'
+                            }
 
                             if (env.BRANCH_NAME.startsWith("develop")) {
                                 echo 'This is a develop Branch'
                                 //Update pom.xml version
-//                                sh './mvnw -B org.codehaus.mojo:versions-maven-plugin:2.5:set -DprocessAllModules -DnewVersion=1.0.${BUILD_NUMBER}-SNAPSHOT'
+                                // sh './mvnw -B org.codehaus.mojo:versions-maven-plugin:2.5:set -DprocessAllModules -DnewVersion=1.0.${BUILD_NUMBER}-SNAPSHOT'
                                 DOCKER_VERSION = "${DEV_SNAPSHOT_VERSION}"
                             }
 
@@ -183,8 +181,6 @@ def call(Map pipelineParams) {
                                 DOCKER_VERSION = "${RELEASE_NUMBER}"
                             }
                         }
-                        echo readMavenPom().getVersion()
-//                    }
                 }
             }
 
@@ -257,36 +253,6 @@ def call(Map pipelineParams) {
                 steps {
                     withCredentials([azureServicePrincipal('sp-ipim-ip-aks')]) {
                         script {
-//                                AWS_DEV_REGION_MAP = AWS_DEV_REGION.collectEntries {
-//                                    ["${it}" : generateAwsDeployStage(it, "dev")]
-//                                }
-//                                AWS_TEST_REGION_MAP = AWS_TEST_REGION.collectEntries {
-//                                    ["${it}" : generateAwsDeployStage(it, "test")]
-//                                }
-//                                AWS_PPE_REGION_MAP = AWS_PPE_REGION.collectEntries {
-//                                    ["${it}" : generateAwsDeployStage(it, "ppe")]
-//                                }
-//                                AWS_PROD_REGION_MAP = AWS_PROD_REGION.collectEntries {
-//                                    ["${it}" : generateAwsDeployStage(it, "prod")]
-//                                }
-//
-//                                AZURE_DEV_REGION_MAP = AZURE_DEV_REGION.collectEntries {
-//                                    ["${it}" : generateAzureDeployStage(it, "dev")]
-//                                }
-//                                AZURE_TEST_REGION_MAP = AZURE_TEST_REGION.collectEntries {
-//                                    ["${it}" : generateAzureDeployStage(it, "test")]
-//                                }
-//                                AZURE_PPE_REGION_MAP = AZURE_PPE_REGION.collectEntries {
-//                                    ["${it}" : generateAzureDeployStage(it, "ppe")]
-//                                }
-//                                AZURE_PROD_REGION_MAP = AZURE_PROD_REGION.collectEntries {
-//                                    ["${it}" : generateAzureDeployStage(it, "prod")]
-//                                }
-
-//                            sh "az login --service-principal -u ${AZURE_CLIENT_ID} -p ${AZURE_CLIENT_SECRET} -t ${AZURE_TENANT_ID}"
-//                            sh "az account set -s ${AZURE_SUBSCRIPTION_ID}"
-//                            sh "az acr login --name ${PROD_WESTEUROPE_AZACRNAME_PROP}"
-//                            ACRLOGINSERVER = sh(returnStdout: true, script: "az acr show --resource-group ${PROD_WESTEUROPE_AZRGNAME_PROP} --name ${PROD_WESTEUROPE_AZACRNAME_PROP} --query \"loginServer\" --output tsv").trim()
                             sh "docker build -t ${ACRLOGINSERVER}/${DOCKER_ORG_IMAGE}:${DOCKER_VERSION} ."
                             sh "docker push ${ACRLOGINSERVER}/${DOCKER_ORG_IMAGE}:${DOCKER_VERSION}"
 
@@ -343,26 +309,6 @@ def call(Map pipelineParams) {
                 }
             }
 
-//            //TODO move contents to Dredd Test in service test
-//            stage('Fetch Apiary Definition') {
-//                when {
-//                    allOf {
-//                        branch "release/*";
-//                        expression { IS_API_APPLICATION == 'true' }
-//                    }
-//                }
-//                steps {
-//                    script {
-//                        sh """
-//                          cd ./build
-//                          export APIARY_API_KEY=${APIARY_IO_TOKEN_PROP}
-//                          apiary fetch --api-name ${APIARY_PROJECT_NAME} --output ${APIARY_PROJECT_NAME}.apib
-//                          """
-//                        sh "git add ./build/${APIARY_PROJECT_NAME}.apib"
-//                    }
-//                }
-//            }
-
             stage('Service Tests') {
                 when {
                     allOf {
@@ -378,7 +324,7 @@ def call(Map pipelineParams) {
                     }
                     stage('Dredd Tests (API Contract)') {
                         steps {
-
+                            //Fetch API Definition from apiary.io using apiary CLI.
                             script {
                                 sh """
                                    cd ./build
@@ -387,15 +333,15 @@ def call(Map pipelineParams) {
                                    """
                                 sh "git add ./build/${APIARY_PROJECT_NAME}.apib"
                             }
-
+                            //Make copy of dredd-template (to stop git automatically checking in existing modified file
                             sh 'cp ./build/dredd-template.yml ./build/dredd.yml'
-
+                            //Replace variables in Dredd file
                             sh """
                                cd build
                                sed -i -e \"s|APIARY_PROJECT_VAR|${APIARY_PROJECT_NAME}.apib|g\" dredd.yml
                                sed -i -e \"s|SERVICE_GATEWAY_DNS_VAR|${SERVICE_GATEWAY_DNS_PROP}${URI_ROOT_PATH}|g\" dredd.yml
                                """
-
+                            //Run Dredd test.
                             script {
                                 try {
                                     sh 'docker run -i -v ${WORKSPACE}/build:/api -w /api apiaryio/dredd'
@@ -403,7 +349,7 @@ def call(Map pipelineParams) {
                                 } catch (err) {
                                     //sh 'chmod +x ./build/results.xml'
                                     sh 'cd ./build && ls -lart'
-//                                    sh "git add ./build/results.xml"
+                                    //sh "git add ./build/results.xml"
                                     echo 'Get XUnit/JUnit Results if available'
                                     //junit './build/results.xml'
                                 }
