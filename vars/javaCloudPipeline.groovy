@@ -153,15 +153,15 @@ def call(Map pipelineParams) {
 //                    withCredentials([sshUserPrivateKey(credentialsId: 'l-apimgt-u-itsehbgATikea.com', keyFileVariable: 'SSH_KEY')]) {
                         sh 'chmod +x ./mvnw'
                         script {
-                            if (env.BRANCH_NAME.startsWith("PR")) {
-                                echo 'This is a PR Branch'
+//                            if (env.BRANCH_NAME.startsWith("PR")) {
+//                                echo 'This is a PR Branch'
 //                                sh './mvnw -B org.codehaus.mojo:versions-maven-plugin:2.5:set -DprocessAllModules -DnewVersion=${DEV_PR_VERSION}'
-                            }
+//                            }
 
                             if (env.BRANCH_NAME.startsWith("develop")) {
                                 echo 'This is a develop Branch'
                                 //Update pom.xml version
-                                sh './mvnw -B org.codehaus.mojo:versions-maven-plugin:2.5:set -DprocessAllModules -DnewVersion=1.0.${BUILD_NUMBER}-SNAPSHOT'
+//                                sh './mvnw -B org.codehaus.mojo:versions-maven-plugin:2.5:set -DprocessAllModules -DnewVersion=1.0.${BUILD_NUMBER}-SNAPSHOT'
                                 DOCKER_VERSION = "${DEV_SNAPSHOT_VERSION}"
                             }
 
@@ -464,7 +464,7 @@ def call(Map pipelineParams) {
             stage('Commit Changes') {
                 when {
                     anyOf {
-                        branch 'develop*';
+//                        branch 'develop*';
                         branch "release/*"
                         branch "hotfix/*"
                     }
