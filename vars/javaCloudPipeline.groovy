@@ -343,25 +343,25 @@ def call(Map pipelineParams) {
                 }
             }
 
-            //TODO move contents to Dredd Test in service test
-            stage('Fetch Apiary Definition') {
-                when {
-                    allOf {
-                        branch "release/*";
-                        expression { IS_API_APPLICATION == 'true' }
-                    }
-                }
-                steps {
-                    script {
-                        sh """
-                          cd ./build
-                          export APIARY_API_KEY=${APIARY_IO_TOKEN_PROP}
-                          apiary fetch --api-name ${APIARY_PROJECT_NAME} --output ${APIARY_PROJECT_NAME}.apib
-                          """
-                        sh "git add ./build/${APIARY_PROJECT_NAME}.apib"
-                    }
-                }
-            }
+//            //TODO move contents to Dredd Test in service test
+//            stage('Fetch Apiary Definition') {
+//                when {
+//                    allOf {
+//                        branch "release/*";
+//                        expression { IS_API_APPLICATION == 'true' }
+//                    }
+//                }
+//                steps {
+//                    script {
+//                        sh """
+//                          cd ./build
+//                          export APIARY_API_KEY=${APIARY_IO_TOKEN_PROP}
+//                          apiary fetch --api-name ${APIARY_PROJECT_NAME} --output ${APIARY_PROJECT_NAME}.apib
+//                          """
+//                        sh "git add ./build/${APIARY_PROJECT_NAME}.apib"
+//                    }
+//                }
+//            }
 
             stage('Service Tests') {
                 when {
@@ -378,6 +378,16 @@ def call(Map pipelineParams) {
                     }
                     stage('Dredd Tests (API Contract)') {
                         steps {
+
+                            script {
+                                sh """
+                                   cd ./build
+                                   export APIARY_API_KEY=${APIARY_IO_TOKEN_PROP}
+                                   apiary fetch --api-name ${APIARY_PROJECT_NAME} --output ${APIARY_PROJECT_NAME}.apib
+                                   """
+                                sh "git add ./build/${APIARY_PROJECT_NAME}.apib"
+                            }
+
                             sh 'cp ./build/dredd-template.yml ./build/dredd.yml'
 
                             sh """
