@@ -233,36 +233,6 @@ def call(Map pipelineParams) {
                 steps {
                     withCredentials([azureServicePrincipal('sp-ipim-ip-aks')]) {
                         script {
-//                                AWS_DEV_REGION_MAP = AWS_DEV_REGION.collectEntries {
-//                                    ["${it}" : generateAwsDeployStage(it, "dev")]
-//                                }
-//                                AWS_TEST_REGION_MAP = AWS_TEST_REGION.collectEntries {
-//                                    ["${it}" : generateAwsDeployStage(it, "test")]
-//                                }
-//                                AWS_PPE_REGION_MAP = AWS_PPE_REGION.collectEntries {
-//                                    ["${it}" : generateAwsDeployStage(it, "ppe")]
-//                                }
-//                                AWS_PROD_REGION_MAP = AWS_PROD_REGION.collectEntries {
-//                                    ["${it}" : generateAwsDeployStage(it, "prod")]
-//                                }
-//
-//                                AZURE_DEV_REGION_MAP = AZURE_DEV_REGION.collectEntries {
-//                                    ["${it}" : generateAzureDeployStage(it, "dev")]
-//                                }
-//                                AZURE_TEST_REGION_MAP = AZURE_TEST_REGION.collectEntries {
-//                                    ["${it}" : generateAzureDeployStage(it, "test")]
-//                                }
-//                                AZURE_PPE_REGION_MAP = AZURE_PPE_REGION.collectEntries {
-//                                    ["${it}" : generateAzureDeployStage(it, "ppe")]
-//                                }
-//                                AZURE_PROD_REGION_MAP = AZURE_PROD_REGION.collectEntries {
-//                                    ["${it}" : generateAzureDeployStage(it, "prod")]
-//                                }
-
-//                            sh "az login --service-principal -u ${AZURE_CLIENT_ID} -p ${AZURE_CLIENT_SECRET} -t ${AZURE_TENANT_ID}"
-//                            sh "az account set -s ${AZURE_SUBSCRIPTION_ID}"
-//                            sh "az acr login --name ${PROD_WESTEUROPE_AZACRNAME_PROP}"
-//                            ACRLOGINSERVER = sh(returnStdout: true, script: "az acr show --resource-group ${PROD_WESTEUROPE_AZRGNAME_PROP} --name ${PROD_WESTEUROPE_AZACRNAME_PROP} --query \"loginServer\" --output tsv").trim()
                             sh "docker build -t ${ACRLOGINSERVER}/${DOCKER_ORG_IMAGE}:${DOCKER_VERSION} ."
                             sh "docker push ${ACRLOGINSERVER}/${DOCKER_ORG_IMAGE}:${DOCKER_VERSION}"
 
@@ -469,12 +439,12 @@ def generateAzureDeployStage(region, env) {
                     sh 'chmod +x ./build/*.yaml'
                     sh """
                         cd build
-                        cp \"configmap-${region}-${env}.yaml\" \"configmap-${region}-${env}-azure.yaml\"
+                        cp \"configmap-az-${region}-${env}.yaml\" \"configmap-az-${region}-${env}-azure.yaml\"
                         cp \"deploy-service.yaml\" \"deploy-service-azure.yaml\"
                         cp \"virtual-service.yaml\" \"virtual-service-azure.yaml\"
                         
-                        sed -i -e \"s|KUBERNETES_NAMESPACE_VAR|${KUBERNETES_NAMESPACE}|g\" configmap-${region}-${env}-azure.yaml
-                        kubectl apply -f configmap-${region}-${env}-azure.yaml
+                        sed -i -e \"s|KUBERNETES_NAMESPACE_VAR|${KUBERNETES_NAMESPACE}|g\" configmap-az-${region}-${env}-azure.yaml
+                        kubectl apply -f configmap-az-${region}-${env}-azure.yaml
 
                         sed -i -e \"s|IMAGE_NAME_VAR|${ACRLOGINSERVER}/${DOCKER_ORG_IMAGE}:${DOCKER_VERSION}|g\" deploy-service-azure.yaml
                         sed -i -e \"s|SERVICE_NAME_VAR|${IMAGE_NAME}|g\" deploy-service-azure.yaml
@@ -496,6 +466,7 @@ def generateAzureDeployStage(region, env) {
         }
     }
 }
+
 
 void executeDeploy(Map inboundMap) {
 
