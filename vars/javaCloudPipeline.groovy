@@ -190,7 +190,7 @@ def call(Map pipelineParams) {
                     sh """
                        cd build/api-blueprint
                        sed -i -e \"s|APIARY_PROJECT_VAR|${APIARY_PROJECT_NAME}.apib|g\" dredd.yml
-                       sed -i -e \"s|SERVICE_GATEWAY_DNS_VAR|${SERVICE_GATEWAY_DNS_PROP}${URI_ROOT_PATH}|g\" dredd.yml
+                       sed -i -e \"s|SERVICE_GATEWAY_DNS_VAR|${SERVICE_GATEWAY_DNS_PROP}|g\" dredd.yml
                        """
 
                     //Run Dredd Test against APIB Definition and running service.
