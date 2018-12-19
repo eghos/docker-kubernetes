@@ -65,7 +65,7 @@ def call(Map pipelineParams) {
                 steps {
                     script {
                         try {
-                            sh 'dredd --config ./api-blueprint/dredd.yml --reporter junit --output ./api-blueprint/blueprint.xml'
+                            sh 'dredd --config ./api-blueprint/dredd.yml --reporter junit --output ./api-blueprint/blueprint.xml -j apiaryApiKey:ce16ad7641d98a84d231ebb0b1a14292 -j apiaryApiName:priceapi'
                         } catch (err) {
                             //sh 'chmod +x ./build/results.xml'
                             sh 'cd ./api-blueprint && ls -lart'
