@@ -11,8 +11,6 @@ class cloudEnvironmentProps{
     def GIT_SVC_ACCOUNT_USER                = "l-apimgt-u-itsehbg"
     def NPM_NEXUS_REPOSITORY_URL            = "https://nexus.hip.red.cdtapps.com/repository/npm-internal/"
 
-    def SERVICE_GATEWAY_DNS                 = "http://dev-az-svc.westeurope.cloudapp.azure.com"
-
     def getApiaryIoToken(){
         return APIARY_IO_TOKEN
     }
@@ -36,8 +34,5 @@ class cloudEnvironmentProps{
     }
     def getNpmNexusRepositoryUrl(){
         return NPM_NEXUS_REPOSITORY_URL
-    }
-    def getServiceGatewayDns(){
-        return SERVICE_GATEWAY_DNS
     }
 }

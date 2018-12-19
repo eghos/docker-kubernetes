@@ -44,7 +44,6 @@ def call(Map pipelineParams) {
             APIARY_IO_TOKEN_PROP                     = cloudEnvironmentProps.getApiaryIoToken()
             APIARY_IO_DREDD_PROP                     = cloudEnvironmentProps.getApiaryDreddToken()
             NPM_NEXUS_REPOSITORY_URL_PROP            = cloudEnvironmentProps.getNpmNexusRepositoryUrl()
-            SERVICE_GATEWAY_DNS_PROP                 = cloudEnvironmentProps.getServiceGatewayDns()
         }
 
         tools {
