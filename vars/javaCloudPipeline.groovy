@@ -67,7 +67,7 @@ def call(Map pipelineParams) {
                         try {
 //                            sh 'dredd --config ./api-blueprint/dredd.yml --reporter junit --output ./api-blueprint/blueprint.xml '
                             sh """
-                                  export APIARY_API_KEY=${APIARY_IO_TOKEN_PROP}
+                                  export APIARY_API_KEY=ce16ad7641d98a84d231ebb0b1a14292
                                   export APIARY_API_NAME=priceapi
                                   dredd --config ./api-blueprint/dredd.yml
                                """
