@@ -46,6 +46,10 @@ def call(Map pipelineParams) {
             SERVICE_GATEWAY_DNS_PROP                 = cloudEnvironmentProps.getServiceGatewayDns()
         }
 
+        tools {
+            nodejs "latest-node"
+        }
+
         stages {
 
             stage('Install Deps') {
