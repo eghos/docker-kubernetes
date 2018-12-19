@@ -48,6 +48,34 @@ def call(Map pipelineParams) {
 
         stages {
 
+            stage('Install Deps') {
+                    sh 'node -v'
+                    sh 'npm -v'
+                    sh 'npm install'
+                    sh 'npm -g install dredd@stable'
+            }
+
+            stage('Test API Blueprint') {
+                    wrap([$class: 'AnsiColorBuildWrapper', 'colorMapName': 'XTerm']) {
+                        sh 'dredd --config ./build/dredd.yml --reporter junit --output ./build/blueprint.xml'
+                    }
+            }
+
+            stage('Get JUnit Results') {
+                junit './build/blueprint.xml'
+            }
+
+            stage ('Dredd Test') {
+                when {
+                    allOf {
+                        branch "develop/*";
+                    }
+                }
+                steps {
+
+                }
+            }
+
             stage("Skip CICD Dev?") {
                 when {
                     allOf {
@@ -280,6 +308,8 @@ def call(Map pipelineParams) {
                     executeDeploy(AZURE_DEV_REGION_MAP)
                 }
             }
+
+
 
             stage ('TEST Deploy - AWS') {
                 when {
