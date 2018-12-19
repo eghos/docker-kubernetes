@@ -53,29 +53,6 @@ def call(Map pipelineParams) {
 
         stages {
 
-            stage('Install Deps') {
-                steps {
-                    sh 'node -v'
-                    sh 'npm -v'
-                    sh 'npm install'
-                    sh 'npm -g install dredd@stable'
-                }
-            }
-
-
-
-
-            stage ('Dredd Test') {
-                when {
-                    allOf {
-                        branch "develop/*";
-                    }
-                }
-                steps {
-                    echo 'TODO'
-                }
-            }
-
             stage("Skip CICD Dev?") {
                 when {
                     allOf {
@@ -167,41 +144,6 @@ def call(Map pipelineParams) {
 
                             //Log into ACR/ECR etc
                             logIntoAzure()
-                        }
-                    }
-                }
-            }
-
-            stage('Fetch API Blueprint & Run Dredd Test') {
-                steps {
-                    //Firstly fetch the latest API Blueprint Definition.
-                    script {
-                        sh """
-                           cd ./build/api-blueprint
-                           export APIARY_API_KEY=${APIARY_IO_TOKEN_PROP}
-                           apiary fetch --api-name ${APIARY_PROJECT_NAME} --output ${APIARY_PROJECT_NAME}.apib
-                           """
-                        sh "git add ./build/api-blueprint/${APIARY_PROJECT_NAME}.apib"
-                    }
-
-                    //Make copy of dredd-template (to stop git automatically checking in existing modified file
-                    sh 'cp ./build/api-blueprint/dredd-template.yml ./build/api-blueprint/dredd.yml'
-                    //Replace variables in Dredd file
-                    sh """
-                       cd build/api-blueprint
-                       sed -i -e \"s|APIARY_PROJECT_VAR|${APIARY_PROJECT_NAME}.apib|g\" dredd.yml
-                       sed -i -e \"s|SERVICE_GATEWAY_DNS_VAR|${SERVICE_GATEWAY_DNS_PROP}|g\" dredd.yml
-                       """
-
-                    //Run Dredd Test against APIB Definition and running service.
-                    script {
-                        try {
-                            sh """
-                                  export APIARY_API_KEY=${APIARY_IO_DREDD_PROP}
-                                  export APIARY_API_NAME=${APIARY_PROJECT_NAME}
-                                  dredd --config ./build/api-blueprint/dredd.yml
-                               """
-                        } catch (err) {
                         }
                     }
                 }
@@ -344,7 +286,53 @@ def call(Map pipelineParams) {
                 }
             }
 
+            stage('Fetch API Blueprint & Run Dredd Test') {
+                when {
+                    anyOf {
+                        changeRequest target: 'develop*'
+                        branch "develop*";
+                    }
+                }
+                steps {
+                    //Install Dependencies
+                    sh 'node -v'
+                    sh 'npm -v'
+                    sh 'npm install'
+                    sh 'npm -g install dredd@stable'
+                    //Firstly fetch the latest API Blueprint Definition.
+                    script {
+                        sh """
+                           cd ./build/api-blueprint
+                           export APIARY_API_KEY=${APIARY_IO_TOKEN_PROP}
+                           apiary fetch --api-name ${APIARY_PROJECT_NAME} --output ${APIARY_PROJECT_NAME}.apib
+                           """
+                        sh "git add ./build/api-blueprint/${APIARY_PROJECT_NAME}.apib"
+                    }
 
+                    //Make copy of dredd-template (to stop git automatically checking in existing modified file
+                    sh 'cp ./build/api-blueprint/dredd-template.yml ./build/api-blueprint/dredd.yml'
+                    //Replace variables in Dredd file
+                    sh """
+                       cd build/api-blueprint
+                       sed -i -e \"s|APIARY_PROJECT_VAR|${APIARY_PROJECT_NAME}.apib|g\" dredd.yml
+                       sed -i -e \"s|SERVICE_GATEWAY_DNS_VAR|${SERVICE_GATEWAY_DNS_PROP}|g\" dredd.yml
+                       """
+
+                    //Run Dredd Test against APIB Definition and running service.
+                    script {
+                        try {
+                            sh """
+                                  export APIARY_API_KEY=${APIARY_IO_DREDD_PROP}
+                                  export APIARY_API_NAME=${APIARY_PROJECT_NAME}
+                                  dredd --config ./build/api-blueprint/dredd.yml
+                               """
+                        } catch (err) {
+                            //TODO
+                            echo 'Dredd Test failed. Continuing with pipeline'
+                        }
+                    }
+                }
+            }
 
             stage ('TEST Deploy - AWS') {
                 when {
