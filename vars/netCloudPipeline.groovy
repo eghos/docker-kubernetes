@@ -332,7 +332,7 @@ def call(Map pipelineParams) {
                 steps {
                     echo "PR created to Master Branch. PPE Deployment will be performed in this stage."
                     script {
-                        DOCKER_VERSION = "${PROD_RELEASE_NUMBER}"
+                        DOCKER_VERSION = "1.0.0"
                     }
 
                     executeDeploy(AZURE_PPE_REGION_MAP)
@@ -348,6 +348,7 @@ def call(Map pipelineParams) {
                 }
                 steps {
                     echo 'Merge request to Master Branch has been approved. PROD Deployment will be performed in this stage.'
+                    DOCKER_VERSION = "1.0.0"
                     executeDeploy(AZURE_PROD_REGION_MAP)
                 }
             }
