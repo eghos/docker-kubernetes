@@ -308,16 +308,17 @@ def call(Map pipelineParams) {
                            """
                         sh "git add ./build/api-blueprint/${APIARY_PROJECT_NAME}.apib"
                     }
-
-                    //Make copy of dredd-template (to stop git automatically checking in existing modified file
-                    sh 'cp ./build/api-blueprint/dredd-template.yml ./build/api-blueprint/dredd.yml'
-                    //Replace variables in Dredd file
-                    sh """
+                    script {
+                        AZ_ENV_REGION_SVC_HOSTNAME = "${AZURE_SVC_HOSTNAME_PROP}".replace('<ENV>', "dev").replace('<REGION>', "westeurope")
+                        //Make copy of dredd-template (to stop git automatically checking in existing modified file
+                        sh 'cp ./build/api-blueprint/dredd-template.yml ./build/api-blueprint/dredd.yml'
+                        //Replace variables in Dredd file
+                        sh """
                        cd build/api-blueprint
                        sed -i -e \"s|APIARY_PROJECT_VAR|${APIARY_PROJECT_NAME}.apib|g\" dredd.yml
-                       sed -i -e \"s|SERVICE_GATEWAY_DNS_VAR|${SERVICE_GATEWAY_DNS_PROP}${URI_ROOT_PATH}|g\" dredd.yml
+                       sed -i -e \"s|SERVICE_GATEWAY_DNS_VAR|${AZ_ENV_REGION_SVC_HOSTNAME}${URI_ROOT_PATH}|g\" dredd.yml
                        """
-
+                    }
                     //Run Dredd Test against APIB Definition and running service.
                     script {
                         try {
@@ -469,7 +470,7 @@ def call(Map pipelineParams) {
             stage('Commit Changes') {
                 when {
                     anyOf {
-//                        branch 'develop*';
+                        branch 'develop*';
                         branch "release/*"
                         branch "hotfix/*"
                     }
