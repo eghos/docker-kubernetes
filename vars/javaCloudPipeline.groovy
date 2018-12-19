@@ -185,7 +185,7 @@ def call(Map pipelineParams) {
                     }
 
                     //Make copy of dredd-template (to stop git automatically checking in existing modified file
-                    sh 'cp ./build/api-blueprint/dredd-template.yml ./build/dredd.yml'
+                    sh 'cp ./build/api-blueprint/dredd-template.yml ./build/api-blueprint/dredd.yml'
                     //Replace variables in Dredd file
                     sh """
                        cd build/api-blueprint
