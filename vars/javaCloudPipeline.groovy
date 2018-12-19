@@ -68,7 +68,7 @@ def call(Map pipelineParams) {
                             sh 'dredd --config ./api-blueprint/dredd.yml --reporter junit --output ./api-blueprint/blueprint.xml'
                         } catch (err) {
                             //sh 'chmod +x ./build/results.xml'
-                            sh 'cd ./build && ls -lart'
+                            sh 'cd ./api-blueprint && ls -lart'
                             //sh "git add ./build/results.xml"
                             echo 'Get XUnit/JUnit Results if available'
                             junit './api-blueprint/blueprint.xml'
