@@ -1,6 +1,7 @@
 //#!/usr/bin/env groovy
 class cloudEnvironmentProps{
     def APIARY_IO_TOKEN                     = "890e555a1d3107539c130f23b9494155"
+    def APIARY_DREDD_TOKEN                  = "ce16ad7641d98a84d231ebb0b1a14292"
 
     def PROD_WESTEUROPE_AZRGNAME            = "ipimip-prod-westEurope-rg"
     def PROD_WESTEUROPE_AZACRNAME           = "acrweprod01"
@@ -14,6 +15,9 @@ class cloudEnvironmentProps{
 
     def getApiaryIoToken(){
         return APIARY_IO_TOKEN
+    }
+    def getApiaryDreddToken(){
+        return APIARY_DREDD_TOKEN
     }
     def getProdWesteuropeAzRgName(){
         return PROD_WESTEUROPE_AZRGNAME

@@ -42,6 +42,7 @@ def call(Map pipelineParams) {
             PROD_WESTEUROPE_AZRGNAME_PROP            = cloudEnvironmentProps.getProdWesteuropeAzRgName()
             PROD_WESTEUROPE_AZACRNAME_PROP           = cloudEnvironmentProps.getProdWesteuropeAzAcrName()
             APIARY_IO_TOKEN_PROP                     = cloudEnvironmentProps.getApiaryIoToken()
+            APIARY_IO_DREDD_PROP                     = cloudEnvironmentProps.getApiaryDreddToken()
             NPM_NEXUS_REPOSITORY_URL_PROP            = cloudEnvironmentProps.getNpmNexusRepositoryUrl()
             SERVICE_GATEWAY_DNS_PROP                 = cloudEnvironmentProps.getServiceGatewayDns()
         }
@@ -61,26 +62,37 @@ def call(Map pipelineParams) {
                 }
             }
 
-            stage('Test API Blueprint') {
+            stage('Fetch API Blueprint & Run Dredd Test') {
                 steps {
+                    //Firstly fetch the latest API Blueprint Definition.
+                    script {
+                        sh """
+                           cd ./build/api-blueprint
+                           export APIARY_API_KEY=${APIARY_IO_TOKEN_PROP}
+                           apiary fetch --api-name ${APIARY_PROJECT_NAME} --output ${APIARY_PROJECT_NAME}.apib
+                           """
+                        sh "git add ./build/api-blueprint/${APIARY_PROJECT_NAME}.apib"
+                    }
+
+                    //Make copy of dredd-template (to stop git automatically checking in existing modified file
+                    sh 'cp ./build/api-blueprint/dredd-template.yml ./build/dredd.yml'
+                    //Replace variables in Dredd file
+                    sh """
+                       cd build/api-blueprint
+                       sed -i -e \"s|APIARY_PROJECT_VAR|${APIARY_PROJECT_NAME}.apib|g\" dredd.yml
+                       sed -i -e \"s|SERVICE_GATEWAY_DNS_VAR|${SERVICE_GATEWAY_DNS_PROP}${URI_ROOT_PATH}|g\" dredd.yml
+                       """
+
+                    //Run Dredd Test against APIB Definition and running service.
                     script {
                         try {
-//                            sh 'dredd --config ./api-blueprint/dredd.yml --reporter junit --output ./api-blueprint/blueprint.xml '
                             sh """
-                                  export APIARY_API_KEY=ce16ad7641d98a84d231ebb0b1a14292
-                                  export APIARY_API_NAME=priceapi
-                                  dredd --config ./api-blueprint/dredd.yml
+                                  export APIARY_API_KEY=${APIARY_IO_DREDD_PROP}
+                                  export APIARY_API_NAME=${APIARY_PROJECT_NAME}
+                                  dredd --config ./build/api-blueprint/dredd.yml
                                """
-//                            sh 'dredd --config ./api-blueprint/dredd.yml'
-
                         } catch (err) {
-                            //sh 'chmod +x ./build/results.xml'
-                            sh 'cd ./api-blueprint && ls -lart'
-                            //sh "git add ./build/results.xml"
-                            echo 'Get XUnit/JUnit Results if available'
-                            junit './api-blueprint/blueprint.xml'
                         }
-//                        junit './build/blueprint.xml'
                     }
                 }
             }
