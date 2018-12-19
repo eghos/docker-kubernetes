@@ -32,7 +32,7 @@ def call(Map pipelineParams) {
 
             AWS_DOCKER_TAG           = "${DOCKER_REPO}/${ORG}/${IMAGE_NAME}"
             DOCKER_ORG_IMAGE         = "${ORG}/${IMAGE_NAME}"
-            
+
 
             DEPLOY_TO_AWS            = ""
             DEPLOY_TO_AZURE          = ""
@@ -234,7 +234,9 @@ def call(Map pipelineParams) {
                }
                steps {
                   nodejs(nodeJSInstallationName: 'latest-node', configId: 'eb9d09bd-11d9-4fbb-88e4-45b12cc7a19f') {
-                    sh "npm publish --registry https://nexus.hip.red.cdtapps.com/repository/npm-internal/ "
+                      //sh "npm publish --registry https://nexus.hip.red.cdtapps.com/repository/npm-internal/ "
+                      sh "npm publish --registry ${NPM_NEXUS_REPOSITORY_URL_PROP}"
+
                   }
                }
             }
