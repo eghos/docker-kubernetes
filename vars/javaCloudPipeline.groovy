@@ -226,18 +226,18 @@ def call(Map pipelineParams) {
 //                 }
 //             }
 
-//            stage('Code Deploy to Nexus') {
-//                when {
-//                    anyOf {
-//                        branch "develop*";
-//                        branch "release/*"
-//                    }
-//                }
-//                steps {
-//                    sh 'chmod +x ./mvnw'
-//                    sh './mvnw -f pom.xml -Dmaven.test.skip=true deploy'
-//                }
-//            }
+            stage('Code Deploy to Nexus') {
+                when {
+                    anyOf {
+                        branch "develop*";
+                        branch "release/*"
+                    }
+                }
+                steps {
+                    sh 'chmod +x ./mvnw'
+                    sh './mvnw -f pom.xml -Dmaven.test.skip=true deploy'
+                }
+            }
 
             stage('Docker Build') {
                 when {

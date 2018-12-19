@@ -26,15 +26,13 @@ def call(Map pipelineParams) {
                                        ).trim()}"""
             DEV_SNAPSHOT_VERSION     = "1.0.${BUILD_NUMBER}-SNAPSHOT"
             RELEASE_NUMBER           = env.BRANCH_NAME.replace('release/', '')
-            RELEASE_VERSION          = "${RELEASE_NUMBER}.RELEASE"
+            RELEASE_VERSION          = "${RELEASE_NUMBER}"
 
             GIT_URL_MODIFIED         = env.GIT_URL.replace('https://', 'git@').replace('com/', 'com:')
 
             AWS_DOCKER_TAG           = "${DOCKER_REPO}/${ORG}/${IMAGE_NAME}"
             DOCKER_ORG_IMAGE         = "${ORG}/${IMAGE_NAME}"
-
-            JAVA_HOME                = "/usr/lib/jvm/java-10-oracle"
-            JAVA_HOME8               = "/usr/lib/jvm/java-8-oracle"
+            
 
             DEPLOY_TO_AWS            = ""
             DEPLOY_TO_AZURE          = ""
