@@ -50,7 +50,7 @@ def call(Map pipelineParams) {
 
             stage('Install Deps') {
                 steps {
-                    sh 'node -v'
+//                    sh 'node -v'
                     sh 'npm -v'
                     sh 'npm install'
                     sh 'npm -g install dredd@stable'
