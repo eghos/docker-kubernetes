@@ -54,7 +54,7 @@ def call(Map pipelineParams) {
 
             stage('Install Deps') {
                 steps {
-//                    sh 'node -v'
+                    sh 'node -v'
                     sh 'npm -v'
                     sh 'npm install'
                     sh 'npm -g install dredd@stable'
@@ -63,17 +63,11 @@ def call(Map pipelineParams) {
 
             stage('Test API Blueprint') {
                 steps {
-
-                        sh 'dredd --config ./build/dredd-template2.yml --reporter junit --output ./build/blueprint.xml'
-
-                }
-            }
-
-            stage('Get JUnit Results') {
-                steps {
+                    sh 'dredd --config ./api-blueprint/dredd.yml --reporter junit --output blueprint.xml'
                     junit './build/blueprint.xml'
                 }
             }
+
 
             stage ('Dredd Test') {
                 when {
