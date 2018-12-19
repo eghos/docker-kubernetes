@@ -348,7 +348,9 @@ def call(Map pipelineParams) {
                 }
                 steps {
                     echo 'Merge request to Master Branch has been approved. PROD Deployment will be performed in this stage.'
-                    DOCKER_VERSION = "1.0.0"
+                    script {
+                        DOCKER_VERSION = "1.0.0"
+                    }
                     executeDeploy(AZURE_PROD_REGION_MAP)
                 }
             }
