@@ -49,20 +49,26 @@ def call(Map pipelineParams) {
         stages {
 
             stage('Install Deps') {
+                steps {
                     sh 'node -v'
                     sh 'npm -v'
                     sh 'npm install'
                     sh 'npm -g install dredd@stable'
+                }
             }
 
             stage('Test API Blueprint') {
+                steps {
                     wrap([$class: 'AnsiColorBuildWrapper', 'colorMapName': 'XTerm']) {
                         sh 'dredd --config ./build/dredd.yml --reporter junit --output ./build/blueprint.xml'
                     }
+                }
             }
 
             stage('Get JUnit Results') {
-                junit './build/blueprint.xml'
+                steps {
+                    junit './build/blueprint.xml'
+                }
             }
 
             stage ('Dredd Test') {
