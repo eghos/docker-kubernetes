@@ -64,7 +64,7 @@ def call(Map pipelineParams) {
             stage('Test API Blueprint') {
                 steps {
 
-                        sh 'dredd --config ./build/dredd.yml --reporter junit --output ./build/blueprint.xml'
+                        sh 'dredd --config ./build/dredd-template2.yml --reporter junit --output ./build/blueprint.xml'
 
                 }
             }
