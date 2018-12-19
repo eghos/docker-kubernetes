@@ -179,6 +179,7 @@ def call(Map pipelineParams) {
 
                             if (env.BRANCH_NAME.startsWith("master")) {
                                 echo 'This is a master Branch'
+                                DOCKER_VERSION = "${VERSION_FROM_PJ}"
                             }
 
                             if (env.BRANCH_NAME.startsWith("hotfix")) {
@@ -350,7 +351,7 @@ def call(Map pipelineParams) {
                 steps {
                     echo "PR created to Master Branch. PPE Deployment will be performed in this stage."
                     script {
-                        DOCKER_VERSION = "${PROD_RELEASE_NUMBER}"
+                        DOCKER_VERSION = "${VERSION_FROM_PJ}"
                     }
 
                     executeDeploy(AZURE_PPE_REGION_MAP)
