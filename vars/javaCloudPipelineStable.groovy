@@ -20,7 +20,7 @@ def call(Map pipelineParams) {
             DEV_SNAPSHOT_VERSION     = "1.0.${BUILD_NUMBER}-SNAPSHOT"
             RELEASE_NUMBER           = env.BRANCH_NAME.replace('release/', '')
             RELEASE_VERSION          = "${RELEASE_NUMBER}.RELEASE"
-            PROD_RELEASE_NUMBER      = readMavenPom().getVersion().replace('release/', '')
+            PROD_RELEASE_NUMBER      = readMavenPom().getVersion().replace('.RELEASE', '')
 
             GIT_URL_MODIFIED         = env.GIT_URL.replace('https://', 'git@').replace('com/', 'com:')
 
@@ -226,18 +226,18 @@ def call(Map pipelineParams) {
 //                 }
 //             }
 
-//            stage('Code Deploy to Nexus') {
-//                when {
-//                    anyOf {
-//                        branch "develop*";
-//                        branch "release/*"
-//                    }
-//                }
-//                steps {
-//                    sh 'chmod +x ./mvnw'
-//                    sh './mvnw -f pom.xml -Dmaven.test.skip=true deploy'
-//                }
-//            }
+            stage('Code Deploy to Nexus') {
+                when {
+                    anyOf {
+                        branch "develop*";
+                        branch "release/*"
+                    }
+                }
+                steps {
+                    sh 'chmod +x ./mvnw'
+                    sh './mvnw -f pom.xml -Dmaven.test.skip=true deploy'
+                }
+            }
 
             stage('Docker Build') {
                 when {
