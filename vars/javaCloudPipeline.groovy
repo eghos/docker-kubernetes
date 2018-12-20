@@ -317,6 +317,7 @@ def call(Map pipelineParams) {
                        sed -i -e \"s|APIARY_PROJECT_VAR|${APIARY_PROJECT_NAME}.apib|g\" dredd.yml
                        sed -i -e \"s|SERVICE_GATEWAY_DNS_VAR|${AZ_ENV_REGION_SVC_HOSTNAME}|g\" dredd.yml
                        cat dredd.yml
+                       cat ${APIARY_PROJECT_NAME}.apib
                        """
                     }
                     //Run Dredd Test against APIB Definition and running service.
