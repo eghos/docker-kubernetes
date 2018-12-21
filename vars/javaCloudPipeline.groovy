@@ -52,6 +52,12 @@ def call(Map pipelineParams) {
 
         stages {
 
+            stage('API Fortress Tests') {
+                steps {
+                    sh 'python ./build/api-fortess-testing/apif-run.py run-by-id https://ikea.apifortress.com/app/api/rest/v3/a340aba1-b0c1-45cd-8d2b-26ccd74c4b023 -i 5bab61ec30c49e00012c0f49 -e "apif_env:dev-environment" -o test-result.json'
+                }
+            }
+
             stage("Skip CICD Dev?") {
                 when {
                     allOf {
@@ -331,49 +337,12 @@ def call(Map pipelineParams) {
                 parallel {
                     stage('API Fortress Tests') {
                         steps {
-                            sh 'echo'
+                            sh 'python ./build/api-fortess-testing/apif-run.py run-by-id https://ikea.apifortress.com/app/api/rest/v3/a340aba1-b0c1-45cd-8d2b-26ccd74c4b023 -i 5bab61ec30c49e00012c0f49 -e "apif_env:dev-environment" -o test-result.json'
                         }
                     }
                     stage('Dredd Test)') {
                         steps {
-                            //Install Dependencies
-                            sh 'node -v'
-                            sh 'npm -v'
-                            sh 'npm install'
-                            sh 'npm -g install dredd@stable'
-                            //Firstly fetch the latest API Blueprint Definition.
-                            script {
-                                sh """
-                                   cd ./build/api-contract-testing
-                                   export APIARY_API_KEY=${APIARY_IO_TOKEN_PROP}
-                                   apiary fetch --api-name ${APIARY_PROJECT_NAME} --output ${APIARY_PROJECT_NAME}.apib
-                                   """
-                                sh "git add ./build/api-contract-testing/${APIARY_PROJECT_NAME}.apib"
-                            }
-                            script {
-                                AZ_ENV_REGION_SVC_HOSTNAME = "${AZURE_SVC_HOSTNAME_PROP}".replace('<ENV>', "dev").replace('<REGION>', "westeurope")
-                                //Make copy of dredd-template (to stop git automatically checking in existing modified file
-                                sh 'cp ./build/api-contract-testing/dredd-template.yml ./build/api-contract-testing/dredd.yml'
-                                //Replace variables in Dredd file
-                                sh """
-                                   cd build/api-contract-testing
-                                   sed -i -e \"s|APIARY_PROJECT_VAR|${APIARY_PROJECT_NAME}.apib|g\" dredd.yml
-                                   sed -i -e \"s|SERVICE_GATEWAY_DNS_VAR|http://${AZ_ENV_REGION_SVC_HOSTNAME}|g\" dredd.yml
-                                   """
-                            }
-                            //Run Dredd Test against APIB Definition and running service.
-                            script {
-                                try {
-                                    sh """
-                                  export APIARY_API_KEY=${APIARY_IO_DREDD_PROP}
-                                  export APIARY_API_NAME=${APIARY_PROJECT_NAME}
-                                  dredd --config ./build/api-contract-testing/dredd.yml
-                               """
-                                } catch (err) {
-                                    //TODO
-                                    echo 'Dredd Test failed. Continuing with pipeline'
-                                }
-                            }
+                            runDreddTest()
                         }
                     }
                     stage('Functional-Test') {
