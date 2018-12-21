@@ -62,7 +62,7 @@ def call(Map pipelineParams) {
                         API_FORTRESS_TEST_ID = functionalTestProperties['API_FORTRESS_TEST_ID']
                     }
                     //sh "python ./build/api-fortress/apif-run.py run-by-id https://ikea.apifortress.com/app/api/rest/v3/a340aba1-b0c1-45cd-8d2b-26ccd74c4b023 -i ${API_FORTRESS_TEST_ID} -e \"apif_env:dev-environment\" -o test-result.json"
-                    sh "python apif-run.py run-by-id config_key -c ./build/api-functional-testing/config.yml -i ${API_FORTRESS_TEST_ID} -e \"apif_env:dev-environment\" -o test-result.json"
+                    sh "python ./build/api-functional-testing/apif-run.py run-by-id config_key -c ./build/api-functional-testing/config.yml -i ${API_FORTRESS_TEST_ID} -e \"apif_env:dev-environment\" -o test-result.json"
                     //sh 'python ./build/api-fortress/apif-run.py run-by-id https://ikea.apifortress.com/app/api/rest/v3/a340aba1-b0c1-45cd-8d2b-26ccd74c4b023 -i 5bab61ec30c49e00012c0f49 -e "apif_env:dev-environment" -o test-result.json'
                 }
             }
