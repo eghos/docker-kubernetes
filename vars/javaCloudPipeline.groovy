@@ -446,6 +446,7 @@ def call(Map pipelineParams) {
                                     echo 'Git Commit/Push was not successful (Nothing to Commit and Push)'
                                 }
 
+                                sh 'git config --global --add hub.host git.build.ingka.ikea.comg'
                                 sh 'hub pull-request -m "test pull from pipeline"'
                             }
                         }
