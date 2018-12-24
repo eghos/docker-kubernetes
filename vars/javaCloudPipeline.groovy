@@ -54,8 +54,6 @@ def call(Map pipelineParams) {
 
             stage('API Fortress Tests') {
                 steps {
-                    sh 'whoami'
-                    sh 'hub --help'
                     script {
                         //Get variables from project deployment.properties
                         functionalTestProperties = readProperties file: './build/api-functional-testing/functional-test.properties'
@@ -447,6 +445,8 @@ def call(Map pipelineParams) {
                                 } catch (err){
                                     echo 'Git Commit/Push was not successful (Nothing to Commit and Push)'
                                 }
+
+                                sh 'hub pull-request -m "test pull from pipeline"'
                             }
                         }
                     }
