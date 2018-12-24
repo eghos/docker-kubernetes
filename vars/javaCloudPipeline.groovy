@@ -54,6 +54,7 @@ def call(Map pipelineParams) {
 
             stage('API Fortress Tests') {
                 steps {
+                    sh 'whoami'
                     sh 'hub --help'
                     script {
                         //Get variables from project deployment.properties
