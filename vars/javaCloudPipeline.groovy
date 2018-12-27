@@ -446,11 +446,22 @@ def call(Map pipelineParams) {
                                     echo 'Git Commit/Push was not successful (Nothing to Commit and Push)'
                                 }
 
-                                sh 'git config --global --add hub.host git.build.ingka.ikea.com'
                                 sh 'hub pull-request -m "test pull from pipeline"'
                             }
                         }
                     }
+                }
+            }
+
+            stage('PR from Release to Dev Branch') {
+                when {
+                    allOf {
+                        changeRequest target: 'master'
+                    }
+                }
+                steps {
+                    echo "Creating a PR from Release Branch to Develop Branch"
+                    sh "hub pull-request -b development -m \"PR from ${PROD_RELEASE_NUMBER} to Develop Branch\""
                 }
             }
 
