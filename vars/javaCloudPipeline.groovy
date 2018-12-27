@@ -446,8 +446,7 @@ def call(Map pipelineParams) {
                                     echo 'Git Commit/Push was not successful (Nothing to Commit and Push)'
                                 }
 
-//                                sh 'hub pull-request -m "test pull from pipeline"'
-                                sh "hub pull-request -b development -m \"PR from ${PROD_RELEASE_NUMBER} to Develop Branch\""
+                                sh 'hub pull-request -b development -m "test pull from pipeline"'
                             }
                         }
                     }
