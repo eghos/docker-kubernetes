@@ -52,18 +52,18 @@ def call(Map pipelineParams) {
 
         stages {
 
-            stage('API Fortress Tests') {
-                steps {
-                    script {
-                        //Get variables from project deployment.properties
-                        functionalTestProperties = readProperties file: './build/api-functional-testing/functional-test.properties'
-
-                        //Collect AWS Deployment variables
-                        API_FORTRESS_TEST_ID = functionalTestProperties['API_FORTRESS_TEST_ID']
-                    }
-                    sh "python ./build/api-functional-testing/apif-run.py run-by-id config_key -c ./build/api-functional-testing/config.yml -i ${API_FORTRESS_TEST_ID} -e \"apif_env:dev-environment\" -o test-result.json"
-                }
-            }
+//            stage('API Fortress Tests') {
+//                steps {
+//                    script {
+//                        //Get variables from project deployment.properties
+//                        functionalTestProperties = readProperties file: './build/api-functional-testing/functional-test.properties'
+//
+//                        //Collect AWS Deployment variables
+//                        API_FORTRESS_TEST_ID = functionalTestProperties['API_FORTRESS_TEST_ID']
+//                    }
+//                    sh "python ./build/api-functional-testing/apif-run.py run-by-id config_key -c ./build/api-functional-testing/config.yml -i ${API_FORTRESS_TEST_ID} -e \"apif_env:dev-environment\" -o test-result.json"
+//                }
+//            }
 
             stage("Skip CICD Dev?") {
                 when {
@@ -344,7 +344,15 @@ def call(Map pipelineParams) {
                 parallel {
                     stage('API Fortress Tests') {
                         steps {
-                            sh 'python ./build/api-functional-testing/apif-run.py run-by-id https://ikea.apifortress.com/app/api/rest/v3/a340aba1-b0c1-45cd-8d2b-26ccd74c4b023 -i 5bab61ec30c49e00012c0f49 -e "apif_env:dev-environment" -o test-result.json'
+                            script {
+                                //Get variables from project deployment.properties
+                                functionalTestProperties = readProperties file: './build/api-functional-testing/functional-test.properties'
+
+                                //Collect AWS Deployment variables
+                                API_FORTRESS_TEST_ID = functionalTestProperties['API_FORTRESS_TEST_ID']
+                            }
+                            sh "python ./build/api-functional-testing/apif-run.py run-by-id config_key -c ./build/api-functional-testing/config.yml -i ${API_FORTRESS_TEST_ID} -e \"apif_env:dev-environment\" -o test-result.json"
+
                         }
                     }
                     stage('Dredd Test)') {
@@ -490,10 +498,10 @@ def call(Map pipelineParams) {
                     echo "Creating a PR from Release Branch to Develop Branch"
                     script {
                         try {
-                            sh 'hub pull-request -b develop -m "PR Created from Release Branch to Develop Branch." -l "Please Review!"'
+                            sh 'hub pull-request -b develop -m "PR Created from Release Branch to Develop Branch."'
                         } catch (err) {
                             echo 'Develop Branch does not exist? Trying Development Branch'
-                            sh 'hub pull-request -b development -m "PR Created from Release Branch to Develop Branch." -l "Please Review!"'
+                            sh 'hub pull-request -b development -m "PR Created from Release Branch to Develop Branch."'
 
                         }
                     }
