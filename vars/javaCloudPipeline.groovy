@@ -387,6 +387,23 @@ def call(Map pipelineParams) {
                 }
             }
 
+            stage('PPE Deploy - AWS') {
+                when {
+                    allOf {
+                        changeRequest target: 'master'
+                        expression { DEPLOY_TO_AWS == 'true' }
+                    }
+                }
+                steps {
+                    echo "PR created to Master Branch. PPE Deployment will be performed in this stage."
+                    script {
+                        DOCKER_VERSION = "${PROD_RELEASE_NUMBER}"
+                    }
+
+                    executeDeploy(AWS_PPE_REGION_MAP)
+                }
+            }
+
             stage('PROD Deploy Release - Azure') {
                 when {
                     allOf {
@@ -397,6 +414,19 @@ def call(Map pipelineParams) {
                 steps {
                     echo 'Merge request to Master Branch has been approved. PROD Deployment will be performed in this stage.'
                     executeDeploy(AZURE_PROD_REGION_MAP)
+                }
+            }
+
+            stage('PROD Deploy Release - AWS') {
+                when {
+                    allOf {
+                        branch 'master';
+                        expression {DEPLOY_TO_AWS == 'true'}
+                    }
+                }
+                steps {
+                    echo 'Merge request to Master Branch has been approved. PROD Deployment will be performed in this stage.'
+                    executeDeploy(AWS_PROD_REGION_MAP)
                 }
             }
 
@@ -446,8 +476,6 @@ def call(Map pipelineParams) {
                                 } catch (err){
                                     echo 'Git Commit/Push was not successful (Nothing to Commit and Push)'
                                 }
-
-//                                sh 'hub pull-request -b development -m "test pull from pipeline"'
                             }
                         }
                     }
@@ -456,13 +484,30 @@ def call(Map pipelineParams) {
 
             stage('PR from Release to Dev Branch') {
                 when {
-                    allOf {
                         changeRequest target: 'master'
-                    }
                 }
                 steps {
                     echo "Creating a PR from Release Branch to Develop Branch"
-                    sh 'hub pull-request -b development -m "PR Created from Release Branch to Develop Branch."'
+                    try {
+                        sh 'hub pull-request -b develop -m "PR Created from Release Branch to Develop Branch." -l "Please Review!"'
+                    } catch (err){
+                        echo 'Develop Branch does not exist? Trying Development Branch'
+                        sh 'hub pull-request -b development -m "PR Created from Release Branch to Develop Branch." -l "Please Review!"'
+
+                    }
+                }
+            }
+
+            stage('GIT Create Tag') {
+                when {
+                    allOf {
+                        branch 'master';
+                    }
+                }
+                steps {
+                    echo 'Merge request to Master Branch has been approved. PROD Deployment will be performed in this stage.'
+                    sh 'git tag tag123'
+                    sh 'git push origin --tags'
                 }
             }
 
