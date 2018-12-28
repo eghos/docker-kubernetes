@@ -518,9 +518,13 @@ def call(Map pipelineParams) {
                     }
                 }
                 steps {
-                    echo 'Merge request to Master Branch has been approved. PROD Deployment will be performed in this stage.'
-                    sh 'git tag tag123'
-                    sh 'git push origin --tags'
+                    withCredentials([sshUserPrivateKey(credentialsId: 'l-apimgt-u-itsehbgATikea.com', keyFileVariable: 'SSH_KEY')]) {
+                        withEnv(["GIT_SSH_COMMAND=ssh -o StrictHostKeyChecking=no -o User=${GIT_SVC_ACCOUNT_USER_PROP} -i ${SSH_KEY}"]) {
+                            echo 'Merge request to Master Branch has been approved. PROD Deployment will be performed in this stage.'
+                            sh 'git tag tag123'
+                            sh 'git push origin --tags'
+                        }
+                    }
                 }
             }
 
