@@ -457,6 +457,7 @@ def call(Map pipelineParams) {
                         branch 'develop*';
                         branch "release/*"
                         branch "hotfix/*"
+                        branch "master"
                         changeRequest target: 'master'
                     }
                 }
@@ -468,19 +469,21 @@ def call(Map pipelineParams) {
                                 sh "git remote add origin ${GIT_URL_MODIFIED}"
                                 sh 'git config --global user.email "l-apimgt-u-itsehbg@ikea.com"'
                                 sh 'git config --global user.name "l-apimgt-u-itsehbg"'
-                                sh 'git add pom.xml'
-                                sh 'git status'
 
                                 try {
                                     if (env.BRANCH_NAME.startsWith("develop")) {
+                                        sh 'git add pom.xml'
+                                        sh 'git status'
                                         sh 'git commit -m "System - CICD Pipeline changes committed for Development. [ci skip dev]"'
+                                        sh 'git push origin "${BRANCH_NAME_FULL}" -f'
                                     }
 
                                     if (env.BRANCH_NAME.startsWith("release/")) {
+                                        sh 'git add pom.xml'
+                                        sh 'git status'
                                         sh 'git commit -m "System - CICD Pipeline changes committed for Release. [ci skip release]"'
+                                        sh 'git push origin "${BRANCH_NAME_FULL}" -f'
                                     }
-
-                                    sh 'git push origin "${BRANCH_NAME_FULL}" -f'
                                 } catch (err){
                                     echo 'Git Commit/Push was not successful (Nothing to Commit and Push)'
                                 }
