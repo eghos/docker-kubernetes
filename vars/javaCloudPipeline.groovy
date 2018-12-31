@@ -513,7 +513,7 @@ def call(Map pipelineParams) {
                 steps {
                     echo "Creating a PR from Release Branch to Develop Branch"
                     script {
-                        try {
+//                        try {
                             sh 'hub pull-request -b development -m "PR Created from Release Branch to Develop Branch."'
 //                        } catch (err) {
 //                            echo 'Develop Branch does not exist? Trying Development Branch'
