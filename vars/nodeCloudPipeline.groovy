@@ -91,7 +91,7 @@ def call(Map pipelineParams) {
                         stageSetupGeneral()
                         script {
                             //Get variables from project deployment.properties
-                            deploymentProperties = readProperties file: 'deployment.properties'
+                            deploymentProperties = readProperties file: './build/deployment.properties'
 
                             //Collect AWS Deployment variables
                             DEPLOY_TO_AWS = deploymentProperties['DEPLOY_TO_AWS']
