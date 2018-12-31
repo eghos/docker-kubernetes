@@ -482,24 +482,20 @@ def call(Map pipelineParams) {
                                 sh "git remote add origin ${GIT_URL_MODIFIED}"
                                 sh 'git config --global user.email "l-apimgt-u-itsehbg@ikea.com"'
                                 sh 'git config --global user.name "l-apimgt-u-itsehbg"'
-
+                                sh 'git add pom.xml'
+                                sh 'git status'
                                 try {
                                     if (env.BRANCH_NAME.startsWith("develop")) {
-                                        sh 'git add pom.xml'
-                                        sh 'git status'
                                         sh 'git commit -m "System - CICD Pipeline changes committed for Development. [ci skip dev]"'
-                                        sh 'git push origin "${BRANCH_NAME_FULL}" -f'
                                     }
-
                                     if (env.BRANCH_NAME.startsWith("release/")) {
-                                        sh 'git add pom.xml'
-                                        sh 'git status'
                                         sh 'git commit -m "System - CICD Pipeline changes committed for Release. [ci skip release]"'
-                                        sh 'git push origin "${BRANCH_NAME_FULL}" -f'
                                     }
+                                    sh 'git push origin "${BRANCH_NAME_FULL}" -f'
                                 } catch (err){
                                     echo 'Git Commit/Push was not successful (Nothing to Commit and Push)'
                                 }
+
                             }
                         }
                     }
@@ -514,7 +510,7 @@ def call(Map pipelineParams) {
                     echo "Creating a PR from Release Branch to Develop Branch"
                     script {
 //                        try {
-                            sh 'hub pull-request --push -b development -m "PR Created from Release Branch to Develop Branch."'
+                            sh 'hub pull-request -b development -m "PR Created from Release Branch to Develop Branch."'
 //                        } catch (err) {
 //                            echo 'Develop Branch does not exist? Trying Development Branch'
 //                            sh 'hub pull-request -b origin:development -m "PR Created from Release Branch to Develop Branch."'
