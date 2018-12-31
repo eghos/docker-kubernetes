@@ -300,9 +300,9 @@ def call(Map pipelineParams) {
 
             stage('Dredd Test') {
                 when {
-                    anyOf {
-                        changeRequest target: 'develop*'
+                    allOf {
                         branch "develop*";
+                        expression { IS_API_APPLICATION == 'true' }
                     }
                 }
                 steps {
