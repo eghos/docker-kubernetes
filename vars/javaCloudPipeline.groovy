@@ -52,19 +52,6 @@ def call(Map pipelineParams) {
 
         stages {
 
-//            stage('API Fortress Tests') {
-//                steps {
-//                    script {
-//                        //Get variables from project deployment.properties
-//                        functionalTestProperties = readProperties file: './build/api-functional-testing/functional-test.properties'
-//
-//                        //Collect AWS Deployment variables
-//                        API_FORTRESS_TEST_ID = functionalTestProperties['API_FORTRESS_TEST_ID']
-//                    }
-//                    sh "python ./build/api-functional-testing/apif-run.py run-by-id config_key -c ./build/api-functional-testing/config.yml -i ${API_FORTRESS_TEST_ID} -e \"apif_env:dev-environment\" -o test-result.json"
-//                }
-//            }
-
             stage("Skip CICD Dev?") {
                 when {
                     allOf {
@@ -495,7 +482,6 @@ def call(Map pipelineParams) {
                                 } catch (err){
                                     echo 'Git Commit/Push was not successful (Nothing to Commit and Push)'
                                 }
-
                             }
                         }
                     }
@@ -630,9 +616,7 @@ def logIntoAzure(){
 }
 
 void executeDeploy(Map inboundMap) {
-
     def mapValues = inboundMap.values();
-
     for (customStage in mapValues) {
         script customStage
     }
