@@ -451,7 +451,20 @@ def call(Map pipelineParams) {
                 }
             }
 
-            stage('Commit Changes') {
+            stage('PROD Deploy HotFix - AWS') {
+                when {
+                    allOf {
+                        branch "hotfix/*"
+                        expression {DEPLOY_TO_AWS == 'true'}
+                    }
+                }
+                steps {
+                    echo 'HotFix change has been implemented. PROD Deployment will be performed in this stage.'
+                    executeDeploy(AWS_PROD_REGION_MAP)
+                }
+            }
+
+            stage('GIT Commit Changes') {
                 when {
                     anyOf {
                         branch 'develop*';
@@ -493,25 +506,24 @@ def call(Map pipelineParams) {
                 }
             }
 
-            stage('PR from Release to Dev Branch') {
+            stage('GIT PR from Release to Dev') {
                 when {
-                        changeRequest target: 'master'
+                    changeRequest target: 'master'
                 }
                 steps {
                     echo "Creating a PR from Release Branch to Develop Branch"
                     script {
                         try {
-                            sh 'hub pull-request -b develop -m "PR Created from Release Branch to Develop Branch."'
-                        } catch (err) {
-                            echo 'Develop Branch does not exist? Trying Development Branch'
                             sh 'hub pull-request -b development -m "PR Created from Release Branch to Develop Branch."'
-
-                        }
+//                        } catch (err) {
+//                            echo 'Develop Branch does not exist? Trying Development Branch'
+//                            sh 'hub pull-request -b origin:development -m "PR Created from Release Branch to Develop Branch."'
+//                        }
                     }
                 }
             }
 
-            stage('GIT Create Tag') {
+            stage('GIT Create Tag from Release') {
                 when {
                     allOf {
                         branch 'master';
@@ -639,10 +651,10 @@ def runDreddTest(){
     //Firstly fetch the latest API Blueprint Definition.
     script {
         sh """
-                           cd ./build/api-contract-testing
-                           export APIARY_API_KEY=${APIARY_IO_TOKEN_PROP}
-                           apiary fetch --api-name ${APIARY_PROJECT_NAME} --output ${APIARY_PROJECT_NAME}.apib
-                           """
+           cd ./build/api-contract-testing
+           export APIARY_API_KEY=${APIARY_IO_TOKEN_PROP}
+           apiary fetch --api-name ${APIARY_PROJECT_NAME} --output ${APIARY_PROJECT_NAME}.apib
+           """
         sh "git add ./build/api-contract-testing/${APIARY_PROJECT_NAME}.apib"
     }
     script {
@@ -651,19 +663,19 @@ def runDreddTest(){
         sh 'cp ./build/api-contract-testing/dredd-template.yml ./build/api-contract-testing/dredd.yml'
         //Replace variables in Dredd file
         sh """
-                       cd build/api-contract-testing
-                       sed -i -e \"s|APIARY_PROJECT_VAR|${APIARY_PROJECT_NAME}.apib|g\" dredd.yml
-                       sed -i -e \"s|SERVICE_GATEWAY_DNS_VAR|http://${AZ_ENV_REGION_SVC_HOSTNAME}|g\" dredd.yml
-                       """
+           cd build/api-contract-testing
+           sed -i -e \"s|APIARY_PROJECT_VAR|${APIARY_PROJECT_NAME}.apib|g\" dredd.yml
+           sed -i -e \"s|SERVICE_GATEWAY_DNS_VAR|http://${AZ_ENV_REGION_SVC_HOSTNAME}|g\" dredd.yml
+           """
     }
     //Run Dredd Test against APIB Definition and running service.
     script {
         try {
             sh """
-                                  export APIARY_API_KEY=${APIARY_IO_DREDD_PROP}
-                                  export APIARY_API_NAME=${APIARY_PROJECT_NAME}
-                                  dredd --config ./build/api-contract-testing/dredd.yml
-                               """
+               export APIARY_API_KEY=${APIARY_IO_DREDD_PROP}
+               export APIARY_API_NAME=${APIARY_PROJECT_NAME}
+               dredd --config ./build/api-contract-testing/dredd.yml
+               """
         } catch (err) {
             //TODO
             echo 'Dredd Test failed. Continuing with pipeline'
