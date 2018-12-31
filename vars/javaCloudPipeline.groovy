@@ -499,7 +499,7 @@ def call(Map pipelineParams) {
                             sh 'hub pull-request -b develop -m "PR Created from Release Branch to Develop Branch."'
                         } catch (err) {
                             echo 'Develop Branch does not exist? Trying Development Branch'
-                            sh 'hub pull-request -b origin:development -m "PR Created from Release Branch to Develop Branch."'
+                            sh 'hub pull-request -b development -m "PR Created from Release Branch to Develop Branch."'
                         }
                     }
                 }
