@@ -52,6 +52,22 @@ def call(Map pipelineParams) {
 
         stages {
 
+            stage("Is Feature Branch?") {
+                when {
+                    anyOf {
+                        branch "feature*";
+                        branch "feature/*";
+                    }
+                }
+                steps {
+                    script {
+                        echo 'Got ci=skip, aborting build'
+                        currentBuild.result = 'SUCCESS'
+                        error('CI-Skip')
+                    }
+                }
+            }
+
             stage("Skip CICD Dev?") {
                 when {
                     allOf {
