@@ -63,7 +63,7 @@ def call(Map pipelineParams) {
                     script {
                         echo 'Got ci=skip, aborting build'
                         currentBuild.result = 'SUCCESS'
-                        error('CI-Skip')
+//                        error('CI-Skip')
                     }
                 }
             }
