@@ -51,7 +51,7 @@ def call(Map pipelineParams) {
         }
 
         stages {
-            
+
             stage("Skip CICD Dev?") {
                 when {
                     allOf {

@@ -6,7 +6,8 @@ class cloudEnvironmentProps{
     def PROD_WESTEUROPE_AZRGNAME            = "ipimip-prod-westEurope-rg"
     def PROD_WESTEUROPE_AZACRNAME           = "acrweprod01"
 
-    def AZURE_SVC_HOSTNAME                  = "<ENV>-az-svc.<REGION>.cloudapp.azure.com"
+    //def AZURE_SVC_HOSTNAME                  = "<ENV>-az-svc.<REGION>.cloudapp.azure.com"
+    def AZURE_SVC_HOSTNAME                  = "<ENV>.<REGION>.svc.hip.red.cdtapps.com"
     def GIT_SVC_ACOUNT_EMAIL                = "l-apimgt-u-itsehbg@ikea.com"
     def GIT_SVC_ACCOUNT_USER                = "l-apimgt-u-itsehbg"
     def NPM_NEXUS_REPOSITORY_URL            = "https://nexus.hip.red.cdtapps.com/repository/npm-internal/"
