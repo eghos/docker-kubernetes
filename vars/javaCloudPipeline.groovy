@@ -124,7 +124,7 @@ def call(Map pipelineParams) {
                                 ["${it}": generateAwsDeployStage(it, "ppe")]
                             }
                             AWS_PROD_REGION_MAP = AWS_PROD_REGION.collectEntries {
-                                ["${it}": generateAwsDeployStage(it, "inter")]
+                                ["${it}": generateAwsDeployStage(it, "prod")]
                             }
 
                             //Set up Azure deployment region map properties
@@ -138,7 +138,7 @@ def call(Map pipelineParams) {
                                 ["${it}": generateAzureDeployStage(it, "ppe")]
                             }
                             AZURE_PROD_REGION_MAP = AZURE_PROD_REGION.collectEntries {
-                                ["${it}": generateAzureDeployStage(it, "inter")]
+                                ["${it}": generateAzureDeployStage(it, "prod")]
                             }
 
                             //Log into ACR/ECR etc
