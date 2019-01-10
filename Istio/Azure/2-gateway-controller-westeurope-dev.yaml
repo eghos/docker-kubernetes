@@ -2,6 +2,7 @@ apiVersion: networking.istio.io/v1alpha3
 kind: Gateway
 metadata:
   name: gateway-controller
+  namespace: ipimip
   labels:
     app: gateway-controller
     version: v1
@@ -14,12 +15,14 @@ spec:
       name: http
       protocol: HTTP
     hosts:
-     - "dev-az-svc.westeurope.cloudapp.azure.com"
-     - "dev.westeurope.ui.hip.red.cdtapps.com"
+     - dev-az-svc.westeurope.cloudapp.azure.com
+     - dev.westeurope.ui.hip.red.cdtapps.com
+     - dev.westeurope.svc.hip.red.cdtapps.com
   - port:
       number: 443
       name: https
       protocol: HTTP
     hosts:
-      - "dev-az-svc.westeurope.cloudapp.azure.com"
-      - "dev.westeurope.ui.hip.red.cdtapps.com"
+      - dev-az-svc.westeurope.cloudapp.azure.com
+      - dev.westeurope.ui.hip.red.cdtapps.com
+      - dev.westeurope.svc.hip.red.cdtapps.com

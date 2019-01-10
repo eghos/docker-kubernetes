@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: price-service-configmap
+  namespace: KUBERNETES_NAMESPACE_VAR
+data:
+  MONGO_CONNECTION_URI: mongodb://cdbweprodhkyv5s:TJwQiMQnvAnRwohwMiWFRixPqSyE7aA5GNqPFtiSGIBg1SJBiWSMY2raDaXjXPBcu2qG8BL4h6AGJz7A3g67Ww==@cdbweprodhkyv5s.documents.azure.com:10255/ipimipdb?ssl=true&replicaSet=globaldb
+  PORT: "8080"
+  KAFKA_BROKERS: 10.14.126.11:9094,10.14.126.7:9094,10.14.126.18:9094
+  KAFKA_RATE_TOPIC: ipimip-fx-rate
+  SPRING_LOG_LEVEL: INFO
+  IKEA_LOG_LEVEL: INFO

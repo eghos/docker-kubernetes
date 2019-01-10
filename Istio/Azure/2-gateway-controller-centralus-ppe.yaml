@@ -2,6 +2,7 @@ apiVersion: networking.istio.io/v1alpha3
 kind: Gateway
 metadata:
   name: gateway-controller
+  namespace: ipimip
   labels:
     app: gateway-controller
     version: v1
@@ -16,6 +17,7 @@ spec:
     hosts:
      - ppe-az-svc.centralus.cloudapp.azure.com
      - ppe.centralus.ui.hip.red.cdtapps.com
+     - ppe.centralus.svc.hip.red.cdtapps.com
   - port:
       number: 443
       name: https
@@ -23,3 +25,4 @@ spec:
     hosts:
       - ppe-az-svc.centralus.cloudapp.azure.com
       - ppe.centralus.ui.hip.red.cdtapps.com
+      - ppe.centralus.svc.hip.red.cdtapps.com

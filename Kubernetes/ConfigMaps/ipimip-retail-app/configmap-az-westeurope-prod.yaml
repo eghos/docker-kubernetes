@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: retail-app-configmap
+  namespace: KUBERNETES_NAMESPACE_VAR
+data:
+  PRICE_SERVICE_HOST: https://inter.westeurope.api.hip.red.cdtapps.com
+  MASTER_PRODUCT_SERVICE_HOST: https://inter.westeurope.api.hip.red.cdtapps.com
+  LOCAL_PRODUCT_SERVICE_HOST: https://inter.westeurope.api.hip.red.cdtapps.com
+  WEBSOCKET_SERVICE_HOST: ws://prod-az-svc.westeurope.cloudapp.azure.com
