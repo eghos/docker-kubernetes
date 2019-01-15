@@ -217,7 +217,7 @@ def call(Map pipelineParams) {
                          //sh './mvnw -f pom.xml sonar:sonar -Dsonar.login=$USERNAME -Dsonar.password=$PASSWORD'
 
                          sh ''' export JAVA_HOME=$JAVA_HOME8
-                         ./mvnw -f ../pom.xml sonar:sonar -Dsonar.login=2d43347374b1c08e2e718edce7001c638f533869 -Dsonar.projectKey=ipimip.${IMAGE_NAME}.dev'''
+                         ./mvnw -f pom.xml sonar:sonar -Dsonar.login=2d43347374b1c08e2e718edce7001c638f533869 -Dsonar.projectKey=ipimip.${IMAGE_NAME}.dev'''
 
                          //2d43347374b1c08e2e718edce7001c638f533869 = staging2
                          //2af9224b1068533d1c48def794f022f2df1b928e = staging
