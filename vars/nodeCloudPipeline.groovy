@@ -563,7 +563,7 @@ def generateAzureDeployStage(region, env) {
                     sh "az aks get-credentials --resource-group=${AZ_DEPLOY_RG_NAME} --name=${AZ_DEPLOY_AKS_CLUSTER_NAME}"
                     sh 'chmod +x ./build/istio/*.yaml'
                     sh """
-                        cd build
+                        cd build/istio
                         cp \"configmap-az-${region}-${env}.yaml\" \"configmap-az-${region}-${env}-azure.yaml\"
                         cp \"deploy-service.yaml\" \"deploy-service-azure.yaml\"
                         cp \"virtual-service.yaml\" \"virtual-service-azure.yaml\"
