@@ -530,7 +530,7 @@ def generateAwsDeployStage(region, env) {
                 }
                 sh "docker logout ${DOCKER_REPO}"
                 sh "docker login -u ${USERNAME} -p ${PASSWORD} ${DOCKER_REPO}"
-                sh 'chmod +x ./build/*.yaml'
+                sh 'chmod +x ./build/istio/*.yaml'
                 sh """
                     cd build
                     export CONFIGMAP=configmap-${region}-${env}
@@ -561,7 +561,7 @@ def generateAzureDeployStage(region, env) {
                     AZ_DEPLOY_AKS_CLUSTER_NAME = sh(returnStdout: true, script: "az resource list --query \"[?tags.Env=='${env}' && tags.Region=='${region}' && tags.Cluster=='default' && tags.ServiceType=='aks'].{name:name}\" --output tsv").trim()
                     AZ_ENV_REGION_SVC_HOSTNAME = "${AZURE_SVC_HOSTNAME_PROP}".replace('<ENV>', "${env}").replace('<REGION>', "${region}")
                     sh "az aks get-credentials --resource-group=${AZ_DEPLOY_RG_NAME} --name=${AZ_DEPLOY_AKS_CLUSTER_NAME}"
-                    sh 'chmod +x ./build/*.yaml'
+                    sh 'chmod +x ./build/istio/*.yaml'
                     sh """
                         cd build
                         cp \"configmap-az-${region}-${env}.yaml\" \"configmap-az-${region}-${env}-azure.yaml\"
