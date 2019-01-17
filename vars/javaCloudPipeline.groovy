@@ -3,10 +3,6 @@ def call(Map pipelineParams) {
     pipeline {
         agent any
 
-        parameters {
-
-        }
-
         environment {
             BRANCH_NAME_FULL         = env.BRANCH_NAME.replace('', '')
             IMAGE_NAME               = readMavenPom().getArtifactId()
