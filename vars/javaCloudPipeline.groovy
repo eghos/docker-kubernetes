@@ -561,19 +561,25 @@ def generateAwsDeployStage(region, env) {
     return {
         stage("${env} - ${region}") {
             script {
-                sh 'mkdir -p ~/.aws'
-                sh 'cp ./build/aws/credentials ~/.aws/credentials'
-                sh 'cp ./build/aws/config ~/.aws/config'
-                sh "export AWS_PROFILE=eks@ikea-${env}"
+//                sh 'mkdir -p ~/.aws'
+//                sh 'cp ./build/aws/credentials ~/.aws/credentials'
+//                sh 'cp ./build/aws/config ~/.aws/config'
+//                sh "export AWS_PROFILE=eks@ikea-${env}"
 //                AWS_DEPLOY_EKS_CLUSTER_NAME = sh(returnStdout: true, script: "aws ssm get-parameter --name /ipimip/cluster/<the_cluster_tag>/name --query 'Parameter.Value' --output text").trim()
 //                AWS_DEPLOY_EKS_CLUSTER_NAME = sh(returnStdout: true, script: "aws ssm get-parameter --name /ipimip/cluster/cluster1/name --query 'Parameter.Value' --output text").trim()
-//                sh "aws eks update-kubeconfig --kubeconfig mykubeconfig --name ${AWS_DEPLOY_EKS_CLUSTER_NAME}"
-                sh "aws eks update-kubeconfig --kubeconfig mykubeconfig --name cluster1 --region eu-west-1"
+//                sh "aws eks update-kubeconfig --kubeconfig awskubeconfig --name ${AWS_DEPLOY_EKS_CLUSTER_NAME}"
+//                sh "aws eks update-kubeconfig --kubeconfig awskubeconfig --name cluster1 --region eu-west-1"
 
                 AWS_ENV_REGION_SVC_HOSTNAME = "${AWS_SVC_HOSTNAME_PROP}".replace('<ENV>', "${env}").replace('<REGION>', "${region}")
 
                 sh 'chmod +x ./build/istio/*.yaml'
                 sh """
+                        mkdir -p ~/.aws
+                        cp ./build/aws/credentials ~/.aws/credentials
+                        cp ./build/aws/config ~/.aws/config
+                        export AWS_PROFILE=eks@ikea-${env}
+                        aws eks update-kubeconfig --kubeconfig awskubeconfig --name cluster1
+
                         cd build/istio
                         cp \"configmap-aws-${region}-${env}.yaml\" \"configmap-aws-${region}-${env}-aws.yaml\"
                         cp \"deploy-service.yaml\" \"deploy-service-aws.yaml\"
