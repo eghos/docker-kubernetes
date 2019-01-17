@@ -578,7 +578,7 @@ def generateAwsDeployStage(region, env) {
                         cp ./build/aws/credentials ~/.aws/credentials
                         cp ./build/aws/config ~/.aws/config
                         export AWS_PROFILE=eks@ikea-${env}
-                        aws eks update-kubeconfig --kubeconfig awskubeconfig --name cluster1
+                        aws eks update-kubeconfig --kubeconfig ./build/aws/awskubeconfig --name cluster1
 
                         cd build/istio
                         cp \"configmap-aws-${region}-${env}.yaml\" \"configmap-aws-${region}-${env}-aws.yaml\"
