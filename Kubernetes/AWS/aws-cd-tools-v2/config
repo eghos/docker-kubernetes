@@ -1,0 +1,14 @@
+[profile eks@ikea-test]
+region = eu-west-1
+role_arn = arn:aws:iam::770479470456:role/EksAdminRole
+source_profile = ikea-tools-system
+
+[profile eks@ikea-dev]
+region = eu-west-1
+role_arn = arn:aws:iam::603698310563:role/EksAdminRole
+source_profile = ikea-tools-system
+
+[profile eks@ikea-preprod]
+region = eu-west-1
+role_arn = arn:aws:iam::322650178061:role/EksAdminRole
+source_profile = ikea-tools-system

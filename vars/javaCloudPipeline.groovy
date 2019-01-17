@@ -4,16 +4,10 @@ def call(Map pipelineParams) {
         agent any
 
         parameters {
-            string(name: 'DOCKER_ORG',                          defaultValue: 'apimgt',                                   description: 'Docker Repository user e.g. apimgt')
-            string(name: 'DOCKER_REPO',                         defaultValue: 'dtrdev.hip.red.cdtapps.com',               description: 'Docker Repo URL e.g. dtrdev.hip.red.cdtapps.com')
-            string(name: 'INTERNAL_SVC_HOSTNAME',               defaultValue: 'dev.eu-west-1.svc.hipint.red.cdtapps.com', description: 'AWS Ingress Internal Host Path e.g. dev.eu-west-1.svc.hipint.red.cdtapps.com')
+
         }
 
         environment {
-            ORG                      = "${params.DOCKER_ORG}"
-            DOCKER_REPO              = "${params.DOCKER_REPO}"
-            INTERNAL_SVC_HOSTNAME    = "${params.INTERNAL_SVC_HOSTNAME}"
-
             BRANCH_NAME_FULL         = env.BRANCH_NAME.replace('', '')
             IMAGE_NAME               = readMavenPom().getArtifactId()
             VERSION_FROM_POM         = readMavenPom().getVersion()
@@ -37,6 +31,7 @@ def call(Map pipelineParams) {
             IS_API_APPLICATION       = ""
 
             AZURE_SVC_HOSTNAME_PROP                  = cloudEnvironmentProps.getAzureSvcHostname()
+            AWS_SVC_HOSTNAME_PROP                    = cloudEnvironmentProps.getAwsSvcHostname()
             GIT_SVC_ACOUNT_EMAIL_PROP                = cloudEnvironmentProps.getGitSvcAccountEmail()
             GIT_SVC_ACCOUNT_USER_PROP                = cloudEnvironmentProps.getGitSvcAccountUser()
             PROD_WESTEUROPE_AZRGNAME_PROP            = cloudEnvironmentProps.getProdWesteuropeAzRgName()
@@ -141,7 +136,7 @@ def call(Map pipelineParams) {
                                 ["${it}": generateAzureDeployStage(it, "prod")]
                             }
 
-                            //Log into ACR/ECR etc
+                            //Log into Central Container Repository (ACR)
                             logIntoAzure()
                         }
                     }
@@ -533,34 +528,84 @@ def call(Map pipelineParams) {
     }
 }
 
+//def generateAwsDeployStage(region, env) {
+//    return {
+//        stage("${region}") {
+//            withCredentials(bindings: [usernamePassword(credentialsId: 'bc608fa5-71e6-4e08-b769-af3ca6024715', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
+//                sh "docker login -u ${USERNAME} -p ${PASSWORD} ${DOCKER_REPO}"
+//                script {
+//                    sh "docker build -t ${AWS_DOCKER_TAG}:${DOCKER_VERSION} ."
+//                    sh "docker push ${AWS_DOCKER_TAG}:${DOCKER_VERSION}"
+//                }
+//                sh "docker logout ${DOCKER_REPO}"
+//                sh "docker login -u ${USERNAME} -p ${PASSWORD} ${DOCKER_REPO}"
+//                sh 'chmod +x ./build/*.yaml'
+//                sh """
+//                    cd build
+//                    export CONFIGMAP=configmap-${region}-${env}
+//                    export TARGET_HOST=aws
+//                    export DOCKER_VERSION=${DOCKER_VERSION}
+//                    cp configmap-${region}-${env}.yaml configmap-${region}-${env}-aws.yaml
+//                    cp deploy-service.yaml deploy-service-aws.yaml
+//                    cp ingress.yaml ingress-aws.yaml
+//                    sed -i -e \"s|IMAGE_NAME_VAR|${AWS_DOCKER_TAG}:${DOCKER_VERSION}|g\" deploy-service-aws.yaml
+//                    sed -i -e \"s|INTERNAL_SVC_HOSTNAME_VAR|${INTERNAL_SVC_HOSTNAME}|g\" ingress-aws.yaml
+//                    cd ./${env}-ucp-bundle-admin
+//                    . ./env.sh
+//                    cd ..
+//                    . ./deploy.sh
+//                   """
+//                sh "docker logout ${DOCKER_REPO}"
+//            }
+//        }
+//    }
+//}
+
 def generateAwsDeployStage(region, env) {
     return {
-        stage("${region}") {
-            withCredentials(bindings: [usernamePassword(credentialsId: 'bc608fa5-71e6-4e08-b769-af3ca6024715', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
-                sh "docker login -u ${USERNAME} -p ${PASSWORD} ${DOCKER_REPO}"
-                script {
-                    sh "docker build -t ${AWS_DOCKER_TAG}:${DOCKER_VERSION} ."
-                    sh "docker push ${AWS_DOCKER_TAG}:${DOCKER_VERSION}"
-                }
-                sh "docker logout ${DOCKER_REPO}"
-                sh "docker login -u ${USERNAME} -p ${PASSWORD} ${DOCKER_REPO}"
+        stage("${env} - ${region}") {
+            script {
+                sh 'mkdir -p ~/.aws'
+                sh 'cp ./build/aws/credentials ~/.aws/credentials'
+                sh 'cp ./build/aws/config ~/.aws/config'
+                sh "export AWS_PROFILE=eks@ikea-${env}"
+//                AWS_DEPLOY_EKS_CLUSTER_NAME = sh(returnStdout: true, script: "aws ssm get-parameter --name /ipimip/cluster/<the_cluster_tag>/name --query 'Parameter.Value' --output text").trim()
+                AWS_DEPLOY_EKS_CLUSTER_NAME = sh(returnStdout: true, script: "aws ssm get-parameter --name /ipimip/cluster/cluster1/name --query 'Parameter.Value' --output text").trim()
+                sh "aws eks update-kubeconfig --kubeconfig mykubeconfig --name ${AWS_DEPLOY_EKS_CLUSTER_NAME}"
+
+                AWS_ENV_REGION_SVC_HOSTNAME = "${AWS_SVC_HOSTNAME_PROP}".replace('<ENV>', "${env}").replace('<REGION>', "${region}")
+
                 sh 'chmod +x ./build/*.yaml'
                 sh """
-                    cd build
-                    export CONFIGMAP=configmap-${region}-${env}
-                    export TARGET_HOST=aws
-                    export DOCKER_VERSION=${DOCKER_VERSION}
-                    cp configmap-${region}-${env}.yaml configmap-${region}-${env}-aws.yaml
-                    cp deploy-service.yaml deploy-service-aws.yaml
-                    cp ingress.yaml ingress-aws.yaml
-                    sed -i -e \"s|IMAGE_NAME_VAR|${AWS_DOCKER_TAG}:${DOCKER_VERSION}|g\" deploy-service-aws.yaml
-                    sed -i -e \"s|INTERNAL_SVC_HOSTNAME_VAR|${INTERNAL_SVC_HOSTNAME}|g\" ingress-aws.yaml
-                    cd ./${env}-ucp-bundle-admin
-                    . ./env.sh
-                    cd ..
-                    . ./deploy.sh
-                   """
-                sh "docker logout ${DOCKER_REPO}"
+                        cd build/istio
+                        cp \"configmap-aws-${region}-${env}.yaml\" \"configmap-aws-${region}-${env}-aws.yaml\"
+                        cp \"deploy-service.yaml\" \"deploy-service-aws.yaml\"
+                        cp \"virtual-service.yaml\" \"virtual-service-aws.yaml\"
+                        cp \"destination-rule.yaml\" \"destination-rule-aws.yaml\"
+                        
+                        sed -i -e \"s|KUBERNETES_NAMESPACE_VAR|${KUBERNETES_NAMESPACE}|g\" configmap-aws-${region}-${env}-aws.yaml
+                        kubectl --kubeconfig ./aws/awskubeconfig apply -f configmap-aws-${region}-${env}-aws.yaml
+
+                        sed -i -e \"s|IMAGE_NAME_VAR|${ACRLOGINSERVER}/${DOCKER_ORG_IMAGE}:${DOCKER_VERSION}|g\" deploy-service-aws.yaml
+                        sed -i -e \"s|SERVICE_NAME_VAR|${IMAGE_NAME}|g\" deploy-service-aws.yaml
+                        sed -i -e \"s|KUBERNETES_NAMESPACE_VAR|${KUBERNETES_NAMESPACE}|g\" deploy-service-aws.yaml
+                        sed -i -e \"s|CONFIGMAP_NAME_VAR|${IMAGE_NAME}-configmap|g\" deploy-service-aws.yaml
+                        sed -i -e \"s|VERSION_VAR|${DOCKER_VERSION}|g\" deploy-service-aws.yaml
+                        kubectl --kubeconfig ./aws/awskubeconfig apply -f deploy-service-aws.yaml
+                        
+                        sed -i -e \"s|KUBERNETES_NAMESPACE_VAR|${KUBERNETES_NAMESPACE}|g\" virtual-service-aws.yaml
+                        sed -i -e \"s|INTERNAL_SVC_HOSTNAME_VAR|${AWS_ENV_REGION_SVC_HOSTNAME}|g\" virtual-service-aws.yaml
+                        sed -i -e \"s|SERVICE_NAME_VAR|${IMAGE_NAME}|g\" virtual-service-aws.yaml
+                        sed -i -e \"s|SVC_PATH_VAR|${URI_ROOT_PATH}|g\" virtual-service-aws.yaml
+                        sed -i -e \"s|ENV_VAR|${env}|g\" virtual-service-aws.yaml
+                        sed -i -e \"s|REGION_VAR|${region}|g\" virtual-service-aws.yaml
+                        kubectl --kubeconfig ./aws/awskubeconfig apply -f virtual-service-aws.yaml
+                        
+                        sed -i -e \"s|SERVICE_NAME_VAR|${IMAGE_NAME}|g\" destination-rule-aws.yaml
+                        sed -i -e \"s|KUBERNETES_NAMESPACE_VAR|${KUBERNETES_NAMESPACE}|g\" destination-rule-aws.yaml 
+                        sed -i -e \"s|LABEL_APP_VAR|${IMAGE_NAME}|g\" destination-rule-aws.yaml                       
+                        kubectl --kubeconfig ./awas/awskubeconfig apply -f destination-rule-aws.yaml
+                       """
             }
         }
     }
@@ -577,7 +622,7 @@ def generateAzureDeployStage(region, env) {
                     sh "az aks get-credentials --resource-group=${AZ_DEPLOY_RG_NAME} --name=${AZ_DEPLOY_AKS_CLUSTER_NAME}"
                     sh 'chmod +x ./build/*.yaml'
                     sh """
-                        cd build
+                        cd build/istio
                         cp \"configmap-az-${region}-${env}.yaml\" \"configmap-az-${region}-${env}-azure.yaml\"
                         cp \"deploy-service.yaml\" \"deploy-service-azure.yaml\"
                         cp \"virtual-service.yaml\" \"virtual-service-azure.yaml\"
