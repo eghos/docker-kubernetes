@@ -580,6 +580,8 @@ def generateAwsDeployStage(region, env) {
                         export AWS_PROFILE=eks@ikea-${env}
                         aws eks update-kubeconfig --kubeconfig ./build/aws/awskubeconfig --name cluster1
 
+                        sed -i -e \"s|aws-iam-authenticator|./aws-iam-authenticator|g\" ./build/aws/awskubeconfig
+
                         cd build/istio
                         cp \"configmap-aws-${region}-${env}.yaml\" \"configmap-aws-${region}-${env}-aws.yaml\"
                         cp \"deploy-service.yaml\" \"deploy-service-aws.yaml\"
@@ -587,14 +589,14 @@ def generateAwsDeployStage(region, env) {
                         cp \"destination-rule.yaml\" \"destination-rule-aws.yaml\"
                         
                         sed -i -e \"s|KUBERNETES_NAMESPACE_VAR|${KUBERNETES_NAMESPACE}|g\" configmap-aws-${region}-${env}-aws.yaml
-                        kubectl --kubeconfig ./aws/awskubeconfig apply -f configmap-aws-${region}-${env}-aws.yaml
+                        kubectl --kubeconfig ../aws/awskubeconfig apply -f configmap-aws-${region}-${env}-aws.yaml
 
                         sed -i -e \"s|IMAGE_NAME_VAR|${ACRLOGINSERVER}/${DOCKER_ORG_IMAGE}:${DOCKER_VERSION}|g\" deploy-service-aws.yaml
                         sed -i -e \"s|SERVICE_NAME_VAR|${IMAGE_NAME}|g\" deploy-service-aws.yaml
                         sed -i -e \"s|KUBERNETES_NAMESPACE_VAR|${KUBERNETES_NAMESPACE}|g\" deploy-service-aws.yaml
                         sed -i -e \"s|CONFIGMAP_NAME_VAR|${IMAGE_NAME}-configmap|g\" deploy-service-aws.yaml
                         sed -i -e \"s|VERSION_VAR|${DOCKER_VERSION}|g\" deploy-service-aws.yaml
-                        kubectl --kubeconfig ./aws/awskubeconfig apply -f deploy-service-aws.yaml
+                        kubectl --kubeconfig ../aws/awskubeconfig apply -f deploy-service-aws.yaml
                         
                         sed -i -e \"s|KUBERNETES_NAMESPACE_VAR|${KUBERNETES_NAMESPACE}|g\" virtual-service-aws.yaml
                         sed -i -e \"s|INTERNAL_SVC_HOSTNAME_VAR|${AWS_ENV_REGION_SVC_HOSTNAME}|g\" virtual-service-aws.yaml
@@ -602,12 +604,12 @@ def generateAwsDeployStage(region, env) {
                         sed -i -e \"s|SVC_PATH_VAR|${URI_ROOT_PATH}|g\" virtual-service-aws.yaml
                         sed -i -e \"s|ENV_VAR|${env}|g\" virtual-service-aws.yaml
                         sed -i -e \"s|REGION_VAR|${region}|g\" virtual-service-aws.yaml
-                        kubectl --kubeconfig ./aws/awskubeconfig apply -f virtual-service-aws.yaml
+                        kubectl --kubeconfig ../aws/awskubeconfig apply -f virtual-service-aws.yaml
                         
                         sed -i -e \"s|SERVICE_NAME_VAR|${IMAGE_NAME}|g\" destination-rule-aws.yaml
                         sed -i -e \"s|KUBERNETES_NAMESPACE_VAR|${KUBERNETES_NAMESPACE}|g\" destination-rule-aws.yaml 
                         sed -i -e \"s|LABEL_APP_VAR|${IMAGE_NAME}|g\" destination-rule-aws.yaml                       
-                        kubectl --kubeconfig ./awas/awskubeconfig apply -f destination-rule-aws.yaml
+                        kubectl --kubeconfig ../awas/awskubeconfig apply -f destination-rule-aws.yaml
                        """
             }
         }
