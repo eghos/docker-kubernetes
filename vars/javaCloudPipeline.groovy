@@ -571,7 +571,7 @@ def generateAwsDeployStage(region, env) {
 
                 AWS_ENV_REGION_SVC_HOSTNAME = "${AWS_SVC_HOSTNAME_PROP}".replace('<ENV>', "${env}").replace('<REGION>', "${region}")
 
-                sh 'chmod +x ./build/*.yaml'
+                sh 'chmod +x ./build/istio/*.yaml'
                 sh """
                         cd build/istio
                         cp \"configmap-aws-${region}-${env}.yaml\" \"configmap-aws-${region}-${env}-aws.yaml\"
@@ -616,7 +616,7 @@ def generateAzureDeployStage(region, env) {
                     AZ_DEPLOY_AKS_CLUSTER_NAME = sh(returnStdout: true, script: "az resource list --query \"[?tags.Env=='${env}' && tags.Region=='${region}' && tags.Cluster=='default' && tags.ServiceType=='aks'].{name:name}\" --output tsv").trim()
                     AZ_ENV_REGION_SVC_HOSTNAME = "${AZURE_SVC_HOSTNAME_PROP}".replace('<ENV>', "${env}").replace('<REGION>', "${region}")
                     sh "az aks get-credentials --resource-group=${AZ_DEPLOY_RG_NAME} --name=${AZ_DEPLOY_AKS_CLUSTER_NAME}"
-                    sh 'chmod +x ./build/*.yaml'
+                    sh 'chmod +x ./build/istio/*.yaml'
                     sh """
                         cd build/istio
                         cp \"configmap-az-${region}-${env}.yaml\" \"configmap-az-${region}-${env}-azure.yaml\"
