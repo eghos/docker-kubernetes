@@ -578,10 +578,12 @@ def generateAwsDeployStage(region, env) {
                         cp ./build/aws/credentials ~/.aws/credentials
                         cp ./build/aws/config ~/.aws/config
                         export AWS_PROFILE=eks@ikea-${env}
+
                         aws eks update-kubeconfig --kubeconfig ./build/aws/awskubeconfig --name cluster1
                         chmod +x ./build/aws/awskubeconfig
 
                         sed -i -e \"s|aws-iam-authenticator|./aws-iam-authenticator|g\" ./build/aws/awskubeconfig
+                        kubectl --kubeconfig ./build/aws/awskubeconfig get pods
 
                         cd build/istio
                         cp \"configmap-aws-${region}-${env}.yaml\" \"configmap-aws-${region}-${env}-aws.yaml\"
