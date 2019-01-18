@@ -579,6 +579,10 @@ def generateAwsDeployStage(region, env) {
                         cp ./build/aws/config ~/.aws/config
                         export AWS_PROFILE=eks@ikea-${env}
 
+                        aws ecr get-login --no-include-email --region eu-west-1
+                        docker tag ${DOCKER_ORG_IMAGE}:${DOCKER_VERSION} 603698310563.dkr.ecr.eu-west-1.amazonaws.com/${DOCKER_ORG_IMAGE}:${DOCKER_VERSION}
+                        docker push 603698310563.dkr.ecr.eu-west-1.amazonaws.com/${DOCKER_ORG_IMAGE}:${DOCKER_VERSION}
+
                         aws eks update-kubeconfig --kubeconfig ./build/aws/awskubeconfig --name cluster1
                         chmod +x ./build/aws/aws-iam-authenticator
                         
@@ -596,7 +600,7 @@ def generateAwsDeployStage(region, env) {
                         sed -i -e \"s|KUBERNETES_NAMESPACE_VAR|${KUBERNETES_NAMESPACE}|g\" configmap-aws-${region}-${env}-aws.yaml
                         kubectl --kubeconfig ../aws/awskubeconfig apply -f configmap-aws-${region}-${env}-aws.yaml
 
-                        sed -i -e \"s|IMAGE_NAME_VAR|${ACRLOGINSERVER}/${DOCKER_ORG_IMAGE}:${DOCKER_VERSION}|g\" deploy-service-aws.yaml
+                        sed -i -e \"s|IMAGE_NAME_VAR|603698310563.dkr.ecr.eu-west-1.amazonaws.com/${DOCKER_ORG_IMAGE}:${DOCKER_VERSION}|g\" deploy-service-aws.yaml
                         sed -i -e \"s|SERVICE_NAME_VAR|${IMAGE_NAME}|g\" deploy-service-aws.yaml
                         sed -i -e \"s|KUBERNETES_NAMESPACE_VAR|${KUBERNETES_NAMESPACE}|g\" deploy-service-aws.yaml
                         sed -i -e \"s|CONFIGMAP_NAME_VAR|${IMAGE_NAME}-configmap|g\" deploy-service-aws.yaml
