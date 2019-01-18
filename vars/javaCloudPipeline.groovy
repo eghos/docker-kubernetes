@@ -609,7 +609,7 @@ def generateAwsDeployStage(region, env) {
                         sed -i -e \"s|SERVICE_NAME_VAR|${IMAGE_NAME}|g\" destination-rule-aws.yaml
                         sed -i -e \"s|KUBERNETES_NAMESPACE_VAR|${KUBERNETES_NAMESPACE}|g\" destination-rule-aws.yaml 
                         sed -i -e \"s|LABEL_APP_VAR|${IMAGE_NAME}|g\" destination-rule-aws.yaml                       
-                        kubectl --kubeconfig ../awas/awskubeconfig apply -f destination-rule-aws.yaml
+                        kubectl --kubeconfig ../aws/awskubeconfig apply -f destination-rule-aws.yaml
                        """
             }
         }
