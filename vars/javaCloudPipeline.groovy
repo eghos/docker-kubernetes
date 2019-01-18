@@ -580,7 +580,7 @@ def generateAwsDeployStage(region, env) {
                         export AWS_PROFILE=eks@ikea-${env}
 
                         aws ecr get-login --no-include-email --region eu-west-1
-                        docker tag ${DOCKER_ORG_IMAGE}:${DOCKER_VERSION} 603698310563.dkr.ecr.eu-west-1.amazonaws.com/${DOCKER_ORG_IMAGE}:${DOCKER_VERSION}
+                        docker tag acrweprod01.azurecr.io/${DOCKER_ORG_IMAGE}:${DOCKER_VERSION} 603698310563.dkr.ecr.eu-west-1.amazonaws.com/${DOCKER_ORG_IMAGE}:${DOCKER_VERSION}
                         docker push 603698310563.dkr.ecr.eu-west-1.amazonaws.com/${DOCKER_ORG_IMAGE}:${DOCKER_VERSION}
 
                         aws eks update-kubeconfig --kubeconfig ./build/aws/awskubeconfig --name cluster1
