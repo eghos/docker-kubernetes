@@ -581,6 +581,8 @@ def generateAwsDeployStage(region, env) {
 
                         aws eks update-kubeconfig --kubeconfig ./build/aws/awskubeconfig --name cluster1
                         chmod +x ./build/aws/awskubeconfig
+                        chmod 775 ./build/aws/awskubeconfig
+                        ls -ltr ./build/aws
 
                         sed -i -e \"s|aws-iam-authenticator|./aws-iam-authenticator|g\" ./build/aws/awskubeconfig
                         kubectl --kubeconfig ./build/aws/awskubeconfig get pods
