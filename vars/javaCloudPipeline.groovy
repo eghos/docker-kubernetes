@@ -14,9 +14,6 @@ def call(Map pipelineParams) {
 
             GIT_URL_MODIFIED         = env.GIT_URL.replace('https://', 'git@').replace('com/', 'com:')
 
-            AWS_DOCKER_TAG           = "${DOCKER_REPO}/${ORG}/${IMAGE_NAME}"
-            DOCKER_ORG_IMAGE         = "${ORG}/${IMAGE_NAME}"
-
             JAVA_HOME                = "/usr/lib/jvm/java-10-oracle"
             JAVA_HOME8               = "/usr/lib/jvm/java-8-oracle"
 
@@ -35,6 +32,9 @@ def call(Map pipelineParams) {
             APIARY_IO_TOKEN_PROP                     = cloudEnvironmentProps.getApiaryIoToken()
             APIARY_IO_DREDD_PROP                     = cloudEnvironmentProps.getApiaryDreddToken()
             NPM_NEXUS_REPOSITORY_URL_PROP            = cloudEnvironmentProps.getNpmNexusRepositoryUrl()
+            DOCKER_IMAGE_ORG                         = cloudEnvironmentProps.getDockerImageOrg()
+
+            DOCKER_ORG_IMAGE         = "${DOCKER_IMAGE_ORG}/${IMAGE_NAME}"
         }
 
         tools {
@@ -642,7 +642,7 @@ def generateAzureDeployStage(region, env) {
                         kubectl apply -f configmap-az-${region}-${env}-azure.yaml
 
                         sed -i -e \"s|IMAGE_NAME_VAR|${ACRLOGINSERVER}/${DOCKER_ORG_IMAGE}:${DOCKER_VERSION}|g\" deploy-service-azure.yaml
-                        sed -i -e \"s|SERVICE_NAME_VAR|${IMAGE_NAME}|g\" deploy-service-azure.yaml
+                        sed -i -e \"s|SERVICE_NAME_VAR|${IMAGE_NAME}|g\" deploy-service-azure.yamln 
                         sed -i -e \"s|KUBERNETES_NAMESPACE_VAR|${KUBERNETES_NAMESPACE}|g\" deploy-service-azure.yaml
                         sed -i -e \"s|CONFIGMAP_NAME_VAR|${IMAGE_NAME}-configmap|g\" deploy-service-azure.yaml
                         sed -i -e \"s|VERSION_VAR|${DOCKER_VERSION}|g\" deploy-service-azure.yaml
