@@ -580,8 +580,8 @@ def generateAwsDeployStage(region, env) {
                         export AWS_PROFILE=eks@ikea-${env}
 
                         aws eks update-kubeconfig --kubeconfig ./build/aws/awskubeconfig --name cluster1
-                        chmod +x ./build/aws/awskubeconfig
-                        chmod 775 ./build/aws/awskubeconfig
+                        chmod +x ./build/aws/aws-iam-authenticator
+                        
                         ls -ltr ./build/aws
 
                         sed -i -e \"s|aws-iam-authenticator|./aws-iam-authenticator|g\" ./build/aws/awskubeconfig
