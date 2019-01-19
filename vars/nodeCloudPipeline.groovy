@@ -280,6 +280,7 @@ def call(Map pipelineParams) {
                     }
                 }
                 steps {
+                    sh "az account set -s 6795aaca-7ddd-4af7-ae6d-a984bf8d7744"
                     executeDeploy(AZURE_DEV_REGION_MAP)
                 }
             }
@@ -316,6 +317,7 @@ def call(Map pipelineParams) {
                     }
                 }
                 steps {
+                    sh "az account set -s 6795aaca-7ddd-4af7-ae6d-a984bf8d7744"
                     executeDeploy(AZURE_TEST_REGION_MAP)
                 }
             }
@@ -376,7 +378,7 @@ def call(Map pipelineParams) {
                     script {
                         DOCKER_VERSION = "${VERSION_FROM_PJ}"
                     }
-
+                    sh "az account set -s 6795aaca-7ddd-4af7-ae6d-a984bf8d7744"
                     executeDeploy(AZURE_PPE_REGION_MAP)
                 }
             }
@@ -407,6 +409,7 @@ def call(Map pipelineParams) {
                 }
                 steps {
                     echo 'Merge request to Master Branch has been approved. PROD Deployment will be performed in this stage.'
+                    sh "az account set -s 4c58a8b3-26bd-4206-a3ca-6d1fac5d0ed5"
                     executeDeploy(AZURE_PROD_REGION_MAP)
                 }
             }
@@ -420,6 +423,7 @@ def call(Map pipelineParams) {
                 }
                 steps {
                     echo 'HotFix change has been implemented. PROD Deployment will be performed in this stage.'
+                    sh "az account set -s 4c58a8b3-26bd-4206-a3ca-6d1fac5d0ed5"
                     executeDeploy(AZURE_PROD_REGION_MAP)
                 }
             }
@@ -603,7 +607,9 @@ def generateAzureDeployStage(region, env) {
 def logIntoAzure(){
     //Log into ACR/ECR etc
     sh "az login --service-principal -u ${AZURE_CLIENT_ID} -p ${AZURE_CLIENT_SECRET} -t ${AZURE_TENANT_ID}"
-    sh "az account set -s ${AZURE_SUBSCRIPTION_ID}"
+    //    sh "az account set -s ${AZURE_SUBSCRIPTION_ID}"
+    //Use Prod Subscription ID
+    sh "az account set -s 4c58a8b3-26bd-4206-a3ca-6d1fac5d0ed5"
     sh "az acr login --name ${PROD_WESTEUROPE_AZACRNAME_PROP}"
     ACRLOGINSERVER = sh(returnStdout: true, script: "az acr show --resource-group ${PROD_WESTEUROPE_AZRGNAME_PROP} --name ${PROD_WESTEUROPE_AZACRNAME_PROP} --query \"loginServer\" --output tsv").trim()
 }
