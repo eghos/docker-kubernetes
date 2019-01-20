@@ -309,6 +309,7 @@ def call(Map pipelineParams) {
                     }
                 }
                 steps {
+                    sh "az account set -s 6795aaca-7ddd-4af7-ae6d-a984bf8d7744"
                     executeDeploy(AZURE_TEST_REGION_MAP)
                 }
             }
