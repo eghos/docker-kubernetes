@@ -175,22 +175,22 @@ def call(Map pipelineParams) {
                 }
             }
 
-//            stage('Code Build') {
-//                when {
-//                    anyOf {
-//                        branch "develop*";
-//                        branch "PR*"
-//                        branch "release/*"
-//                        branch "hotfix/*"
-//                    }
-//                }
-//                steps {
-//                    withCredentials(bindings: [usernamePassword(credentialsId: 'bc608fa5-71e6-4e08-b769-af3ca6024715', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
-//                        sh 'chmod +x ./mvnw'
-//                        sh './mvnw -B -T 4 -fae -f pom.xml -Dmaven.test.skip=true clean install'
-//                    }
-//                }
-//            }
+            stage('Code Build') {
+                when {
+                    anyOf {
+                        branch "develop*";
+                        branch "PR*"
+                        branch "release/*"
+                        branch "hotfix/*"
+                    }
+                }
+                steps {
+                    withCredentials(bindings: [usernamePassword(credentialsId: 'bc608fa5-71e6-4e08-b769-af3ca6024715', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
+                        sh 'chmod +x ./mvnw'
+                        sh './mvnw -B -T 4 -fae -f pom.xml -Dmaven.test.skip=true clean install'
+                    }
+                }
+            }
 
 //             stage('Code Test') {
 //                 when {
