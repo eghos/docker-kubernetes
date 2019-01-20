@@ -163,7 +163,7 @@ global:
   # block in the relevant section below and setting the desired resources values.
   defaultResources:
     requests:
-      cpu: 10m
+      cpu: 100m
     #   memory: 128Mi
     # limits:
     #   cpu: 100m
@@ -198,10 +198,10 @@ ingress:
   autoscaleMax: 5
   service:
     annotations: {}
-    loadBalancerIP: ""
+    loadBalancerIP: "137.117.161.202"
     type: LoadBalancer #change to NodePort, ClusterIP or LoadBalancer if need be
     # Uncomment the following line to preserve client source ip.
-    externalTrafficPolicy: Local
+    # externalTrafficPolicy: Local
     ports:
     - port: 80
       name: http
@@ -229,20 +229,22 @@ gateways:
     replicaCount: 1
     autoscaleMin: 1
     autoscaleMax: 5
-    resources: {}
+    resources: #{}
       # limits:
       #  cpu: 100m
       #  memory: 128Mi
       #requests:
       #  cpu: 1800m
-      #  memory: 256Mi
+      #  memory: 512Mi
     cpu:
       targetAverageUtilization: 80
-    loadBalancerIP: "13.81.29.106"
-    serviceAnnotations: {}
+    #loadBalancerIP: "23.100.15.102"
+    loadBalancerIP: "40.91.205.1"
+    serviceAnnotations: #{}
+        #service.beta.kubernetes.io/azure-load-balancer-internal: "true"
     type: LoadBalancer #change to NodePort, ClusterIP or LoadBalancer if need be
     # Uncomment the following line to preserve client source ip.
-    externalTrafficPolicy: Local
+    # externalTrafficPolicy: Local
 
     ports:
       ## You can add custom gateway ports
@@ -410,11 +412,11 @@ pilot:
   autoscaleMax: 5
   image: pilot
   sidecar: true
-  traceSampling: 1.0
+  traceSampling: 100.0
   # Resources for a small pilot install
   resources:
     requests:
-      cpu: 500m
+      cpu: 1800m
       memory: 2048Mi
   env:
     PILOT_PUSH_THROTTLE_COUNT: 100
@@ -446,15 +448,16 @@ grafana:
     #tag: 5.2.3
     tag: 5.4.2
   persist: false
-  storageClassName: "azurefile"
+  storageClassName: ""
   accessMode: ReadWriteMany
   security:
-    #enabled: false
     enabled: true
     adminUser: admin
     adminPassword: admin4ipimIP
   service:
     annotations: {}
+       #prometheus.io/scrape: "true"
+       #prometheus.io/port:
     name: http
     type: ClusterIP
     externalPort: 3000
@@ -487,7 +490,7 @@ servicegraph:
     enabled: true
     # Used to create an Ingress record.
     hosts:
-      - dev-az-ms-svc.a5d1cab819d3470183ce.westeurope.aksapp.io
+      - servicegraph.local
     annotations:
        kubernetes.io/ingress.class: istio
       # kubernetes.io/ingress.class: nginx
@@ -515,7 +518,7 @@ tracing:
       enabled: true
       # Used to create an Ingress record.
       hosts:
-        - dev-az-ms-trace.a5d1cab819d3470183ce.westeurope.aksapp.io
+        - jaeger.local
       annotations:
          kubernetes.io/ingress.class: istio
         # kubernetes.io/ingress.class: nginx
@@ -536,9 +539,8 @@ tracing:
     enabled: false
     # Used to create an Ingress record.
     hosts:
-      - dev-az-ms-zip.a5d1cab819d3470183ce.westeurope.aksapp.io
+      - tracing.local
     annotations:
-      kubernetes.io/ingress.class: istio
       # kubernetes.io/ingress.class: nginx
       # kubernetes.io/tls-acme: "true"
     tls:
@@ -557,9 +559,9 @@ kiali:
     enabled: true
     ## Used to create an Ingress record.
     hosts:
-      - dev-az-ms-kiali.a5d1cab819d3470183ce.westeurope.aksapp.io
+      - ppe-az-ms-kiali.9c4e1535f0b14a5e9fec.westeurope.aksapp.io
     annotations:
-      kubernetes.io/ingress.class: istio
+        kubernetes.io/ingress.class: istio
       # kubernetes.io/ingress.class: nginx
       # kubernetes.io/tls-acme: "true"
     tls:
@@ -574,11 +576,10 @@ kiali:
     passphrase: admin4ipimIP
 
     # Override the automatically detected Grafana URL, usefull when Grafana service has no ExternalIPs
-    # http://dev-az-ms-graf.a5d1cab819d3470183ce.westeurope.aksapp.io
-    grafanaURL: http://grafana.istio-system:3000 
+    grafanaURL: http://grafana.istio-system:3000
 
     # Override the automatically detected Jaeger URL, usefull when Jaeger service has no ExternalIPs
-    jaegerURL: http://dev-az-ms-trace.a5d1cab819d3470183ce.westeurope.aksapp.io
+    jaegerURL: http://ppe-az-ms-jaeger.9c4e1535f0b14a5e9fec.westeurope.aksapp.io
 
 # Certmanager uses ACME to sign certificates. Since Istio gateways are
 # mounting the TLS secrets the Certificate CRDs must be created in the

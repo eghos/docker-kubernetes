@@ -198,7 +198,7 @@ ingress:
   autoscaleMax: 5
   service:
     annotations: {}
-    loadBalancerIP: "137.117.161.22"
+    loadBalancerIP: "137.117.161.202"
     type: LoadBalancer #change to NodePort, ClusterIP or LoadBalancer if need be
     # Uncomment the following line to preserve client source ip.
     # externalTrafficPolicy: Local
@@ -233,13 +233,13 @@ gateways:
       # limits:
       #  cpu: 100m
       #  memory: 128Mi
-      requests:
-        cpu: 1800m
-        memory: 512Mi
+      #requests:
+      #  cpu: 1800m
+      #  memory: 512Mi
     cpu:
       targetAverageUtilization: 80
     #loadBalancerIP: "23.100.15.102"
-    loadBalancerIP: "10.13.0.101"
+    loadBalancerIP: "40.91.205.1"
     serviceAnnotations: #{}
         #service.beta.kubernetes.io/azure-load-balancer-internal: "true"
     type: LoadBalancer #change to NodePort, ClusterIP or LoadBalancer if need be

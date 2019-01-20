@@ -198,7 +198,7 @@ ingress:
   autoscaleMax: 5
   service:
     annotations: {}
-    loadBalancerIP: "65.52.150.166"
+    loadBalancerIP: "51.137.109.187"
     #loadBalancerIP: ""
     type: LoadBalancer #change to NodePort, ClusterIP or LoadBalancer if need be
     # Uncomment the following line to preserve client source ip.
@@ -239,7 +239,7 @@ gateways:
       #  memory: 256Mi
     cpu:
       targetAverageUtilization: 80
-    loadBalancerIP: "168.63.104.238"
+    loadBalancerIP: "51.145.156.171"
     #loadBalancerIP: ""
     serviceAnnotations: {}
       #cloud.google.com/load-balancer-type: "internal"
