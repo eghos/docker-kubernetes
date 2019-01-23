@@ -5,10 +5,10 @@ metadata:
   namespace: ipimip
 spec:
   hosts:
-  - cdbwetestic7ysb.documents.azure.com
+  - cdbwedevrcbt7h.documents.azure.com
   ports:
   - number: 10255
-    name:   mongo-we-test
+    name:   mongo-we-dev
     protocol: MONGO
   location: MESH_INTERNAL
   resolution: DNS

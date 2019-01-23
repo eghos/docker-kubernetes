@@ -1,0 +1,24 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: ServiceEntry
+metadata:
+  name: external-kafka
+  namespace: ipimip
+  labels:
+    app: kafka
+    version: v1
+    instance: dev
+spec:
+  hosts:
+  - broker01-eh-dev-we.com
+  addresses:
+  - 10.128.0.0/16  # Kafka CIDR
+  ports:
+  - number: 9094
+    name:   kafka-we-dev
+    protocol: TCP
+  location: MESH_EXTERNAL
+  resolution: STATIC
+  endpoints:
+  - address: 10.128.35.172
+  - address: 10.128.98.90
+  - address: 10.128.33.55

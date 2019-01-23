@@ -1,0 +1,18 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: grafana
+  namespace: istio-system
+  labels:
+    app: grafana
+  annotations:
+    kubernetes.io/ingress.class: istio
+spec:
+  rules:
+  - host: dev.grafana.westeurope.hip.red.cdtapps.com
+    http:
+      paths:
+      - path: /*
+        backend:
+          serviceName: grafana
+          servicePort: 3000

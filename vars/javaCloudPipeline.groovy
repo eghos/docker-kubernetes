@@ -428,6 +428,7 @@ def call(Map pipelineParams) {
                 }
                 steps {
                     echo 'HotFix change has been implemented. PROD Deployment will be performed in this stage.'
+                    sh "az account set -s 4c58a8b3-26bd-4206-a3ca-6d1fac5d0ed5"
                     executeDeploy(AZURE_PROD_REGION_MAP)
                 }
             }

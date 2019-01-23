@@ -163,7 +163,7 @@ global:
   # block in the relevant section below and setting the desired resources values.
   defaultResources:
     requests:
-      cpu: 100m
+      cpu: 10m
     #   memory: 128Mi
     # limits:
     #   cpu: 100m
@@ -198,10 +198,11 @@ ingress:
   autoscaleMax: 5
   service:
     annotations: {}
-    loadBalancerIP: "137.117.161.202"
+    loadBalancerIP: "13.80.133.4"
+    #loadBalancerIP: ""
     type: LoadBalancer #change to NodePort, ClusterIP or LoadBalancer if need be
     # Uncomment the following line to preserve client source ip.
-    # externalTrafficPolicy: Local
+    #externalTrafficPolicy: Local
     ports:
     - port: 80
       name: http
@@ -229,19 +230,20 @@ gateways:
     replicaCount: 1
     autoscaleMin: 1
     autoscaleMax: 5
-    resources: #{}
+    resources: {}
       # limits:
       #  cpu: 100m
       #  memory: 128Mi
       #requests:
       #  cpu: 1800m
-      #  memory: 512Mi
+      #  memory: 256Mi
     cpu:
       targetAverageUtilization: 80
-    #loadBalancerIP: "23.100.15.102"
-    loadBalancerIP: "40.91.205.1"
-    serviceAnnotations: #{}
-        #service.beta.kubernetes.io/azure-load-balancer-internal: "true"
+    loadBalancerIP: "40.113.97.188"
+    #loadBalancerIP: ""
+    serviceAnnotations: {}
+      #cloud.google.com/load-balancer-type: "internal"
+      #service.beta.kubernetes.io/azure-load-balancer-internal: "true"
     type: LoadBalancer #change to NodePort, ClusterIP or LoadBalancer if need be
     # Uncomment the following line to preserve client source ip.
     # externalTrafficPolicy: Local
@@ -416,7 +418,7 @@ pilot:
   # Resources for a small pilot install
   resources:
     requests:
-      cpu: 1800m
+      cpu: 500m
       memory: 2048Mi
   env:
     PILOT_PUSH_THROTTLE_COUNT: 100
@@ -456,8 +458,6 @@ grafana:
     adminPassword: admin4ipimIP
   service:
     annotations: {}
-       #prometheus.io/scrape: "true"
-       #prometheus.io/port:
     name: http
     type: ClusterIP
     externalPort: 3000
@@ -467,8 +467,8 @@ prometheus:
   enabled: true
   replicaCount: 1
   hub: docker.io/prom
-  #tag: v2.3.1
-  tag: v2.5.0
+  tag: v2.3.1
+  #tag: v2.6.0
 
   service:
     annotations: {}
@@ -492,7 +492,7 @@ servicegraph:
     hosts:
       - servicegraph.local
     annotations:
-       kubernetes.io/ingress.class: istio
+      kubernetes.io/ingress.class: istio
       # kubernetes.io/ingress.class: nginx
       # kubernetes.io/tls-acme: "true"
     tls:
@@ -508,8 +508,7 @@ tracing:
   provider: jaeger
   jaeger:
     hub: docker.io/jaegertracing
-    #tag: 1.5
-    tag: 1.8.2
+    tag: 1.5
     memory:
       max_traces: 50000
     ui:
@@ -518,7 +517,7 @@ tracing:
       enabled: true
       # Used to create an Ingress record.
       hosts:
-        - jaeger.local
+        - jaeger-query-ppe-we-ui.9c4e1535f0b14a5e9fec.westeurope.aksapp.io
       annotations:
          kubernetes.io/ingress.class: istio
         # kubernetes.io/ingress.class: nginx
@@ -541,6 +540,7 @@ tracing:
     hosts:
       - tracing.local
     annotations:
+       kubernetes.io/ingress.class: istio
       # kubernetes.io/ingress.class: nginx
       # kubernetes.io/tls-acme: "true"
     tls:
@@ -561,7 +561,7 @@ kiali:
     hosts:
       - ppe-az-ms-kiali.9c4e1535f0b14a5e9fec.westeurope.aksapp.io
     annotations:
-        kubernetes.io/ingress.class: istio
+       kubernetes.io/ingress.class: istio
       # kubernetes.io/ingress.class: nginx
       # kubernetes.io/tls-acme: "true"
     tls:
@@ -589,6 +589,5 @@ kiali:
 certmanager:
   enabled: true
   hub: quay.io/jetstack
-  #tag: v0.3.1
-  tag: v0.5.2
+  tag: v0.3.1
   resources: {}
