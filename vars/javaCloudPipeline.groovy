@@ -293,7 +293,7 @@ def call(Map pipelineParams) {
                     allOf {
                         branch "release/*";
                         expression { DEPLOY_TO_AWS == 'true' }
-                        expression { AWS_TEST_REGION == 'centralus'}
+                        expression { AWS_TEST_REGION == 'eu-west-1'}
                     }
                 }
                 steps {
@@ -381,6 +381,7 @@ def call(Map pipelineParams) {
                     allOf {
                         changeRequest target: 'master'
                         expression { DEPLOY_TO_AWS == 'true' }
+                        expression { AWS_PPE_REGION == 'eu-west-1'}
                     }
                 }
                 steps {
@@ -412,6 +413,7 @@ def call(Map pipelineParams) {
                     allOf {
                         branch 'master';
                         expression {DEPLOY_TO_AWS == 'true'}
+                        expression { AWS_PROD_REGION == 'eu-west-1'}
                     }
                 }
                 steps {
@@ -439,6 +441,7 @@ def call(Map pipelineParams) {
                     allOf {
                         branch "hotfix/*"
                         expression {DEPLOY_TO_AWS == 'true'}
+                        expression { AWS_PROD_REGION == 'eu-west-1'}
                     }
                 }
                 steps {
