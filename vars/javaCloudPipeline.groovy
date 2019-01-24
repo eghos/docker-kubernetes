@@ -293,6 +293,7 @@ def call(Map pipelineParams) {
                     allOf {
                         branch "release/*";
                         expression { DEPLOY_TO_AWS == 'true' }
+                        expression { AWS_TEST_REGION == 'centralus'}
                     }
                 }
                 steps {
