@@ -12,10 +12,7 @@ def call(Map pipelineParams) {
             RELEASE_VERSION          = "${RELEASE_NUMBER}.RELEASE"
 
             GIT_URL_MODIFIED         = env.GIT_URL.replace('https://', 'git@').replace('com/', 'com:')
-
-            AWS_DOCKER_TAG           = "${DOCKER_REPO}/${ORG}/${IMAGE_NAME}"
-            DOCKER_ORG_IMAGE         = "${ORG}/${IMAGE_NAME}"
-
+            
             JAVA_HOME                = "/usr/lib/jvm/java-10-oracle"
             JAVA_HOME8               = "/usr/lib/jvm/java-8-oracle"
 
