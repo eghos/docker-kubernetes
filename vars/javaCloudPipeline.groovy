@@ -528,39 +528,6 @@ def call(Map pipelineParams) {
     }
 }
 
-//def generateAwsDeployStage(region, env) {
-//    return {
-//        stage("${region}") {
-//            withCredentials(bindings: [usernamePassword(credentialsId: 'bc608fa5-71e6-4e08-b769-af3ca6024715', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
-//                sh "docker login -u ${USERNAME} -p ${PASSWORD} ${DOCKER_REPO}"
-//                script {
-//                    sh "docker build -t ${AWS_DOCKER_TAG}:${DOCKER_VERSION} ."
-//                    sh "docker push ${AWS_DOCKER_TAG}:${DOCKER_VERSION}"
-//                }
-//                sh "docker logout ${DOCKER_REPO}"
-//                sh "docker login -u ${USERNAME} -p ${PASSWORD} ${DOCKER_REPO}"
-//                sh 'chmod +x ./build/*.yaml'
-//                sh """
-//                    cd build
-//                    export CONFIGMAP=configmap-${region}-${env}
-//                    export TARGET_HOST=aws
-//                    export DOCKER_VERSION=${DOCKER_VERSION}
-//                    cp configmap-${region}-${env}.yaml configmap-${region}-${env}-aws.yaml
-//                    cp deploy-service.yaml deploy-service-aws.yaml
-//                    cp ingress.yaml ingress-aws.yaml
-//                    sed -i -e \"s|IMAGE_NAME_VAR|${AWS_DOCKER_TAG}:${DOCKER_VERSION}|g\" deploy-service-aws.yaml
-//                    sed -i -e \"s|INTERNAL_SVC_HOSTNAME_VAR|${INTERNAL_SVC_HOSTNAME}|g\" ingress-aws.yaml
-//                    cd ./${env}-ucp-bundle-admin
-//                    . ./env.sh
-//                    cd ..
-//                    . ./deploy.sh
-//                   """
-//                sh "docker logout ${DOCKER_REPO}"
-//            }
-//        }
-//    }
-//}
-
 def generateAwsDeployStage(region, env) {
     return {
         stage("${env} - ${region}") {
@@ -576,6 +543,7 @@ def generateAwsDeployStage(region, env) {
 
                 AWS_ENV_REGION_SVC_HOSTNAME = "${AWS_SVC_HOSTNAME_PROP}".replace('<ENV>', "${env}").replace('<REGION>', "${region}")
 
+                //To generate te docker login command, need to use  $(aws ecr get-login --no-include-email --region eu-west-1)
                 sh 'chmod +x ./build/istio/*.yaml'
                 sh """
                         mkdir -p ~/.aws
@@ -583,8 +551,8 @@ def generateAwsDeployStage(region, env) {
                         cp ./build/aws/config ~/.aws/config
                         export AWS_PROFILE=eks@ikea-${env}
 
-                       docker login -u AWS -p eyJwYXlsb2FkIjoiOFZUbE1zc2VBTG9vNGZERUN1N2l1WnovWGZGQXpuQXhBTU5NN2NiMXJJQzZzYm1TaEk2VDhZQ0llWUIyUDAwQlk2ZS9YWW1EV1Y2MHVnRVZWYldNZDV0S0g4cmdBNVdJdkxpNzBXUlg3cTFpeStXNmFmUlgrUjRaSWIrL2N5TVQ4bjVucU5CT0UxU3B5Ry95cDZQYU1kVWhwQmZWeC8zTmI0clBSdUc0Z0NwREVCVHpDamREdGVaYUIzNlhDOXNaUGZGQmxCV2tGNW1vdmZ1clJHNXNBYXlKOHg2ekZPdTYzOTVUazJ6YTF3clJUM0RSVFFOMTZNMmoyMCtCMjJjZTZKblhoSW1PdEZkZmNpYUV4TFpSOEtRRmVHcFFsaGwrWXJLRlh6eXlqTkp3N3ZPd1Y4SDd5Z2RPdzBJdjg0ZUFaSWhvSmNlbEU1ODlzR3hJdU52dzFJTUJETmJ3YW9PbUhhc3RxcE4xZzFIN1JJWkNXaFpVQS9raHZ0dU9KL0JaeVFVb0MzeU41NHhNQWgvK0xsN3I4d0J2NEowQTlOYW12ay9lWmVRTStEcTVqNFZ2Tjl3OWNXalFwYnJZM1I0OXY4Smk4ZVNXeXR2WXZMMGN3SnIweWdHM2VDRzdTeXpNNW5FL29wNWMzY3o5KzhDdjkxV3NpM3VjcUxwSHZ0b01aNHp4OHVNK3IrMGlKbGoyTjFJbzZVaWxYMXNqV3o3RDUrR0ViNmZhUEhCMlhJL2k5YS90Zm5rQUlyVlZiMDJmbnhQcWp1b0hoZmZUQzhRL21nM0dQQ0pOTXc4UFB4T1FDTE44VTd0MXFYUWZBT3RWU3NHQytISFVPWHArYkd3dnkzNTQ3QzBmMWowSkYxNmd3K2xoejZQakFjQVBxNk10cHZGQitHamlKeEZKTnZzbUw1WXJ3MXlTanlCZW9YSFYxdDloaTFZejdQa3pMa3M2Y0VOV2QrNEt6K21Dekx3dDlyQTJwS3VOWmkxTHZta2ZLd2JmYUpwRHJpWTdZMkN4Sk5lMTBQdVk4QU96KzVFLzJTNU53dHlJc3BnSzFFdnFpQjdUWDdQa0ptRzVIeWZOQ3F4bXBMVlV6aXUxb3VYTnhGNFpnZjVvaUgxcXFKTGI0cm5CRFFzTDdqY1IrdklraVVjcTlRN1VqZ1FQRlgyamRPOEpPS2RNSWxLTGVtdlVsV2JhaktsdlJNOS9QWjVpd1JYU2hJaW05dWVnYW5mOHZrNVY4dkpxQkxGR1RSVmlhYk5EU0d0REFEU09XSUJIU2lWYThZMnY0VUVURDZFZzl0VjNqMllsdGNZSG04a2dodC83c254YWRORWFPREZ5dzFJS0VHT3kwZnlCOG5sVjQ5c2lQMTZjVE1LY1ZwY1FDaXhoYkw2d1R3UFBCOGcxNHZNRVV5NDYwYVVTdGhrM1JGNHhscVFxcUxUaWJwaUdLUWl0NEpaNTdvdE9GajlOV3NVcTlwRWx2ZXdJRitoOGpqRUJsemIvbkRvRFJUTlArZGwrMVhvdEtycFBUKzJTUXJSZEoxYUpaNjhOYm9WQXZxMVRXaEtYcUNGL3NRbGEwcW5QR0Z4N1NsMTF2STh5UVdabkR5QnhsMWRnYWVkRkNnVVllcVR5NVQ1bUx4ZHlTTDlYRXdSd2tuS2h5S20zVHBaVUtNeFpkMDQ3YnZjN0dMU1A4NlFIRzIvdkUrKzdLSklDakRoSXErUnlkK1JQMDdhSUNsd0J2Y3VYVDRQY0xCVkRKUWxLVnAwdHAyVllvSWFLNFBzRkxkamo1Zz09IiwiZGF0YWtleSI6IkFRRUJBSGgrZFMrQmxOdTBOeG5Yd293YklMczExNXlqZCtMTkFaaEJMWnN1bk94azNBQUFBSDR3ZkFZSktvWklodmNOQVFjR29HOHdiUUlCQURCb0Jna3Foa2lHOXcwQkJ3RXdIZ1lKWUlaSUFXVURCQUV1TUJFRURPbXlaRTFUQVQzMjhpS0cxUUlCRUlBN3M2OERqMVJSeDRrNDQ2RjI3VlNJR0J2VEVnbVY2VVV3RmZGWDl1cEpRVWJJc2hqeWVLMEQ4cnBHcmsxRXVYNzNaMkx2YWY3TUYxQUtlVlk9IiwidmVyc2lvbiI6IjIiLCJ0eXBlIjoiREFUQV9LRVkiLCJleHBpcmF0aW9uIjoxNTQ4MzU5MzUzfQ== https://603698310563.dkr.ecr.eu-west-1.amazonaws.com
-
+                        docker login -u AWS -p eyJwYXlsb2FkIjoieE5RY0NZYzBxbXc5YkRoUGJHWHFvSFY1K1lWekJPRXhVazB6TWlVTE5xUVhkYzh5Z0w1K042c2FjRzY4SzF0cWdLMjNlaUpZUWxaUEQrbGJsUkpWcFNqQ01MUWxZRnJudVZGQWpva2VMZ1FLdlpsMnVZV003cTV1NW5KVjl5VUlGcmVKZ1hVSThueEVxQjFqVExXanJQUWxIb0pQTGcrazhHZmEraXhLRHRiMzh3d25WQ2V2eHdwbnZFR2ltU2lMbVM0akVqb25haDZNSFFDSE5wR2lZRXg5ZGdMcHl2dVA2M1FPemhrWG55LzY1dUFVZGV5UFRBY3FsbXBZQjNuZ2J4UW5OVnVZUHlmd2E1a0hkVXNFdEVuRzdlemFyOTlLVGJNQmpzTzhUVk1aMmptZ2Q2NkQzV3hSemRSUFd0Mjlnc1dtWmp5SHlyRmRveVdyVWhMM1JhMXJ3OW1iaUJuUUN4MU5QQ0hPR3poNENFMkZIbFFCN0kwdEhFNldOQmdacHNIamJYcFMvT2pEL3dOZUgvcEtMeXUwQWl5RGtLWVdYK1p5YU1GRXdUeHRueGVHT0tIcisxTTNVWXVVVnNVUWJPbnZ6VjJqZFZGOTJpY1hKRWRXTmFTTEkvTFVFdmkybFVBejVWUy84NFc3YTNGUmZoc1FrYzQ5QWJpS25TMkVTMFR0blgxcmtPd2tINVVzVWV6Sk5IVmZuZHIzSTJlQkN2Z1N6OHRvdTJzSUQ1YWtUb1FnbVZOSngxNlZ1MGJGSUJOSHhIUEdzcTV3U2I1bzlTMllIL25qYjcwTVMvWHJMd0poNHB1Wll3RkltdWNPVXBIVHNEV25sOWNMdHBTUU1Qa3pXM3QzTTFBU0dWM2RTcndZbGRDSHRZY0U5SzBPQTd0TTVnMEF1TVpLL1l1ZXFyQXRacjRPYkV3OHZEdVJzZDg4bkk3Wmk2RW9yd2Uxa0puNzRuVS9qcHc4SFhXRzVUeUdONyt2MldXT25WTVA2UWhDa1JQMFRKNE5tU2pQWUgyMGdLdlFETnJGeG5ZU3N3bEQxZ0ZrN1N2VVp1R0FKZGM3VHdlZlVEdXI5aEh6QUkyTS9XZG45YjBiWHBFOThJSEpQMERuMW14S1l1RC9ERThhTitON1FVSnFCTGF5dG5kQ3pmenRjUlJsRDFtOW04bWhCbVhzWnVNZWp6QThEU0xFL3JIWVYva1gvYmVuTGtvMDNNMXB2elFycDlkczVuTGFydlJSMWkzV0xmT0o2Q2Z6bC9ZdHc1NTZsenRNOUNVM3I4K1IyNEVJNmZzS3ljY04yd0VsaEhybzRpZTJwbjNWQ2JxV1Z5c29FdkVlYW9HZWwxWnYxeUpmL3ZMdjhYcEsrbURZVVdxTnBkWlBlVk1hUTlRbDlUR2hwZTQyQ0hid1F2Rk1DdkI5SmZIN0taVkhGeGVBeVZDS2tkR2oyY1NERWhGbi82RjYzbXN5Wm4zQ2FKUmE3b1BtNEFtZTZSQTZBcGx2cFpLVG1rVlpKODlvK1UzZitJRXlkOHdDelljTHk0QXRMSlNSczNBdDNzV21BcVlLZEpEUmo3OGJFY21GRlIwdFZXTVAvbExVdU9FdnRlZjNxbmo5L1IrVkNPSXJHSzNiWkxEWDd6bjRpYlZvWlZiSzBDeitkRS9ucmx6ZUhoMmtOZlFNeFRHbFpkanpxSWxmenRWS1hQNDVMWVY4Mjc4UXFiMkg1SGFKTWwraWJVNGFmUVcvRjluVnVjaGV5aklpUURhWUR5cGEyZGZuUzZNeXNMUnJvZz09IiwiZGF0YWtleSI6IkFRRUJBSGgrZFMrQmxOdTBOeG5Yd293YklMczExNXlqZCtMTkFaaEJMWnN1bk94azNBQUFBSDR3ZkFZSktvWklodmNOQVFjR29HOHdiUUlCQURCb0Jna3Foa2lHOXcwQkJ3RXdIZ1lKWUlaSUFXVURCQUV1TUJFRURBQ3hQQ1N6UHpSZDZWZlNtQUlCRUlBN0FZOGNTcmx2a2VaTkYwWjhLS0F3emdjK2d3UjRyeHBxV1dpa1pFYjdOZ0tDOXNOTml5d3JxL0ZqeWlVQzF3VEJYcEV0QUdxa2RWbmJzdEk9IiwidmVyc2lvbiI6IjIiLCJ0eXBlIjoiREFUQV9LRVkiLCJleHBpcmF0aW9uIjoxNTQ4NjU2ODE0fQ== https://603698310563.dkr.ecr.eu-west-1.amazonaws.com
+                        
                         docker tag acrweprod01.azurecr.io/${DOCKER_ORG_IMAGE}:${DOCKER_VERSION} 603698310563.dkr.ecr.eu-west-1.amazonaws.com/${DOCKER_ORG_IMAGE}:${DOCKER_VERSION}
                         docker push 603698310563.dkr.ecr.eu-west-1.amazonaws.com/${DOCKER_ORG_IMAGE}:${DOCKER_VERSION}
 
