@@ -255,7 +255,7 @@ def call(Map pipelineParams) {
                 when {
                     allOf {
                         branch "develop*";
-                        expression { DEPLOY_TO_AWS == 'true' }
+                        expression { DEPLOY_TO_AWS eq 'true' }
                     }
                 }
                 steps {
