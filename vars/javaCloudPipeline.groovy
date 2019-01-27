@@ -261,7 +261,7 @@ def call(Map pipelineParams) {
                 }
                 steps {
                     script {
-                        if (AWS_PPE_REGION != null) {
+                        if (AWS_DEV_REGION != null) {
                             executeDeploy(AWS_DEV_REGION_MAP)
                         }
                     }
