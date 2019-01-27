@@ -256,7 +256,7 @@ def call(Map pipelineParams) {
                     allOf {
                         branch "develop*";
 //                        expression { DEPLOY_TO_AWS == 'true' }
-                        expression { return AWS_DEV_REGION != null }
+                        expression { AWS_DEV_REGION != null }
                     }
                 }
                 steps {
