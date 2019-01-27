@@ -256,11 +256,13 @@ def call(Map pipelineParams) {
                     allOf {
                         branch "develop*";
 //                        expression { DEPLOY_TO_AWS == 'true' }
-                        expression { AWS_DEV_REGION != null }
+                        expression { DEPLOY_TO_AWS == 'true' }
                     }
                 }
                 steps {
-                    executeDeploy(AWS_DEV_REGION_MAP)
+                    if (AWS_PPE_REGION != null) {
+                        executeDeploy(AWS_DEV_REGION_MAP)
+                    }
                 }
             }
 
