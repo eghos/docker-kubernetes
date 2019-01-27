@@ -20,10 +20,6 @@ def call(Map pipelineParams) {
 
             GIT_URL_MODIFIED         = env.GIT_URL.replace('https://', 'git@').replace('com/', 'com:')
 
-            AWS_DOCKER_TAG           = "${DOCKER_REPO}/${ORG}/${IMAGE_NAME}"
-            DOCKER_ORG_IMAGE         = "${ORG}/${IMAGE_NAME}"
-
-
             DEPLOY_TO_AWS            = ""
             DEPLOY_TO_AZURE          = ""
             DEPLOY_TO_ON_PREM        = ""
