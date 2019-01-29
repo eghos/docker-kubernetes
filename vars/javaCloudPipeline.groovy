@@ -32,9 +32,12 @@ def call(Map pipelineParams) {
             APIARY_IO_TOKEN_PROP                     = cloudEnvironmentProps.getApiaryIoToken()
             APIARY_IO_DREDD_PROP                     = cloudEnvironmentProps.getApiaryDreddToken()
             NPM_NEXUS_REPOSITORY_URL_PROP            = cloudEnvironmentProps.getNpmNexusRepositoryUrl()
-            DOCKER_IMAGE_ORG                         = cloudEnvironmentProps.getDockerImageOrg()
+            DOCKER_IMAGE_ORG_PROP                    = cloudEnvironmentProps.getDockerImageOrg()
+            AZURE_PROD_SUBSCRIPTION_ID_PROP          = cloudEnvironmentProps.getAzureProdSubscriptionId()
+            AZURE_LOWER_ENV_SUBSCRIPTION_ID_PROP     = cloudEnvironmentProps.getAzureLowerEnvSubscriptionId()
+            AWS_CONTAINER_REPOSITORY_URL_PROP        = cloudEnvironmentProps.getAwsContainerRepositoryUrl()
 
-            DOCKER_ORG_IMAGE         = "${DOCKER_IMAGE_ORG}/${IMAGE_NAME}"
+            DOCKER_ORG_IMAGE         = "${DOCKER_IMAGE_ORG_PROP}/${IMAGE_NAME}"
         }
 
         tools {
@@ -243,7 +246,9 @@ def call(Map pipelineParams) {
                 steps {
                     withCredentials([azureServicePrincipal('sp-ipim-ip-aks')]) {
                         script {
+                            //Build Docker image for Azure
                             sh "docker build -t ${ACRLOGINSERVER}/${DOCKER_ORG_IMAGE}:${DOCKER_VERSION} ."
+                            //Push Docker image to ACR.
                             sh "docker push ${ACRLOGINSERVER}/${DOCKER_ORG_IMAGE}:${DOCKER_VERSION}"
 
                         }
@@ -255,7 +260,6 @@ def call(Map pipelineParams) {
                 when {
                     allOf {
                         branch "develop*";
-//                        expression { DEPLOY_TO_AWS == 'true' }
                         expression { DEPLOY_TO_AWS == 'true' }
                     }
                 }
@@ -276,7 +280,7 @@ def call(Map pipelineParams) {
                     }
                 }
                 steps {
-                    sh "az account set -s 6795aaca-7ddd-4af7-ae6d-a984bf8d7744"
+                    sh "az account set -s ${AZURE_LOWER_ENV_SUBSCRIPTION_ID_PROP}"
                     executeDeploy(AZURE_DEV_REGION_MAP)
                 }
             }
@@ -315,7 +319,7 @@ def call(Map pipelineParams) {
                     }
                 }
                 steps {
-                    sh "az account set -s 6795aaca-7ddd-4af7-ae6d-a984bf8d7744"
+                    sh "az account set -s ${AZURE_LOWER_ENV_SUBSCRIPTION_ID_PROP}"
                     executeDeploy(AZURE_TEST_REGION_MAP)
                 }
             }
@@ -368,10 +372,10 @@ def call(Map pipelineParams) {
                 }
                 steps {
                     echo "PR created to Master Branch. PPE Deployment will be performed in this stage."
+                    sh "az account set -s ${AZURE_LOWER_ENV_SUBSCRIPTION_ID_PROP}"
                     script {
                         DOCKER_VERSION = "${PROD_RELEASE_NUMBER}"
                     }
-                    sh "az account set -s 6795aaca-7ddd-4af7-ae6d-a984bf8d7744"
                     executeDeploy(AZURE_PPE_REGION_MAP)
                 }
             }
@@ -403,7 +407,7 @@ def call(Map pipelineParams) {
                 }
                 steps {
                     echo 'Merge request to Master Branch has been approved. PROD Deployment will be performed in this stage.'
-                    sh "az account set -s 4c58a8b3-26bd-4206-a3ca-6d1fac5d0ed5"
+                    sh "az account set -s ${AZURE_PROD_SUBSCRIPTION_ID_PROP}"
                     executeDeploy(AZURE_PROD_REGION_MAP)
                 }
             }
@@ -469,7 +473,6 @@ def call(Map pipelineParams) {
                                 sh 'git config --global user.email "l-apimgt-u-itsehbg@ikea.com"'
                                 sh 'git config --global user.name "l-apimgt-u-itsehbg"'
                                 sh 'git add pom.xml'
-                                sh 'git status'
                                 try {
                                     if (env.BRANCH_NAME.startsWith("develop")) {
                                         sh 'git commit -m "System - CICD Pipeline changes committed for Development. [ci skip dev]"'
@@ -549,6 +552,8 @@ def generateAwsDeployStage(region, env) {
                 AWS_ENV_REGION_SVC_HOSTNAME = "${AWS_SVC_HOSTNAME_PROP}".replace('<ENV>', "${env}").replace('<REGION>', "${region}")
 
                 //To generate te docker login command, need to use  $(aws ecr get-login --no-include-email --region eu-west-1)
+                //docker tag acrweprod01.azurecr.io/${DOCKER_ORG_IMAGE}:${DOCKER_VERSION} 603698310563.dkr.ecr.eu-west-1.amazonaws.com/${DOCKER_ORG_IMAGE}:${DOCKER_VERSION}
+                //docker push 603698310563.dkr.ecr.eu-west-1.amazonaws.com/${DOCKER_ORG_IMAGE}:${DOCKER_VERSION}
                 sh 'chmod +x ./build/istio/*.yaml'
                 sh """
                         mkdir -p ~/.aws
@@ -556,10 +561,10 @@ def generateAwsDeployStage(region, env) {
                         cp ./build/aws/config ~/.aws/config
                         export AWS_PROFILE=eks@ikea-${env}
 
-                        docker login -u AWS -p eyJwYXlsb2FkIjoieE5RY0NZYzBxbXc5YkRoUGJHWHFvSFY1K1lWekJPRXhVazB6TWlVTE5xUVhkYzh5Z0w1K042c2FjRzY4SzF0cWdLMjNlaUpZUWxaUEQrbGJsUkpWcFNqQ01MUWxZRnJudVZGQWpva2VMZ1FLdlpsMnVZV003cTV1NW5KVjl5VUlGcmVKZ1hVSThueEVxQjFqVExXanJQUWxIb0pQTGcrazhHZmEraXhLRHRiMzh3d25WQ2V2eHdwbnZFR2ltU2lMbVM0akVqb25haDZNSFFDSE5wR2lZRXg5ZGdMcHl2dVA2M1FPemhrWG55LzY1dUFVZGV5UFRBY3FsbXBZQjNuZ2J4UW5OVnVZUHlmd2E1a0hkVXNFdEVuRzdlemFyOTlLVGJNQmpzTzhUVk1aMmptZ2Q2NkQzV3hSemRSUFd0Mjlnc1dtWmp5SHlyRmRveVdyVWhMM1JhMXJ3OW1iaUJuUUN4MU5QQ0hPR3poNENFMkZIbFFCN0kwdEhFNldOQmdacHNIamJYcFMvT2pEL3dOZUgvcEtMeXUwQWl5RGtLWVdYK1p5YU1GRXdUeHRueGVHT0tIcisxTTNVWXVVVnNVUWJPbnZ6VjJqZFZGOTJpY1hKRWRXTmFTTEkvTFVFdmkybFVBejVWUy84NFc3YTNGUmZoc1FrYzQ5QWJpS25TMkVTMFR0blgxcmtPd2tINVVzVWV6Sk5IVmZuZHIzSTJlQkN2Z1N6OHRvdTJzSUQ1YWtUb1FnbVZOSngxNlZ1MGJGSUJOSHhIUEdzcTV3U2I1bzlTMllIL25qYjcwTVMvWHJMd0poNHB1Wll3RkltdWNPVXBIVHNEV25sOWNMdHBTUU1Qa3pXM3QzTTFBU0dWM2RTcndZbGRDSHRZY0U5SzBPQTd0TTVnMEF1TVpLL1l1ZXFyQXRacjRPYkV3OHZEdVJzZDg4bkk3Wmk2RW9yd2Uxa0puNzRuVS9qcHc4SFhXRzVUeUdONyt2MldXT25WTVA2UWhDa1JQMFRKNE5tU2pQWUgyMGdLdlFETnJGeG5ZU3N3bEQxZ0ZrN1N2VVp1R0FKZGM3VHdlZlVEdXI5aEh6QUkyTS9XZG45YjBiWHBFOThJSEpQMERuMW14S1l1RC9ERThhTitON1FVSnFCTGF5dG5kQ3pmenRjUlJsRDFtOW04bWhCbVhzWnVNZWp6QThEU0xFL3JIWVYva1gvYmVuTGtvMDNNMXB2elFycDlkczVuTGFydlJSMWkzV0xmT0o2Q2Z6bC9ZdHc1NTZsenRNOUNVM3I4K1IyNEVJNmZzS3ljY04yd0VsaEhybzRpZTJwbjNWQ2JxV1Z5c29FdkVlYW9HZWwxWnYxeUpmL3ZMdjhYcEsrbURZVVdxTnBkWlBlVk1hUTlRbDlUR2hwZTQyQ0hid1F2Rk1DdkI5SmZIN0taVkhGeGVBeVZDS2tkR2oyY1NERWhGbi82RjYzbXN5Wm4zQ2FKUmE3b1BtNEFtZTZSQTZBcGx2cFpLVG1rVlpKODlvK1UzZitJRXlkOHdDelljTHk0QXRMSlNSczNBdDNzV21BcVlLZEpEUmo3OGJFY21GRlIwdFZXTVAvbExVdU9FdnRlZjNxbmo5L1IrVkNPSXJHSzNiWkxEWDd6bjRpYlZvWlZiSzBDeitkRS9ucmx6ZUhoMmtOZlFNeFRHbFpkanpxSWxmenRWS1hQNDVMWVY4Mjc4UXFiMkg1SGFKTWwraWJVNGFmUVcvRjluVnVjaGV5aklpUURhWUR5cGEyZGZuUzZNeXNMUnJvZz09IiwiZGF0YWtleSI6IkFRRUJBSGgrZFMrQmxOdTBOeG5Yd293YklMczExNXlqZCtMTkFaaEJMWnN1bk94azNBQUFBSDR3ZkFZSktvWklodmNOQVFjR29HOHdiUUlCQURCb0Jna3Foa2lHOXcwQkJ3RXdIZ1lKWUlaSUFXVURCQUV1TUJFRURBQ3hQQ1N6UHpSZDZWZlNtQUlCRUlBN0FZOGNTcmx2a2VaTkYwWjhLS0F3emdjK2d3UjRyeHBxV1dpa1pFYjdOZ0tDOXNOTml5d3JxL0ZqeWlVQzF3VEJYcEV0QUdxa2RWbmJzdEk9IiwidmVyc2lvbiI6IjIiLCJ0eXBlIjoiREFUQV9LRVkiLCJleHBpcmF0aW9uIjoxNTQ4NjU2ODE0fQ== https://603698310563.dkr.ecr.eu-west-1.amazonaws.com
+                        docker login -u AWS -p eyJwYXlsb2FkIjoieE5RY0NZYzBxbXc5YkRoUGJHWHFvSFY1K1lWekJPRXhVazB6TWlVTE5xUVhkYzh5Z0w1K042c2FjRzY4SzF0cWdLMjNlaUpZUWxaUEQrbGJsUkpWcFNqQ01MUWxZRnJudVZGQWpva2VMZ1FLdlpsMnVZV003cTV1NW5KVjl5VUlGcmVKZ1hVSThueEVxQjFqVExXanJQUWxIb0pQTGcrazhHZmEraXhLRHRiMzh3d25WQ2V2eHdwbnZFR2ltU2lMbVM0akVqb25haDZNSFFDSE5wR2lZRXg5ZGdMcHl2dVA2M1FPemhrWG55LzY1dUFVZGV5UFRBY3FsbXBZQjNuZ2J4UW5OVnVZUHlmd2E1a0hkVXNFdEVuRzdlemFyOTlLVGJNQmpzTzhUVk1aMmptZ2Q2NkQzV3hSemRSUFd0Mjlnc1dtWmp5SHlyRmRveVdyVWhMM1JhMXJ3OW1iaUJuUUN4MU5QQ0hPR3poNENFMkZIbFFCN0kwdEhFNldOQmdacHNIamJYcFMvT2pEL3dOZUgvcEtMeXUwQWl5RGtLWVdYK1p5YU1GRXdUeHRueGVHT0tIcisxTTNVWXVVVnNVUWJPbnZ6VjJqZFZGOTJpY1hKRWRXTmFTTEkvTFVFdmkybFVBejVWUy84NFc3YTNGUmZoc1FrYzQ5QWJpS25TMkVTMFR0blgxcmtPd2tINVVzVWV6Sk5IVmZuZHIzSTJlQkN2Z1N6OHRvdTJzSUQ1YWtUb1FnbVZOSngxNlZ1MGJGSUJOSHhIUEdzcTV3U2I1bzlTMllIL25qYjcwTVMvWHJMd0poNHB1Wll3RkltdWNPVXBIVHNEV25sOWNMdHBTUU1Qa3pXM3QzTTFBU0dWM2RTcndZbGRDSHRZY0U5SzBPQTd0TTVnMEF1TVpLL1l1ZXFyQXRacjRPYkV3OHZEdVJzZDg4bkk3Wmk2RW9yd2Uxa0puNzRuVS9qcHc4SFhXRzVUeUdONyt2MldXT25WTVA2UWhDa1JQMFRKNE5tU2pQWUgyMGdLdlFETnJGeG5ZU3N3bEQxZ0ZrN1N2VVp1R0FKZGM3VHdlZlVEdXI5aEh6QUkyTS9XZG45YjBiWHBFOThJSEpQMERuMW14S1l1RC9ERThhTitON1FVSnFCTGF5dG5kQ3pmenRjUlJsRDFtOW04bWhCbVhzWnVNZWp6QThEU0xFL3JIWVYva1gvYmVuTGtvMDNNMXB2elFycDlkczVuTGFydlJSMWkzV0xmT0o2Q2Z6bC9ZdHc1NTZsenRNOUNVM3I4K1IyNEVJNmZzS3ljY04yd0VsaEhybzRpZTJwbjNWQ2JxV1Z5c29FdkVlYW9HZWwxWnYxeUpmL3ZMdjhYcEsrbURZVVdxTnBkWlBlVk1hUTlRbDlUR2hwZTQyQ0hid1F2Rk1DdkI5SmZIN0taVkhGeGVBeVZDS2tkR2oyY1NERWhGbi82RjYzbXN5Wm4zQ2FKUmE3b1BtNEFtZTZSQTZBcGx2cFpLVG1rVlpKODlvK1UzZitJRXlkOHdDelljTHk0QXRMSlNSczNBdDNzV21BcVlLZEpEUmo3OGJFY21GRlIwdFZXTVAvbExVdU9FdnRlZjNxbmo5L1IrVkNPSXJHSzNiWkxEWDd6bjRpYlZvWlZiSzBDeitkRS9ucmx6ZUhoMmtOZlFNeFRHbFpkanpxSWxmenRWS1hQNDVMWVY4Mjc4UXFiMkg1SGFKTWwraWJVNGFmUVcvRjluVnVjaGV5aklpUURhWUR5cGEyZGZuUzZNeXNMUnJvZz09IiwiZGF0YWtleSI6IkFRRUJBSGgrZFMrQmxOdTBOeG5Yd293YklMczExNXlqZCtMTkFaaEJMWnN1bk94azNBQUFBSDR3ZkFZSktvWklodmNOQVFjR29HOHdiUUlCQURCb0Jna3Foa2lHOXcwQkJ3RXdIZ1lKWUlaSUFXVURCQUV1TUJFRURBQ3hQQ1N6UHpSZDZWZlNtQUlCRUlBN0FZOGNTcmx2a2VaTkYwWjhLS0F3emdjK2d3UjRyeHBxV1dpa1pFYjdOZ0tDOXNOTml5d3JxL0ZqeWlVQzF3VEJYcEV0QUdxa2RWbmJzdEk9IiwidmVyc2lvbiI6IjIiLCJ0eXBlIjoiREFUQV9LRVkiLCJleHBpcmF0aW9uIjoxNTQ4NjU2ODE0fQ== https://603698310563.dkr.ecr.eu-west-1.amazonaws.com                      
                         
-                        docker tag acrweprod01.azurecr.io/${DOCKER_ORG_IMAGE}:${DOCKER_VERSION} 603698310563.dkr.ecr.eu-west-1.amazonaws.com/${DOCKER_ORG_IMAGE}:${DOCKER_VERSION}
-                        docker push 603698310563.dkr.ecr.eu-west-1.amazonaws.com/${DOCKER_ORG_IMAGE}:${DOCKER_VERSION}
+                        docker tag ${ACRLOGINSERVER}/${DOCKER_ORG_IMAGE}:${DOCKER_VERSION} ${AWS_CONTAINER_REPOSITORY_URL_PROP}/${DOCKER_ORG_IMAGE}:${DOCKER_VERSION}
+                        docker push ${ACRLOGINSERVER}/${DOCKER_ORG_IMAGE}:${DOCKER_VERSION}
 
                         aws eks update-kubeconfig --kubeconfig ./build/aws/awskubeconfig --name cluster1
                         chmod +x ./build/aws/aws-iam-authenticator
@@ -567,7 +572,6 @@ def generateAwsDeployStage(region, env) {
                         ls -ltr ./build/aws
 
                         sed -i -e \"s|aws-iam-authenticator|./aws-iam-authenticator|g\" ./build/aws/awskubeconfig
-                        kubectl --kubeconfig ./build/aws/awskubeconfig get pods
 
                         cd build/istio
                         cp \"configmap-aws-${region}-${env}.yaml\" \"configmap-aws-${region}-${env}-aws.yaml\"
@@ -654,7 +658,8 @@ def logIntoAzure(){
     sh "az login --service-principal -u ${AZURE_CLIENT_ID} -p ${AZURE_CLIENT_SECRET} -t ${AZURE_TENANT_ID}"
 //    sh "az account set -s ${AZURE_SUBSCRIPTION_ID}"
     //Use Prod Subscription ID
-    sh "az account set -s 4c58a8b3-26bd-4206-a3ca-6d1fac5d0ed5"
+//    sh "az account set -s 4c58a8b3-26bd-4206-a3ca-6d1fac5d0ed5"
+    sh "az account set -s ${AZURE_PROD_SUBSCRIPTION_ID_PROP}"
     sh "az acr login --name ${PROD_WESTEUROPE_AZACRNAME_PROP}"
     ACRLOGINSERVER = sh(returnStdout: true, script: "az acr show --resource-group ${PROD_WESTEUROPE_AZRGNAME_PROP} --name ${PROD_WESTEUROPE_AZACRNAME_PROP} --query \"loginServer\" --output tsv").trim()
 }

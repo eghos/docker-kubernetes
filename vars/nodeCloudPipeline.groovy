@@ -34,9 +34,9 @@ def call(Map pipelineParams) {
             PROD_WESTEUROPE_AZACRNAME_PROP           = cloudEnvironmentProps.getProdWesteuropeAzAcrName()
             APIARY_IO_TOKEN_PROP                     = cloudEnvironmentProps.getApiaryIoToken()
             NPM_NEXUS_REPOSITORY_URL_PROP            = cloudEnvironmentProps.getNpmNexusRepositoryUrl()
-            DOCKER_IMAGE_ORG                         = cloudEnvironmentProps.getDockerImageOrg()
+            DOCKER_IMAGE_ORG_PROP                    = cloudEnvironmentProps.getDockerImageOrg()
 
-            DOCKER_ORG_IMAGE         = "${DOCKER_IMAGE_ORG}/${IMAGE_NAME}"
+            DOCKER_ORG_IMAGE         = "${DOCKER_IMAGE_ORG_PROP}/${IMAGE_NAME}"
         }
 
         tools {

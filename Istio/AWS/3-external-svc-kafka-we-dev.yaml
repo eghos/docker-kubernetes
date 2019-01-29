@@ -9,16 +9,9 @@ metadata:
     instance: dev
 spec:
   hosts:
-  - broker01-eh-dev-we.com
-  addresses:
-  - 10.128.0.0/16  # Kafka CIDR
+  - kafka.services.dev.eu-west-1.com
   ports:
-  - number: 9094
-    name:   kafka-we-dev
-    protocol: TCP
+  - number: 9092
+    name: tcp-kafka
+    protocol: tcp
   location: MESH_EXTERNAL
-  resolution: STATIC
-  endpoints:
-  - address: 10.128.35.172
-  - address: 10.128.98.90
-  - address: 10.128.33.55

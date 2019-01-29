@@ -13,9 +13,6 @@ def call(Map pipelineParams) {
 
             GIT_URL_MODIFIED         = env.GIT_URL.replace('https://', 'git@').replace('com/', 'com:')
 
-            JAVA_HOME                = "/usr/lib/jvm/java-10-oracle"
-            JAVA_HOME8               = "/usr/lib/jvm/java-8-oracle"
-
             DEPLOY_TO_AWS            = ""
             DEPLOY_TO_AZURE          = ""
             DEPLOY_TO_ON_PREM        = ""
@@ -30,9 +27,9 @@ def call(Map pipelineParams) {
             PROD_WESTEUROPE_AZACRNAME_PROP           = cloudEnvironmentProps.getProdWesteuropeAzAcrName()
             APIARY_IO_TOKEN_PROP                     = cloudEnvironmentProps.getApiaryIoToken()
             NPM_NEXUS_REPOSITORY_URL_PROP            = cloudEnvironmentProps.getNpmNexusRepositoryUrl()
-            DOCKER_IMAGE_ORG                         = cloudEnvironmentProps.getDockerImageOrg()
+            DOCKER_IMAGE_ORG_PROP                    = cloudEnvironmentProps.getDockerImageOrg()
 
-            DOCKER_ORG_IMAGE         = "${DOCKER_IMAGE_ORG}/${IMAGE_NAME}"
+            DOCKER_ORG_IMAGE         = "${DOCKER_IMAGE_ORG_PROP}/${IMAGE_NAME}"
         }
 
         stages {

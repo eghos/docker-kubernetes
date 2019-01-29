@@ -5,10 +5,9 @@ metadata:
   namespace: ipimip
 spec:
   hosts:
-  - cdbwedevrcbt7h.documents.azure.com
+  - mongodb.services.dev.eu-west-1.com
   ports:
-  - number: 10255
-    name:   mongo-we-dev
-    protocol: MONGO
-  location: MESH_INTERNAL
-  resolution: DNS
+  - number: 27017
+    name: tcp-mongodb
+    protocol: tcp
+  location: MESH_EXTERNAL
