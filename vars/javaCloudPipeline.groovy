@@ -630,7 +630,7 @@ def generateAzureDeployStage(region, env) {
                         cp \"destination-rule.yaml\" \"destination-rule-azure.yaml\"
                         
                         sed -i -e \"s|KUBERNETES_NAMESPACE_VAR|${KUBERNETES_NAMESPACE}|g\" configmap-az-${region}-${env}-azure.yaml
-                        sed -i -e \"s|SERVICE_VERSION_VAR|${SERVICE_VERSION}|g\" configmap-az-${region}-${env}-azure.yaml
+                        sed -i -e \"s|SERVICE_NAME_VAR|${IMAGE_NAME}-${SERVICE_VERSION}|g\" configmap-az-${region}-${env}-azure.yaml
                         kubectl apply -f configmap-az-${region}-${env}-azure.yaml
 
                         sed -i -e \"s|IMAGE_NAME_VAR|${ACRLOGINSERVER}/${DOCKER_ORG_IMAGE}:${DOCKER_VERSION}|g\" deploy-service-azure.yaml
