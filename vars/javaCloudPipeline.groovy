@@ -659,9 +659,8 @@ def logIntoAzure(){
     sh "az login --service-principal -u ${AZURE_CLIENT_ID} -p ${AZURE_CLIENT_SECRET} -t ${AZURE_TENANT_ID}"
 //    sh "az account set -s ${AZURE_SUBSCRIPTION_ID}"
     //Use Prod Subscription ID
-//    sh "az account set -s 4c58a8b3-26bd-4206-a3ca-6d1fac5d0ed5"
-//    sh "az account set -s ${AZURE_PROD_SUBSCRIPTION_ID_PROP}"
-    sh "az account set -s ${AZURE_LOWER_ENV_SUBSCRIPTION_ID_PROP}"
+    sh "az account set -s ${AZURE_PROD_SUBSCRIPTION_ID_PROP}"
+//    sh "az account set -s ${AZURE_LOWER_ENV_SUBSCRIPTION_ID_PROP}"
     sh "az acr login --name ${PROD_WESTEUROPE_AZACRNAME_PROP}"
     ACRLOGINSERVER = sh(returnStdout: true, script: "az acr show --resource-group ${PROD_WESTEUROPE_AZRGNAME_PROP} --name ${PROD_WESTEUROPE_AZACRNAME_PROP} --query \"loginServer\" --output tsv").trim()
 }
