@@ -101,10 +101,13 @@ def call(Map pipelineParams) {
                             DEPLOY_TO_ON_PREM = deploymentProperties['DEPLOY_TO_ON_PREM']
                             ON_PREM_REGION    = deploymentProperties['ON_PREM_REGION']
 
-                            APIARY_PROJECT_NAME = deploymentProperties['APIARY_PROJECT_NAME']
-                            URI_ROOT_PATH = deploymentProperties['URI_ROOT_PATH']
+                            //Collect Deployment related variables
+                            APIARY_PROJECT_NAME  = deploymentProperties['APIARY_PROJECT_NAME']
+                            URI_ROOT_PATH        = deploymentProperties['URI_ROOT_PATH']
                             KUBERNETES_NAMESPACE = deploymentProperties['KUBERNETES_NAMESPACE']
-                            IS_API_APPLICATION = deploymentProperties['IS_API_APPLICATION']
+                            IS_API_APPLICATION   = deploymentProperties['IS_API_APPLICATION']
+                            SERVICE_VERSION      = deploymentProperties['SERVICE_VERSION']
+                            AWS_CLUSTER_NAME     = deploymentProperties['AWS_CLUSTER_NAME']
 
                             //Set up AWS deployment region map properties
                             AWS_DEV_REGION_MAP = AWS_DEV_REGION.collectEntries {

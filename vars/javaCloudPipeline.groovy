@@ -102,10 +102,13 @@ def call(Map pipelineParams) {
                             DEPLOY_TO_ON_PREM = deploymentProperties['DEPLOY_TO_ON_PREM']
                             ON_PREM_REGION    = deploymentProperties['ON_PREM_REGION']
 
-                            APIARY_PROJECT_NAME = deploymentProperties['APIARY_PROJECT_NAME']
-                            URI_ROOT_PATH = deploymentProperties['URI_ROOT_PATH']
+                            //Collect Deployment related variables
+                            APIARY_PROJECT_NAME  = deploymentProperties['APIARY_PROJECT_NAME']
+                            URI_ROOT_PATH        = deploymentProperties['URI_ROOT_PATH']
                             KUBERNETES_NAMESPACE = deploymentProperties['KUBERNETES_NAMESPACE']
-                            IS_API_APPLICATION = deploymentProperties['IS_API_APPLICATION']
+                            IS_API_APPLICATION   = deploymentProperties['IS_API_APPLICATION']
+                            SERVICE_VERSION      = deploymentProperties['SERVICE_VERSION']
+                            AWS_CLUSTER_NAME     = deploymentProperties['AWS_CLUSTER_NAME']
 
                             //Set up AWS deployment region map properties
                             AWS_DEV_REGION_MAP = AWS_DEV_REGION.collectEntries {
@@ -581,24 +584,25 @@ def generateAwsDeployStage(region, env) {
                         cp \"destination-rule.yaml\" \"destination-rule-aws.yaml\"
                         
                         sed -i -e \"s|KUBERNETES_NAMESPACE_VAR|${KUBERNETES_NAMESPACE}|g\" configmap-aws-${region}-${env}-aws.yaml
+                        sed -i -e \"s|SERVICE_VERSION_VAR|${SERVICE_VERSION}|g\" configmap-aws-${region}-${env}-aws.yaml
                         kubectl --kubeconfig ../aws/awskubeconfig apply -f configmap-aws-${region}-${env}-aws.yaml
 
                         sed -i -e \"s|IMAGE_NAME_VAR|${AWS_CONTAINER_REPOSITORY_URL_PROP}/${DOCKER_ORG_IMAGE}:${DOCKER_VERSION}|g\" deploy-service-aws.yaml
-                        sed -i -e \"s|SERVICE_NAME_VAR|${IMAGE_NAME}|g\" deploy-service-aws.yaml
+                        sed -i -e \"s|SERVICE_NAME_VAR|${IMAGE_NAME}-${SERVICE_VERSION}|g\" deploy-service-aws.yaml
                         sed -i -e \"s|KUBERNETES_NAMESPACE_VAR|${KUBERNETES_NAMESPACE}|g\" deploy-service-aws.yaml
-                        sed -i -e \"s|CONFIGMAP_NAME_VAR|${IMAGE_NAME}-configmap|g\" deploy-service-aws.yaml
+                        sed -i -e \"s|CONFIGMAP_NAME_VAR|${IMAGE_NAME}-${SERVICE_VERSION}-configmap|g\" deploy-service-aws.yaml
                         sed -i -e \"s|VERSION_VAR|${DOCKER_VERSION}|g\" deploy-service-aws.yaml
                         kubectl --kubeconfig ../aws/awskubeconfig apply -f deploy-service-aws.yaml
                         
                         sed -i -e \"s|KUBERNETES_NAMESPACE_VAR|${KUBERNETES_NAMESPACE}|g\" virtual-service-aws.yaml
                         sed -i -e \"s|INTERNAL_SVC_HOSTNAME_VAR|${AWS_ENV_REGION_SVC_HOSTNAME}|g\" virtual-service-aws.yaml
-                        sed -i -e \"s|SERVICE_NAME_VAR|${IMAGE_NAME}|g\" virtual-service-aws.yaml
+                        sed -i -e \"s|SERVICE_NAME_VAR|${IMAGE_NAME}-${SERVICE_VERSION}|g\" virtual-service-aws.yaml
                         sed -i -e \"s|SVC_PATH_VAR|${URI_ROOT_PATH}|g\" virtual-service-aws.yaml
                         sed -i -e \"s|ENV_VAR|${env}|g\" virtual-service-aws.yaml
                         sed -i -e \"s|REGION_VAR|${region}|g\" virtual-service-aws.yaml
                         kubectl --kubeconfig ../aws/awskubeconfig apply -f virtual-service-aws.yaml
                         
-                        sed -i -e \"s|SERVICE_NAME_VAR|${IMAGE_NAME}|g\" destination-rule-aws.yaml
+                        sed -i -e \"s|SERVICE_NAME_VAR|${IMAGE_NAME}-${SERVICE_VERSION}|g\" destination-rule-aws.yaml
                         sed -i -e \"s|KUBERNETES_NAMESPACE_VAR|${KUBERNETES_NAMESPACE}|g\" destination-rule-aws.yaml 
                         sed -i -e \"s|LABEL_APP_VAR|${IMAGE_NAME}|g\" destination-rule-aws.yaml                       
                         kubectl --kubeconfig ../aws/awskubeconfig apply -f destination-rule-aws.yaml
@@ -626,18 +630,19 @@ def generateAzureDeployStage(region, env) {
                         cp \"destination-rule.yaml\" \"destination-rule-azure.yaml\"
                         
                         sed -i -e \"s|KUBERNETES_NAMESPACE_VAR|${KUBERNETES_NAMESPACE}|g\" configmap-az-${region}-${env}-azure.yaml
+                        sed -i -e \"s|SERVICE_VERSION_VAR|${SERVICE_VERSION}|g\" configmap-az-${region}-${env}-azure.yaml
                         kubectl apply -f configmap-az-${region}-${env}-azure.yaml
 
                         sed -i -e \"s|IMAGE_NAME_VAR|${ACRLOGINSERVER}/${DOCKER_ORG_IMAGE}:${DOCKER_VERSION}|g\" deploy-service-azure.yaml
-                        sed -i -e \"s|SERVICE_NAME_VAR|${IMAGE_NAME}|g\" deploy-service-azure.yaml 
+                        sed -i -e \"s|SERVICE_NAME_VAR|${IMAGE_NAME}-${SERVICE_VERSION}|g\" deploy-service-azure.yaml 
                         sed -i -e \"s|KUBERNETES_NAMESPACE_VAR|${KUBERNETES_NAMESPACE}|g\" deploy-service-azure.yaml
-                        sed -i -e \"s|CONFIGMAP_NAME_VAR|${IMAGE_NAME}-configmap|g\" deploy-service-azure.yaml
+                        sed -i -e \"s|CONFIGMAP_NAME_VAR|${IMAGE_NAME}-${SERVICE_VERSION}-configmap|g\" deploy-service-azure.yaml
                         sed -i -e \"s|VERSION_VAR|${DOCKER_VERSION}|g\" deploy-service-azure.yaml
                         kubectl apply -f deploy-service-azure.yaml
                         
                         sed -i -e \"s|KUBERNETES_NAMESPACE_VAR|${KUBERNETES_NAMESPACE}|g\" virtual-service-azure.yaml
                         sed -i -e \"s|INTERNAL_SVC_HOSTNAME_VAR|${AZ_ENV_REGION_SVC_HOSTNAME}|g\" virtual-service-azure.yaml
-                        sed -i -e \"s|SERVICE_NAME_VAR|${IMAGE_NAME}|g\" virtual-service-azure.yaml
+                        sed -i -e \"s|SERVICE_NAME_VAR|${IMAGE_NAME}-${SERVICE_VERSION}|g\" virtual-service-azure.yaml
                         sed -i -e \"s|SVC_PATH_VAR|${URI_ROOT_PATH}|g\" virtual-service-azure.yaml
                         sed -i -e \"s|ENV_VAR|${env}|g\" virtual-service-azure.yaml
                         sed -i -e \"s|REGION_VAR|${region}|g\" virtual-service-azure.yaml
@@ -645,7 +650,7 @@ def generateAzureDeployStage(region, env) {
                         
                         sed -i -e \"s|SERVICE_NAME_VAR|${IMAGE_NAME}|g\" destination-rule-azure.yaml
                         sed -i -e \"s|KUBERNETES_NAMESPACE_VAR|${KUBERNETES_NAMESPACE}|g\" destination-rule-azure.yaml 
-                        sed -i -e \"s|LABEL_APP_VAR|${IMAGE_NAME}|g\" destination-rule-azure.yaml                       
+                        sed -i -e \"s|LABEL_APP_VAR|${IMAGE_NAME}-${SERVICE_VERSION}|g\" destination-rule-azure.yaml                       
                         kubectl apply -f destination-rule-azure.yaml
                        """
                 }
@@ -660,7 +665,6 @@ def logIntoAzure(){
 //    sh "az account set -s ${AZURE_SUBSCRIPTION_ID}"
     //Use Prod Subscription ID
     sh "az account set -s ${AZURE_PROD_SUBSCRIPTION_ID_PROP}"
-//    sh "az account set -s ${AZURE_LOWER_ENV_SUBSCRIPTION_ID_PROP}"
     sh "az acr login --name ${PROD_WESTEUROPE_AZACRNAME_PROP}"
     ACRLOGINSERVER = sh(returnStdout: true, script: "az acr show --resource-group ${PROD_WESTEUROPE_AZRGNAME_PROP} --name ${PROD_WESTEUROPE_AZACRNAME_PROP} --query \"loginServer\" --output tsv").trim()
 }
