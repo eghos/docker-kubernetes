@@ -16,7 +16,8 @@ class cloudEnvironmentProps{
     def AZURE_PROD_SUBSCRIPTION_ID          = "4c58a8b3-26bd-4206-a3ca-6d1fac5d0ed5"
     def AZURE_LOWER_ENV_SUBSCRIPTION_ID     = "6795aaca-7ddd-4af7-ae6d-a984bf8d7744"
 
-    def AWS_CONTAINER_REPOSITORY_URL        = "603698310563.dkr.ecr.eu-west-1.amazonaws.com"
+//    def AWS_CONTAINER_REPOSITORY_URL        = "603698310563.dkr.ecr.eu-west-1.amazonaws.com"
+    def AWS_CONTAINER_REPOSITORY_URL        = "318063795105.dkr.ecr.eu-west-1.amazonaws.com"
 
     def getApiaryIoToken(){
         return APIARY_IO_TOKEN
