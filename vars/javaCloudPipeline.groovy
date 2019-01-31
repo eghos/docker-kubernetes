@@ -305,11 +305,9 @@ def call(Map pipelineParams) {
                     allOf {
                         branch "release/*";
                         expression { DEPLOY_TO_AWS == 'true' }
-                        expression { AWS_TEST_REGION == 'eu-west-1'}
                     }
                 }
                 steps {
-                    sh "az account set -s 6795aaca-7ddd-4af7-ae6d-a984bf8d7744"
                     executeDeploy(AWS_TEST_REGION_MAP)
                 }
             }
@@ -388,7 +386,6 @@ def call(Map pipelineParams) {
                     allOf {
                         changeRequest target: 'master'
                         expression { DEPLOY_TO_AWS == 'true' }
-                        expression { AWS_PPE_REGION == 'eu-west-1'}
                     }
                 }
                 steps {
@@ -420,7 +417,6 @@ def call(Map pipelineParams) {
                     allOf {
                         branch 'master';
                         expression {DEPLOY_TO_AWS == 'true'}
-                        expression { AWS_PROD_REGION == 'eu-west-1'}
                     }
                 }
                 steps {
@@ -438,7 +434,7 @@ def call(Map pipelineParams) {
                 }
                 steps {
                     echo 'HotFix change has been implemented. PROD Deployment will be performed in this stage.'
-                    sh "az account set -s 4c58a8b3-26bd-4206-a3ca-6d1fac5d0ed5"
+                    sh "az account set -s ${AZURE_PROD_SUBSCRIPTION_ID_PROP}"
                     executeDeploy(AZURE_PROD_REGION_MAP)
                 }
             }
@@ -448,7 +444,6 @@ def call(Map pipelineParams) {
                     allOf {
                         branch "hotfix/*"
                         expression {DEPLOY_TO_AWS == 'true'}
-                        expression { AWS_PROD_REGION == 'eu-west-1'}
                     }
                 }
                 steps {
