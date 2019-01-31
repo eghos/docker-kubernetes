@@ -273,7 +273,7 @@ def call(Map pipelineParams) {
                     }
                 }
                 steps {
-                    sh "az account set -s 6795aaca-7ddd-4af7-ae6d-a984bf8d7744"
+                    sh "az account set -s ${AZURE_LOWER_ENV_SUBSCRIPTION_ID_PROP}"
                     executeDeploy(AZURE_DEV_REGION_MAP)
                 }
             }
@@ -310,7 +310,7 @@ def call(Map pipelineParams) {
                     }
                 }
                 steps {
-                    sh "az account set -s 6795aaca-7ddd-4af7-ae6d-a984bf8d7744"
+                    sh "az account set -s ${AZURE_LOWER_ENV_SUBSCRIPTION_ID_PROP}"
                     executeDeploy(AZURE_TEST_REGION_MAP)
                 }
             }
@@ -371,7 +371,7 @@ def call(Map pipelineParams) {
                     script {
                         DOCKER_VERSION = "${VERSION_FROM_PJ}"
                     }
-                    sh "az account set -s 6795aaca-7ddd-4af7-ae6d-a984bf8d7744"
+                    sh "az account set -s ${AZURE_LOWER_ENV_SUBSCRIPTION_ID_PROP}"
                     executeDeploy(AZURE_PPE_REGION_MAP)
                 }
             }
@@ -402,7 +402,7 @@ def call(Map pipelineParams) {
                 }
                 steps {
                     echo 'Merge request to Master Branch has been approved. PROD Deployment will be performed in this stage.'
-                    sh "az account set -s 4c58a8b3-26bd-4206-a3ca-6d1fac5d0ed5"
+                    sh "az account set -s ${AZURE_PROD_SUBSCRIPTION_ID_PROP}"
                     executeDeploy(AZURE_PROD_REGION_MAP)
                 }
             }
@@ -416,7 +416,7 @@ def call(Map pipelineParams) {
                 }
                 steps {
                     echo 'HotFix change has been implemented. PROD Deployment will be performed in this stage.'
-                    sh "az account set -s 4c58a8b3-26bd-4206-a3ca-6d1fac5d0ed5"
+                    sh "az account set -s ${AZURE_PROD_SUBSCRIPTION_ID_PROP}"
                     executeDeploy(AZURE_PROD_REGION_MAP)
                 }
             }
@@ -532,25 +532,27 @@ def generateAwsDeployStage(region, env) {
                 AWS_ENV_REGION_SVC_HOSTNAME = "${AWS_SVC_HOSTNAME_PROP}".replace('<ENV>', "${env}").replace('<REGION>', "${region}")
 
                 //To generate te docker login command, need to use  $(aws ecr get-login --no-include-email --region eu-west-1)
+                //docker tag acrweprod01.azurecr.io/${DOCKER_ORG_IMAGE}:${DOCKER_VERSION} 603698310563.dkr.ecr.eu-west-1.amazonaws.com/${DOCKER_ORG_IMAGE}:${DOCKER_VERSION}
+                //docker push 603698310563.dkr.ecr.eu-west-1.amazonaws.com/${DOCKER_ORG_IMAGE}:${DOCKER_VERSION}
                 sh 'chmod +x ./build/istio/*.yaml'
                 sh """
                         mkdir -p ~/.aws
                         cp ./build/aws/credentials ~/.aws/credentials
                         cp ./build/aws/config ~/.aws/config
-                        export AWS_PROFILE=eks@ikea-${env}
+                        export AWS_PROFILE=ikea-tools-system
 
-                        docker login -u AWS -p eyJwYXlsb2FkIjoieE5RY0NZYzBxbXc5YkRoUGJHWHFvSFY1K1lWekJPRXhVazB6TWlVTE5xUVhkYzh5Z0w1K042c2FjRzY4SzF0cWdLMjNlaUpZUWxaUEQrbGJsUkpWcFNqQ01MUWxZRnJudVZGQWpva2VMZ1FLdlpsMnVZV003cTV1NW5KVjl5VUlGcmVKZ1hVSThueEVxQjFqVExXanJQUWxIb0pQTGcrazhHZmEraXhLRHRiMzh3d25WQ2V2eHdwbnZFR2ltU2lMbVM0akVqb25haDZNSFFDSE5wR2lZRXg5ZGdMcHl2dVA2M1FPemhrWG55LzY1dUFVZGV5UFRBY3FsbXBZQjNuZ2J4UW5OVnVZUHlmd2E1a0hkVXNFdEVuRzdlemFyOTlLVGJNQmpzTzhUVk1aMmptZ2Q2NkQzV3hSemRSUFd0Mjlnc1dtWmp5SHlyRmRveVdyVWhMM1JhMXJ3OW1iaUJuUUN4MU5QQ0hPR3poNENFMkZIbFFCN0kwdEhFNldOQmdacHNIamJYcFMvT2pEL3dOZUgvcEtMeXUwQWl5RGtLWVdYK1p5YU1GRXdUeHRueGVHT0tIcisxTTNVWXVVVnNVUWJPbnZ6VjJqZFZGOTJpY1hKRWRXTmFTTEkvTFVFdmkybFVBejVWUy84NFc3YTNGUmZoc1FrYzQ5QWJpS25TMkVTMFR0blgxcmtPd2tINVVzVWV6Sk5IVmZuZHIzSTJlQkN2Z1N6OHRvdTJzSUQ1YWtUb1FnbVZOSngxNlZ1MGJGSUJOSHhIUEdzcTV3U2I1bzlTMllIL25qYjcwTVMvWHJMd0poNHB1Wll3RkltdWNPVXBIVHNEV25sOWNMdHBTUU1Qa3pXM3QzTTFBU0dWM2RTcndZbGRDSHRZY0U5SzBPQTd0TTVnMEF1TVpLL1l1ZXFyQXRacjRPYkV3OHZEdVJzZDg4bkk3Wmk2RW9yd2Uxa0puNzRuVS9qcHc4SFhXRzVUeUdONyt2MldXT25WTVA2UWhDa1JQMFRKNE5tU2pQWUgyMGdLdlFETnJGeG5ZU3N3bEQxZ0ZrN1N2VVp1R0FKZGM3VHdlZlVEdXI5aEh6QUkyTS9XZG45YjBiWHBFOThJSEpQMERuMW14S1l1RC9ERThhTitON1FVSnFCTGF5dG5kQ3pmenRjUlJsRDFtOW04bWhCbVhzWnVNZWp6QThEU0xFL3JIWVYva1gvYmVuTGtvMDNNMXB2elFycDlkczVuTGFydlJSMWkzV0xmT0o2Q2Z6bC9ZdHc1NTZsenRNOUNVM3I4K1IyNEVJNmZzS3ljY04yd0VsaEhybzRpZTJwbjNWQ2JxV1Z5c29FdkVlYW9HZWwxWnYxeUpmL3ZMdjhYcEsrbURZVVdxTnBkWlBlVk1hUTlRbDlUR2hwZTQyQ0hid1F2Rk1DdkI5SmZIN0taVkhGeGVBeVZDS2tkR2oyY1NERWhGbi82RjYzbXN5Wm4zQ2FKUmE3b1BtNEFtZTZSQTZBcGx2cFpLVG1rVlpKODlvK1UzZitJRXlkOHdDelljTHk0QXRMSlNSczNBdDNzV21BcVlLZEpEUmo3OGJFY21GRlIwdFZXTVAvbExVdU9FdnRlZjNxbmo5L1IrVkNPSXJHSzNiWkxEWDd6bjRpYlZvWlZiSzBDeitkRS9ucmx6ZUhoMmtOZlFNeFRHbFpkanpxSWxmenRWS1hQNDVMWVY4Mjc4UXFiMkg1SGFKTWwraWJVNGFmUVcvRjluVnVjaGV5aklpUURhWUR5cGEyZGZuUzZNeXNMUnJvZz09IiwiZGF0YWtleSI6IkFRRUJBSGgrZFMrQmxOdTBOeG5Yd293YklMczExNXlqZCtMTkFaaEJMWnN1bk94azNBQUFBSDR3ZkFZSktvWklodmNOQVFjR29HOHdiUUlCQURCb0Jna3Foa2lHOXcwQkJ3RXdIZ1lKWUlaSUFXVURCQUV1TUJFRURBQ3hQQ1N6UHpSZDZWZlNtQUlCRUlBN0FZOGNTcmx2a2VaTkYwWjhLS0F3emdjK2d3UjRyeHBxV1dpa1pFYjdOZ0tDOXNOTml5d3JxL0ZqeWlVQzF3VEJYcEV0QUdxa2RWbmJzdEk9IiwidmVyc2lvbiI6IjIiLCJ0eXBlIjoiREFUQV9LRVkiLCJleHBpcmF0aW9uIjoxNTQ4NjU2ODE0fQ== https://603698310563.dkr.ecr.eu-west-1.amazonaws.com
+                        docker login -u AWS -p eyJwYXlsb2FkIjoiK1JyTlRtUDRndEJTbGdGNHVBbENwVFhBK3Z0cWJvOHRwQmFidHBhenFsL1RNbUp4aUVMN1hYSWhsU3p2TkxxdnVOenMvYWdmMGpoV3BYeSsvRWt1QjBWYTdSem5wbXgvb3gwK1JnZEcrSW1ycFpPL0Y0ekNSM3pwaURCL3gyTHFjZVM0b1BmZ1BqbHJET1Rtd2tLMW5sdEJhL3RqZGw0c1A5bXdDcGMxZi9ibmkwbXYvZTNXOEFDbzJQTFppVzZnMmNVcDlLdi9oTzdtL1E2S1BNa3dUcCtWMUNOR2dwOUtOd3F2RlhNaUdIMm9mQ1pnYkF0dlhtRURnMVp4WXdCcG9zczk3aitLVk9tWkVGYW1Fc25KbXJLZHFYeXh2dnpmNzY5cTNmUzRXa0Vxb3dCaUVTTkhBcTRBRWFDSWRTOVpDclRHM293bkZ3NEszVXUxdzRrKzV4VmVXbGZpdVFWWG9pTGRlVjZuU200TGs1TG5nU2V3aC9GSUs0QmhVVGtpWE8zaTJBWVFNNkFKNTJTWWgyUTR0NmtxYjM1MWU4citzaWhZS3lqSTUxUDdpaU4zRDJLWnI5blZKUTRDWWNEMUorSkZFbjZ3UnpaeE40OG5hejZvaEwvNkZualArNjZGUm12cndnT2wxUktVcjlZaWN1Tko5WnRlbW15UGVKd0xOOXE5NUkxRUlXOENSdGk1ZVZaZnVHU2NYdXlwQjAxTVBYaTBhNnVVRnMxcEZqTE1KbUtwK3czYmNWa0w5L1RCRlY0TVBaai9sYlZXeG9DVG1Wc1NTb2dYQ0I0NVhhdUgzYXUxVDRpRDJOcWw5d3lUTDk2Q0NHSnJqRHJKYU1hbm13Y21Nd3NRaFo1R0RUN1NzUlVVdFBuQVphZDFFRmRpVnQrVWE0dG80VkhuaGJ3cEZMK2RlaVdIWkVDbnFmYWdnQ29uZXR1UnVrQStwYXVNNU4rOUFiQWR3djdxU1NWU05EUkVjSEVZbGZnSjZtUFFOSGRKSTRuVHdncktsLzRKN0dmMHN6ZGNFNnFETzdQMVpIcEY2NVA4QXlhandYaUpndXdDM1N2YmlZTFpUV2p3N29yYi9KekdMR1REOXA1QjE5WTd1TUlnZko1K0FmcmYwQTRGWTJHbU9MWmFoajVnUllRcHhlMnI1WkZ4bEhhbXNzeFlyMy9qVUQ3bUdqWm5oNkxETkQ3SjdxZEIzbVZpWWVnaVk5eUN2S0V1OHpPVmZCV0JBWnB1bCs0aWpjZUFtS213c01RZ25hbkk4U2tzWC85UzBMN2h3ZGE2QnJKbzZ1L1U0Q05ZTGFGQkJ2Qmxmek5HZVVLa0pKdFJ5K25pbjl1YVBVZ3hwM3dTVEI5eE8rRmJ2djVhSVgrSnlFR0RMTEZXcFNMUm5raXpkb2xYVlYwdjl3dTdEZjhYQmhPZ2JGZ1Vkc1BINXhrK1kyS2ZEQ2g2WFY5OXRUK0FuUXdqcW1lN1czeHciLCJkYXRha2V5IjoiQVFFQkFIaCtkUytCbE51ME54blh3b3diSUxzMTE1eWpkK0xOQVpoQkxac3VuT3hrM0FBQUFINHdmQVlKS29aSWh2Y05BUWNHb0c4d2JRSUJBREJvQmdrcWhraUc5dzBCQndFd0hnWUpZSVpJQVdVREJBRXVNQkVFRE9sMFRXRGFzUDZqVmxaMitBSUJFSUE3TkRpQ3QyVVJYNnFCNDJZQXdFdGtpeEVQRmt5eFRLZi91SVFZcno1VW5KQUhFTXpEWnNnN1NGRkpMa1NIOVBlTWYrQTlDQ2RHN2RqSXQvUT0iLCJ2ZXJzaW9uIjoiMiIsInR5cGUiOiJEQVRBX0tFWSIsImV4cGlyYXRpb24iOjE1NDg5NjI0MTR9 https://318063795105.dkr.ecr.eu-west-1.amazonaws.com
                         
-                        docker tag acrweprod01.azurecr.io/${DOCKER_ORG_IMAGE}:${DOCKER_VERSION} 603698310563.dkr.ecr.eu-west-1.amazonaws.com/${DOCKER_ORG_IMAGE}:${DOCKER_VERSION}
-                        docker push 603698310563.dkr.ecr.eu-west-1.amazonaws.com/${DOCKER_ORG_IMAGE}:${DOCKER_VERSION}
+                        docker tag ${ACRLOGINSERVER}/${DOCKER_ORG_IMAGE}:${DOCKER_VERSION} ${AWS_CONTAINER_REPOSITORY_URL_PROP}/${DOCKER_ORG_IMAGE}:${DOCKER_VERSION}
+                        docker push ${AWS_CONTAINER_REPOSITORY_URL_PROP}/${DOCKER_ORG_IMAGE}:${DOCKER_VERSION}
 
-                        aws eks update-kubeconfig --kubeconfig ./build/aws/awskubeconfig --name cluster1
+                        export AWS_PROFILE=eks@ikea-${env}
+                        aws eks update-kubeconfig --kubeconfig ./build/aws/awskubeconfig --name eksipimip
                         chmod +x ./build/aws/aws-iam-authenticator
                         
                         ls -ltr ./build/aws
 
                         sed -i -e \"s|aws-iam-authenticator|./aws-iam-authenticator|g\" ./build/aws/awskubeconfig
-                        kubectl --kubeconfig ./build/aws/awskubeconfig get pods
 
                         cd build/istio
                         cp \"configmap-aws-${region}-${env}.yaml\" \"configmap-aws-${region}-${env}-aws.yaml\"
@@ -559,24 +561,25 @@ def generateAwsDeployStage(region, env) {
                         cp \"destination-rule.yaml\" \"destination-rule-aws.yaml\"
                         
                         sed -i -e \"s|KUBERNETES_NAMESPACE_VAR|${KUBERNETES_NAMESPACE}|g\" configmap-aws-${region}-${env}-aws.yaml
+                        sed -i -e \"s|SERVICE_NAME_VAR|${IMAGE_NAME}-${SERVICE_VERSION}|g\" configmap-aws-${region}-${env}-aws.yaml
                         kubectl --kubeconfig ../aws/awskubeconfig apply -f configmap-aws-${region}-${env}-aws.yaml
 
-                        sed -i -e \"s|IMAGE_NAME_VAR|603698310563.dkr.ecr.eu-west-1.amazonaws.com/${DOCKER_ORG_IMAGE}:${DOCKER_VERSION}|g\" deploy-service-aws.yaml
-                        sed -i -e \"s|SERVICE_NAME_VAR|${IMAGE_NAME}|g\" deploy-service-aws.yaml
+                        sed -i -e \"s|IMAGE_NAME_VAR|${AWS_CONTAINER_REPOSITORY_URL_PROP}/${DOCKER_ORG_IMAGE}:${DOCKER_VERSION}|g\" deploy-service-aws.yaml
+                        sed -i -e \"s|SERVICE_NAME_VAR|${IMAGE_NAME}-${SERVICE_VERSION}|g\" deploy-service-aws.yaml
                         sed -i -e \"s|KUBERNETES_NAMESPACE_VAR|${KUBERNETES_NAMESPACE}|g\" deploy-service-aws.yaml
-                        sed -i -e \"s|CONFIGMAP_NAME_VAR|${IMAGE_NAME}-configmap|g\" deploy-service-aws.yaml
+                        sed -i -e \"s|CONFIGMAP_NAME_VAR|${IMAGE_NAME}-${SERVICE_VERSION}-configmap|g\" deploy-service-aws.yaml
                         sed -i -e \"s|VERSION_VAR|${DOCKER_VERSION}|g\" deploy-service-aws.yaml
                         kubectl --kubeconfig ../aws/awskubeconfig apply -f deploy-service-aws.yaml
                         
                         sed -i -e \"s|KUBERNETES_NAMESPACE_VAR|${KUBERNETES_NAMESPACE}|g\" virtual-service-aws.yaml
                         sed -i -e \"s|INTERNAL_SVC_HOSTNAME_VAR|${AWS_ENV_REGION_SVC_HOSTNAME}|g\" virtual-service-aws.yaml
-                        sed -i -e \"s|SERVICE_NAME_VAR|${IMAGE_NAME}|g\" virtual-service-aws.yaml
+                        sed -i -e \"s|SERVICE_NAME_VAR|${IMAGE_NAME}-${SERVICE_VERSION}|g\" virtual-service-aws.yaml
                         sed -i -e \"s|SVC_PATH_VAR|${URI_ROOT_PATH}|g\" virtual-service-aws.yaml
                         sed -i -e \"s|ENV_VAR|${env}|g\" virtual-service-aws.yaml
                         sed -i -e \"s|REGION_VAR|${region}|g\" virtual-service-aws.yaml
                         kubectl --kubeconfig ../aws/awskubeconfig apply -f virtual-service-aws.yaml
                         
-                        sed -i -e \"s|SERVICE_NAME_VAR|${IMAGE_NAME}|g\" destination-rule-aws.yaml
+                        sed -i -e \"s|SERVICE_NAME_VAR|${IMAGE_NAME}-${SERVICE_VERSION}|g\" destination-rule-aws.yaml
                         sed -i -e \"s|KUBERNETES_NAMESPACE_VAR|${KUBERNETES_NAMESPACE}|g\" destination-rule-aws.yaml 
                         sed -i -e \"s|LABEL_APP_VAR|${IMAGE_NAME}|g\" destination-rule-aws.yaml                       
                         kubectl --kubeconfig ../aws/awskubeconfig apply -f destination-rule-aws.yaml
@@ -602,29 +605,29 @@ def generateAzureDeployStage(region, env) {
                         cp \"deploy-service.yaml\" \"deploy-service-azure.yaml\"
                         cp \"virtual-service.yaml\" \"virtual-service-azure.yaml\"
                         cp \"destination-rule.yaml\" \"destination-rule-azure.yaml\"
-                        cp \"destination-rule.yaml\" \"destination-rule-azure.yaml\"
                         
                         sed -i -e \"s|KUBERNETES_NAMESPACE_VAR|${KUBERNETES_NAMESPACE}|g\" configmap-az-${region}-${env}-azure.yaml
+                        sed -i -e \"s|SERVICE_NAME_VAR|${IMAGE_NAME}-${SERVICE_VERSION}|g\" configmap-az-${region}-${env}-azure.yaml
                         kubectl apply -f configmap-az-${region}-${env}-azure.yaml
 
                         sed -i -e \"s|IMAGE_NAME_VAR|${ACRLOGINSERVER}/${DOCKER_ORG_IMAGE}:${DOCKER_VERSION}|g\" deploy-service-azure.yaml
-                        sed -i -e \"s|SERVICE_NAME_VAR|${IMAGE_NAME}|g\" deploy-service-azure.yaml
+                        sed -i -e \"s|SERVICE_NAME_VAR|${IMAGE_NAME}-${SERVICE_VERSION}|g\" deploy-service-azure.yaml 
                         sed -i -e \"s|KUBERNETES_NAMESPACE_VAR|${KUBERNETES_NAMESPACE}|g\" deploy-service-azure.yaml
-                        sed -i -e \"s|CONFIGMAP_NAME_VAR|${IMAGE_NAME}-configmap|g\" deploy-service-azure.yaml
+                        sed -i -e \"s|CONFIGMAP_NAME_VAR|${IMAGE_NAME}-${SERVICE_VERSION}-configmap|g\" deploy-service-azure.yaml
                         sed -i -e \"s|VERSION_VAR|${DOCKER_VERSION}|g\" deploy-service-azure.yaml
                         kubectl apply -f deploy-service-azure.yaml
                         
                         sed -i -e \"s|KUBERNETES_NAMESPACE_VAR|${KUBERNETES_NAMESPACE}|g\" virtual-service-azure.yaml
                         sed -i -e \"s|INTERNAL_SVC_HOSTNAME_VAR|${AZ_ENV_REGION_SVC_HOSTNAME}|g\" virtual-service-azure.yaml
-                        sed -i -e \"s|SERVICE_NAME_VAR|${IMAGE_NAME}|g\" virtual-service-azure.yaml
+                        sed -i -e \"s|SERVICE_NAME_VAR|${IMAGE_NAME}-${SERVICE_VERSION}|g\" virtual-service-azure.yaml
                         sed -i -e \"s|SVC_PATH_VAR|${URI_ROOT_PATH}|g\" virtual-service-azure.yaml
                         sed -i -e \"s|ENV_VAR|${env}|g\" virtual-service-azure.yaml
                         sed -i -e \"s|REGION_VAR|${region}|g\" virtual-service-azure.yaml
                         kubectl apply -f virtual-service-azure.yaml
-                                                
+                        
                         sed -i -e \"s|SERVICE_NAME_VAR|${IMAGE_NAME}|g\" destination-rule-azure.yaml
                         sed -i -e \"s|KUBERNETES_NAMESPACE_VAR|${KUBERNETES_NAMESPACE}|g\" destination-rule-azure.yaml 
-                        sed -i -e \"s|LABEL_APP_VAR|${IMAGE_NAME}|g\" destination-rule-azure.yaml                       
+                        sed -i -e \"s|LABEL_APP_VAR|${IMAGE_NAME}-${SERVICE_VERSION}|g\" destination-rule-azure.yaml                       
                         kubectl apply -f destination-rule-azure.yaml
                        """
                 }
@@ -637,9 +640,9 @@ def generateAzureDeployStage(region, env) {
 def logIntoAzure(){
     //Log into ACR/ECR etc
     sh "az login --service-principal -u ${AZURE_CLIENT_ID} -p ${AZURE_CLIENT_SECRET} -t ${AZURE_TENANT_ID}"
-    //    sh "az account set -s ${AZURE_SUBSCRIPTION_ID}"
+//    sh "az account set -s ${AZURE_SUBSCRIPTION_ID}"
     //Use Prod Subscription ID
-    sh "az account set -s 4c58a8b3-26bd-4206-a3ca-6d1fac5d0ed5"
+    sh "az account set -s ${AZURE_PROD_SUBSCRIPTION_ID_PROP}"
     sh "az acr login --name ${PROD_WESTEUROPE_AZACRNAME_PROP}"
     ACRLOGINSERVER = sh(returnStdout: true, script: "az acr show --resource-group ${PROD_WESTEUROPE_AZRGNAME_PROP} --name ${PROD_WESTEUROPE_AZACRNAME_PROP} --query \"loginServer\" --output tsv").trim()
 }
