@@ -315,6 +315,18 @@ def call(Map pipelineParams) {
                 }
             }
 
+            stage('PPE Deploy - AWS') {
+                when {
+                    allOf {
+                        changeRequest target: 'master'
+                        expression { DEPLOY_TO_AWS == 'true' }
+                    }
+                }
+                steps {
+                    executeDeploy(AWS_PPE_REGION_MAP)
+                }
+            }
+
             stage('PPE Deploy - Azure') {
                 when {
                     allOf {
@@ -349,6 +361,18 @@ def call(Map pipelineParams) {
                 }
             }
 
+            stage('PROD Deploy Release - AWS') {
+                when {
+                    allOf {
+                        branch 'master';
+                        expression { DEPLOY_TO_AWS == 'true' }
+                    }
+                }
+                steps {
+                    executeDeploy(AWS_PPE_REGION_MAP)
+                }
+            }
+
             stage('PROD Deploy HotFix - Azure') {
                 when {
                     allOf {
@@ -362,6 +386,20 @@ def call(Map pipelineParams) {
                     executeDeploy(AZURE_PROD_REGION_MAP)
                 }
             }
+
+            stage('PROD Deploy HotFix - AWS') {
+                when {
+                    allOf {
+                        branch "hotfix/*"
+                        expression {DEPLOY_TO_AWS == 'true'}
+                    }
+                }
+                steps {
+                    executeDeploy(AWS_PROD_REGION_MAP)
+                }
+            }
+
+
             stage('Commit Updated Version') {
                 steps {
                     withCredentials([sshUserPrivateKey(credentialsId: 'l-apimgt-u-itsehbgATikea.com', keyFileVariable: 'SSH_KEY')]) {

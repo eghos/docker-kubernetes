@@ -16,9 +16,11 @@ spec:
       protocol: HTTP
     hosts:
     - test.eu-west-1.svc.hip.red.cdtapps.com
+    - sc-77-loadb-z27x14a5dvkp-610330333.eu-west-1.elb.amazonaws.com
   - port:
       number: 443
       name: https
       protocol: HTTP
     hosts:
     - test.eu-west-1.svc.hip.red.cdtapps.com
+    - sc-77-loadb-z27x14a5dvkp-610330333.eu-west-1.elb.amazonaws.com
