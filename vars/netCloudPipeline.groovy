@@ -467,7 +467,7 @@ def generateAwsDeployStage(region, env) {
                         
                         sed -i -e \"s|SERVICE_NAME_VAR|${IMAGE_NAME}-${SERVICE_VERSION}|g\" destination-rule-aws.yaml
                         sed -i -e \"s|KUBERNETES_NAMESPACE_VAR|${KUBERNETES_NAMESPACE}|g\" destination-rule-aws.yaml 
-                        sed -i -e \"s|LABEL_APP_VAR|${IMAGE_NAME}|g\" destination-rule-aws.yaml                       
+                        sed -i -e \"s|LABEL_APP_VAR|${IMAGE_NAME}-${SERVICE_VERSION}|g\" destination-rule-aws.yaml                       
                         kubectl --kubeconfig ../aws/awskubeconfig apply -f destination-rule-aws.yaml
                        """
             }
@@ -511,7 +511,7 @@ def generateAzureDeployStage(region, env) {
                         sed -i -e \"s|REGION_VAR|${region}|g\" virtual-service-azure.yaml
                         kubectl apply -f virtual-service-azure.yaml
                         
-                        sed -i -e \"s|SERVICE_NAME_VAR|${IMAGE_NAME}|g\" destination-rule-azure.yaml
+                        sed -i -e \"s|SERVICE_NAME_VAR|${IMAGE_NAME}-${SERVICE_VERSION}|g\" destination-rule-azure.yaml
                         sed -i -e \"s|KUBERNETES_NAMESPACE_VAR|${KUBERNETES_NAMESPACE}|g\" destination-rule-azure.yaml 
                         sed -i -e \"s|LABEL_APP_VAR|${IMAGE_NAME}-${SERVICE_VERSION}|g\" destination-rule-azure.yaml                       
                         kubectl apply -f destination-rule-azure.yaml
