@@ -1,0 +1,17 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: ServiceEntry
+metadata:
+  name: external-kafka
+  namespace: ipimip
+  labels:
+    app: kafka
+    version: v1
+    instance: dev
+spec:
+  hosts:
+  - kafka.services.test.eu-west-1.com
+  ports:
+  - number: 9092
+    name: tcp-kafka
+    protocol: tcp
+  location: MESH_EXTERNAL

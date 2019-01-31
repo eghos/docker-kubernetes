@@ -15,10 +15,10 @@ spec:
       name: http
       protocol: HTTP
     hosts:
-     - "*"
+    - test.eu-west-1.svc.hip.red.cdtapps.com
   - port:
       number: 443
       name: https
       protocol: HTTP
     hosts:
-      - "*"
+    - test.eu-west-1.svc.hip.red.cdtapps.com
