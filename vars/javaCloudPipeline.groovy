@@ -569,7 +569,7 @@ def generateAwsDeployStage(region, env) {
                         docker tag ${ACRLOGINSERVER}/${DOCKER_ORG_IMAGE}:${DOCKER_VERSION} ${AWS_CONTAINER_REPOSITORY_URL_PROP}/${DOCKER_ORG_IMAGE}:${DOCKER_VERSION}
                         docker push ${AWS_CONTAINER_REPOSITORY_URL_PROP}/${DOCKER_ORG_IMAGE}:${DOCKER_VERSION}
 
-                        export AWS_PROFILE=eks@ikea-${env}
+                        export AWS_PROFILE=eks@ikea-${env}-${region}
                         aws eks update-kubeconfig --kubeconfig ./build/aws/awskubeconfig --name eksipimip
                         chmod +x ./build/aws/aws-iam-authenticator
                         
