@@ -9,7 +9,7 @@ metadata:
     instance: dev
 spec:
   hosts:
-  - kafka.services.test.eu-west-1.com:9092
+  - kafka.services.test.eu-west-1.com
   ports:
   - number: 9092
     name: tcp-kafka
