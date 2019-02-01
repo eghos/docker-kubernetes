@@ -564,7 +564,9 @@ def generateAwsDeployStage(region, env) {
                 //docker push 603698310563.dkr.ecr.eu-west-1.amazonaws.com/${DOCKER_ORG_IMAGE}:${DOCKER_VERSION}
                 sh 'chmod +x ./build/istio/*.yaml'
                 sh """
-
+                        mkdir -p ~/.aws
+                        cp ./build/aws/credentials ~/.aws/credentials
+                        cp ./build/aws/config ~/.aws/config
 
                         export AWS_PROFILE=eks@ikea-${env}-${region}
                         aws eks update-kubeconfig --kubeconfig ./build/aws/awskubeconfig --name eksipimip
