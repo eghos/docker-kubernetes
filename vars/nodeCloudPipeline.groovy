@@ -421,6 +421,19 @@ def call(Map pipelineParams) {
                 }
             }
 
+            stage('PROD Deploy Release - AWS') {
+                when {
+                    allOf {
+                        branch 'master';
+                        expression {DEPLOY_TO_AWS == 'true'}
+                    }
+                }
+                steps {
+                    echo 'Merge request to Master Branch has been approved. PROD Deployment will be performed in this stage.'
+                    executeDeploy(AWS_PROD_REGION_MAP)
+                }
+            }
+
             stage('PROD Deploy HotFix - Azure') {
                 when {
                     allOf {
