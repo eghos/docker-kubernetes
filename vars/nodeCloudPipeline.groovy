@@ -383,7 +383,7 @@ def call(Map pipelineParams) {
                 steps {
                     echo "PR created to Master Branch. PPE Deployment will be performed in this stage."
                     script {
-                        DOCKER_VERSION = ${VERSION_FROM_PJ}
+                        DOCKER_VERSION = "${VERSION_FROM_PJ}"
                     }
                     sh "az account set -s ${AZURE_LOWER_ENV_SUBSCRIPTION_ID_PROP}"
                     executeDeploy(AZURE_PPE_REGION_MAP)
@@ -400,7 +400,7 @@ def call(Map pipelineParams) {
                 steps {
                     echo "PR created to Master Branch. PPE Deployment will be performed in this stage."
                     script {
-                        DOCKER_VERSION = ${VERSION_FROM_PJ}
+                        DOCKER_VERSION = "${VERSION_FROM_PJ}"
                     }
 
                     executeDeploy(AWS_PPE_REGION_MAP)
@@ -417,7 +417,7 @@ def call(Map pipelineParams) {
                 steps {
                     echo 'Merge request to Master Branch has been approved. PROD Deployment will be performed in this stage.'
                     sh "az account set -s ${AZURE_PROD_SUBSCRIPTION_ID_PROP}"
-                    executeDeploy(AZURE_PROD_REGION_MAP)
+//                    executeDeploy(AZURE_PROD_REGION_MAP)
                 }
             }
 

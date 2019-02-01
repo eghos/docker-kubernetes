@@ -372,7 +372,7 @@ def call(Map pipelineParams) {
                         DOCKER_VERSION = ${RELEASE_NUMBER}
                     }
                     sh "az account set -s ${AZURE_PROD_SUBSCRIPTION_ID_PROP}"
-                    executeDeploy(AZURE_PROD_REGION_MAP)
+//                    executeDeploy(AZURE_PROD_REGION_MAP)
                 }
             }
 
