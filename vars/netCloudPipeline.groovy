@@ -323,6 +323,10 @@ def call(Map pipelineParams) {
                     }
                 }
                 steps {
+                    echo "PR created to Master Branch. PPE Deployment will be performed in this stage."
+                    script {
+                        DOCKER_VERSION = "1.0.0"
+                    }
                     executeDeploy(AWS_PPE_REGION_MAP)
                 }
             }
