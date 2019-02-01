@@ -408,7 +408,7 @@ def call(Map pipelineParams) {
                 steps {
                     echo 'Merge request to Master Branch has been approved. PROD Deployment will be performed in this stage.'
                     sh "az account set -s ${AZURE_PROD_SUBSCRIPTION_ID_PROP}"
-                    executeDeploy(AZURE_PROD_REGION_MAP)
+//                    executeDeploy(AZURE_PROD_REGION_MAP)
                 }
             }
 
