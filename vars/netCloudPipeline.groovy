@@ -8,7 +8,8 @@ def call(Map pipelineParams) {
             BRANCH_NAME_FULL         = env.BRANCH_NAME.replace('', '')
             IMAGE_NAME               = "fxrateapi"
             DEV_SNAPSHOT_VERSION     = "1.0.${BUILD_NUMBER}-SNAPSHOT"
-            RELEASE_NUMBER           = env.BRANCH_NAME.replace('release/', '')
+//            RELEASE_NUMBER           = env.BRANCH_NAME.replace('release/', '')
+            RELEASE_NUMBER           = "1.0.0"
             RELEASE_VERSION          = "${RELEASE_NUMBER}.RELEASE"
 
             GIT_URL_MODIFIED         = env.GIT_URL.replace('https://', 'git@').replace('com/', 'com:')
@@ -325,7 +326,7 @@ def call(Map pipelineParams) {
                 steps {
                     echo "PR created to Master Branch. PPE Deployment will be performed in this stage."
                     script {
-                        DOCKER_VERSION = "1.0.0"
+                        DOCKER_VERSION = ${RELEASE_NUMBER}
                     }
                     executeDeploy(AWS_PPE_REGION_MAP)
                 }
@@ -341,7 +342,7 @@ def call(Map pipelineParams) {
                 steps {
                     echo "PR created to Master Branch. PPE Deployment will be performed in this stage."
                     script {
-                        DOCKER_VERSION = "1.0.0"
+                        DOCKER_VERSION = ${RELEASE_NUMBER}
                     }
                     sh "az account set -s ${AZURE_LOWER_ENV_SUBSCRIPTION_ID_PROP}"
                     executeDeploy(AZURE_PPE_REGION_MAP)
@@ -358,7 +359,7 @@ def call(Map pipelineParams) {
                 steps {
                     echo 'Merge request to Master Branch has been approved. PROD Deployment will be performed in this stage.'
                     script {
-                        DOCKER_VERSION = "1.0.0"
+                        DOCKER_VERSION = ${RELEASE_NUMBER}
                     }
                     sh "az account set -s ${AZURE_PROD_SUBSCRIPTION_ID_PROP}"
                     executeDeploy(AZURE_PROD_REGION_MAP)
@@ -373,6 +374,10 @@ def call(Map pipelineParams) {
                     }
                 }
                 steps {
+                    echo 'Merge request to Master Branch has been approved. PROD Deployment will be performed in this stage.'
+                    script {
+                        DOCKER_VERSION = ${RELEASE_NUMBER}
+                    }
                     executeDeploy(AWS_PPE_REGION_MAP)
                 }
             }
@@ -386,6 +391,9 @@ def call(Map pipelineParams) {
                 }
                 steps {
                     echo 'HotFix change has been implemented. PROD Deployment will be performed in this stage.'
+                    script {
+                        DOCKER_VERSION = ${RELEASE_NUMBER}
+                    }
                     sh "az account set -s ${AZURE_PROD_SUBSCRIPTION_ID_PROP}"
                     executeDeploy(AZURE_PROD_REGION_MAP)
                 }
@@ -399,6 +407,10 @@ def call(Map pipelineParams) {
                     }
                 }
                 steps {
+                    echo 'HotFix change has been implemented. PROD Deployment will be performed in this stage.'
+                    script {
+                        DOCKER_VERSION = ${RELEASE_NUMBER}
+                    }
                     executeDeploy(AWS_PROD_REGION_MAP)
                 }
             }
