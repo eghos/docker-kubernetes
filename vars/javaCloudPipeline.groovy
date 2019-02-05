@@ -537,7 +537,7 @@ def call(Map pipelineParams) {
         post {
             always {
                 cleanWs()
-                slackNotifier(currentBuild.currentResult)
+//                slackNotifier(currentBuild.currentResult)
             }
         }
 
