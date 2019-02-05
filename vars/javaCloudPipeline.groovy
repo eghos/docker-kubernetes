@@ -210,7 +210,7 @@ def call(Map pipelineParams) {
                  steps {
                      withCredentials(bindings: [usernamePassword(credentialsId: 'bc608fa5-71e6-4e08-b769-af3ca6024715', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
                          sh 'chmod +x ./mvnw'
-                         sh './mvnw -f pom.xml test'
+//                         sh './mvnw -f pom.xml test'
 
                          // Ensure project exists:
                          // curl -u 2d43347374b1c08e2e718edce7001c638f533869: -X POST “https://staging2.sonarqube.blue.azure.cdtapps.com/api/projects/create?key=ipimip.product-service.dev&name=ipimip.product-service.dev” -d ” ”  
@@ -226,18 +226,18 @@ def call(Map pipelineParams) {
                  }
              }
 
-            stage('Code Deploy to Nexus') {
-                when {
-                    anyOf {
-                        branch "develop*";
-                        branch "release/*"
-                    }
-                }
-                steps {
-                    sh 'chmod +x ./mvnw'
-                    sh './mvnw -f pom.xml -Dmaven.test.skip=true deploy'
-                }
-            }
+//            stage('Code Deploy to Nexus') {
+//                when {
+//                    anyOf {
+//                        branch "develop*";
+//                        branch "release/*"
+//                    }
+//                }
+//                steps {
+//                    sh 'chmod +x ./mvnw'
+//                    sh './mvnw -f pom.xml -Dmaven.test.skip=true deploy'
+//                }
+//            }
 
             stage('Docker Build') {
                 when {
@@ -260,8 +260,7 @@ def call(Map pipelineParams) {
                            cp ./build/aws/config ~/.aws/config
                            export AWS_PROFILE=ikea-tools-system
 
-                           docker login -u AWS -p eyJwYXlsb2FkIjoicWtiS0hLN3JyVys2MTVXY09MWjNqZWh1WTI2bGRlR0kxNEVNQUczQ2lmemtqQlRRdENZQ1RrbFNJa2RrUHQ0YW11ZWhoQ2o4YlQ4R3h0QVFSQ0dJOEExcG9YY0RhU1FqeTNOM3Y4eWU5eGhIUWM4SHc0TlFXTlEwczBYMGMwRVY3c1ovY2NxcWVRQWMzMnI5cVI0VnR4S1BsZGNNM2VPc2NqNmNXdEJPRFNocW9yb3h4Rlo1OUxSUnZTK3ZTd1N0eWFKeTJXUnlpOENKYVdRV2Y0S2JlZTZCN2lPUjkrTU5iMVlZMjQvaU5TZ1NQNDlUNHYwUWNoeG5oSEcrTjJqWWkzcnFpYjNHdUk3TjF6VmpoRmdEUDNpcldzdWtja1V2aEJtVnZqZ0NnL1ZvZk1yRlNkeDZwRFlFZDJONjBuS1gzMitya1dRZTFabExucmVtUi8zL2paWSt5UW80UW1EbFVzcHhFZzJabWRyM00xVnc3d0ZkVkp2SE52NFBVRTNDQnNqQnhGd044bklpbHoxRklROGVIRThKQjRIUmF5bjUzN3FlRkV1b0IwMHdQU3ZuMzJWWVlXK0owNEhWV25OOW5EZlNKTDF2WGNwc1JiZVlHc05QL3FpSjhiT3IrekdxSHk4Q3o3WCtFT2hmWUZrTnEySnJzNUhSdm1ZSlBPOEQwRWJWcFR4Y05RUGUwczNJajd0eWw5L3JWdkVSd29XcWxyb1hMNTh2QjkyN0wzUFVjcE04UXV5L0x3Sk1YYTVFOVQzT052WG9OZ2RxTXNvRUN6a2JRb0J5czd6ZE5nWjRnZkVacW1mR2dyOEdsRkVMaFpjaUR6QUdod1FsMzRkcVJuamc4dmZMbHpSOGF4K0tPTXViSm5FajVaM2xBbW9rT3gxSXMrYVpSYjljeWRPR1dDNHpDWUI4SnBCVFNkRVBUV0VRZmZSdEh6T0FLaGZQRHprUThzRERlRE8rV2t2MUxwaC9IcDdQeUVVQllpN3g3YTBGN0lKNjE1dExKZVlSZjMxNFB1ZitDQXB5THorSnJETlhPMlNCdG9xT1BYTnZ6bTZ4aUg4dkFlb2Fvd0lpRkp1SWQ5Szd5M2hPSlM2eTlUUG9Hc0VRU1l1MVJhaVdRbDMwa3FJU2VzR2YyMVhiSSt1WkJPMnFwQ0NyS0R2YTliL21sNmI1TWkrUk1XV1FBSHlhWFdtdVRwQUFsL1hPTEJlR21LVlpoMXR0NWx0TEo3dG55OVBYenhOb2dVWjNoS3lCekVoVTI2WUJWODMzREpMWmpjRkdlYmlhQmw5Zk9Qb1ZLK2lac2kzcThVaEFpcDNQWThMc21MdTBjY1VYa3ZHQm5ubXhPYVFGTWY5WTlNdWVBOXFWbmZaN0hNMW92OVljdmo5OHE2bDlzUlVOQUx5Mld3MDFPZkpSTjdsVEQvcjZ2eTF1WXFzdGhGQ3FRQURtTWxTZ3AvWlpvOHNHWTFrL21QbWgiLCJkYXRha2V5IjoiQVFFQkFIaCtkUytCbE51ME54blh3b3diSUxzMTE1eWpkK0xOQVpoQkxac3VuT3hrM0FBQUFINHdmQVlKS29aSWh2Y05BUWNHb0c4d2JRSUJBREJvQmdrcWhraUc5dzBCQndFd0hnWUpZSVpJQVdVREJBRXVNQkVFREYvOWFJOU11VlZEUEhDd1RRSUJFSUE3a1p6T2tLdjJwUE9WQWxQRUZEY0doZDNIdm53Nnk1SlR6TGxUKytxdjhKdDZ6dm9KcTJkZFgvM1FoLzl6a1FkUmQvcFNKTHhlclNzczcvMD0iLCJ2ZXJzaW9uIjoiMiIsInR5cGUiOiJEQVRBX0tFWSIsImV4cGlyYXRpb24iOjE1NDkwNzkxNzV9 https://318063795105.dkr.ecr.eu-west-1.amazonaws.com
-                        
+docker login -u AWS -p eyJwYXlsb2FkIjoiUDdxd05UTHU0V0ZIdG53YU5vQjl0TkxzQmwvZVZZbHFvTmx0SmMrcFNVUGUrcmUzUml3b2dwODE3QWJ2ZVJIOElUWmtVQ2dXVlNyTlR4RjFJeGd1LzlhYnVpb3Y2QVZJVExFNElyaHlCUEhCb1FRRkxPSXBWM2Z2MElZWWtMRE53dDRlcFBhVVIrMWJIY0oxQWU2WVU3NGFUV3pSVkZWVU42azM2SUdRVDFMTE5VN0hzSGgyYlRCMU1ndW9JdCtOZVMrQ1VYcmZSb3VhVW55S0dWYlAxTjNYRlhhaWtlMDl6VnRmRllVOXZFYS9DQnovbzh4SUlHdDROazhia0RDS3FGUTRQRGw2TE9XTm96Y2hlb2dKMXhvdmY0U2F3VkhOODJhK1d0UkpCQWNJYXRSMTh4Zlh2TUxBSm9aaHd6eWVmcFR3dDBTZExMRUt2MnN0TytsbFhIQUpXNlp0WW9iZDVSQ1JEMFRkL290dDFjTnIvMGJjRTRqelpTNnhsZjRlc0JUME51cDhtWXMwZ3EvWjlTWHFQbTNoYTNYa2FZcjJLV0d5bDRMNGRER2VSN0VtZ0Z2TGhSSUwxNFNzRTJtajZHL0hWamUwRExpVG9rcndJNmFZOExiaVNQalN0b25iT29BYVRmZkQzV21TNjZtMlZmTUpDQ0JsTlJNdzY5eXpra2ZIbkE0NWhpN1VZdXJGakVtMm9jQjVoaFpZQzZIbGNjV0o0b1FieTVtZ1RUOW10eWhqL3F5bVFLMnVTMHhKNy9GV29EK0o4eHlpc1V0aSs2R1FhYUhKaDJxZ1VsMmhNcXF3Q0tFYklGVnVEdWJ5MVM5Q1RBU1VsMVdGTmJ4V1hjUi9WSG9RU0RlSVpOdC90WEIvTU5UTEQzaXdRU0FqYnBpbksxZmNwOU1XTklaZkRucFkvb0M3T2cweU5XUkU0WGg5bjIrSWZ1dmRvUGJNVXBnV05HSzF5RU9DSFBTSnlNN3hHT3o3NGMwOGRnVU53UGpxNm9zWWY3KzVPc2toMldtbW1hQVdyZy8yS1IxVG5zRXR3NUZDSHYrSDdHNHgxR09oc0NHTmgvM0JPSUdiL2h2eWo3Wk15Si9FRXhoUGVlNWtHbFJaRDRHMlBJYWtVSVl2UkJIaHBJdlozUklBMm1TdlJKd2NGU0FxOWRXV0drN3lJejV5UXFINjRyMS9GM05xTHpoOWxmU1NUMEQ1Z21YaGRFVTJabUFzc2VhbkU4ZzhPdzIzNzNnNGJiZDlYRDdGamVIYU80R3J4cW1tdzZ1NlJ3RUVRTEpjTVNHVkIrUXo4RkNpS2d2RnZKRi9jY2NUdXpqcmVlS25US21Nc3FIR1drKzZwREtVT0c1Rmdya1lYWmNQbmdPbTlaWDlIR09XUGRBbjA5STBVeGdTUGswZ05Xd3JpZGVqQy9zLzByeDA2Vk9sei9NVEVlKzY0TzFaa2pLR0dxRmxZdHRzQVM0b2hVa09yeTFXOU9lM2xZWGlOSnp2IiwiZGF0YWtleSI6IkFRRUJBSGgrZFMrQmxOdTBOeG5Yd293YklMczExNXlqZCtMTkFaaEJMWnN1bk94azNBQUFBSDR3ZkFZSktvWklodmNOQVFjR29HOHdiUUlCQURCb0Jna3Foa2lHOXcwQkJ3RXdIZ1lKWUlaSUFXVURCQUV1TUJFRURHcUkxdDlGUmdqbHFRMHRXZ0lCRUlBN3JxU2F1Tm1mbEZsTk5CR1N2aVdNcWRuKzI0QUJtZWNWQ1RLc3cvZjVtTFVpZjBqMEJMRy9nUXpibzJEV3NLUU1ZTjRCd0ZadGMyUm9ibE09IiwidmVyc2lvbiI6IjIiLCJ0eXBlIjoiREFUQV9LRVkiLCJleHBpcmF0aW9uIjoxNTQ5NDE4MDI3fQ== https://318063795105.dkr.ecr.eu-west-1.amazonaws.com                        
                            docker tag ${ACRLOGINSERVER}/${DOCKER_ORG_IMAGE}:${DOCKER_VERSION} ${AWS_CONTAINER_REPOSITORY_URL_PROP}/${DOCKER_ORG_IMAGE}:${DOCKER_VERSION}
                            docker push ${AWS_CONTAINER_REPOSITORY_URL_PROP}/${DOCKER_ORG_IMAGE}:${DOCKER_VERSION}
                            """
