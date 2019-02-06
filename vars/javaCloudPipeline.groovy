@@ -79,7 +79,7 @@ def call(Map pipelineParams) {
             stage('Setup General') {
                 steps {
                     withCredentials([azureServicePrincipal('sp-ipim-ip-aks')]) {
-                        stageSetupGeneral()
+                        //stageSetupGeneral()
                         script {
                             //Get variables from project deployment.properties
                             deploymentProperties = readProperties file: './build/deployment.properties'
