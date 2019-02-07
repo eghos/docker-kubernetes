@@ -139,15 +139,8 @@ def call(Map pipelineParams) {
                             }
 
                             //Log into Central Container Repository (ACR)
-//                            logIntoAzure()
+                            logIntoAzure()
 
-                            //Log into ACR/ECR etc
-                            sh "az login --service-principal -u ${AZURE_CLIENT_ID} -p ${AZURE_CLIENT_SECRET} -t ${AZURE_TENANT_ID}"
-//    sh "az account set -s ${AZURE_SUBSCRIPTION_ID}"
-                            //Use Prod Subscription ID
-                            sh "az account set -s ${AZURE_PROD_SUBSCRIPTION_ID_PROP}"
-                            sh "az acr login --name ${PROD_WESTEUROPE_AZACRNAME_PROP}"
-                            ACRLOGINSERVER = sh(returnStdout: true, script: "az acr show --resource-group ${PROD_WESTEUROPE_AZRGNAME_PROP} --name ${PROD_WESTEUROPE_AZACRNAME_PROP} --query \"loginServer\" --output tsv").trim()
 
                         }
                     }
@@ -669,7 +662,8 @@ def generateAzureDeployStage(region, env) {
 
 def logIntoAzure(){
     //Log into ACR/ECR etc
-    sh "az login --service-principal -u ${AZURE_CLIENT_ID} -p ${AZURE_CLIENT_SECRET} -t ${AZURE_TENANT_ID}"
+//    sh "az login --service-principal -u ${AZURE_CLIENT_ID} -p ${AZURE_CLIENT_SECRET} -t ${AZURE_TENANT_ID}"
+    sh "az login --service-principal -u d9acf7a6-085f-4d90-82f6-aa02da0c2bbd -p b+vFVCO83RXhUz9LBzZYzP07g+dSXgRKSwaQeCVTKV8= -t 720b637a-655a-40cf-816a-f22f40755c2c"
 //    sh "az account set -s ${AZURE_SUBSCRIPTION_ID}"
     //Use Prod Subscription ID
     sh "az account set -s ${AZURE_PROD_SUBSCRIPTION_ID_PROP}"
