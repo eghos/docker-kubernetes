@@ -108,7 +108,7 @@ def call(Map pipelineParams) {
                         echo "GIT_SVC_ACCOUNT_USER_PROP ${GIT_SVC_ACCOUNT_USER_PROP}"
                         echo "PROD_WESTEUROPE_AZRGNAME_PROP ${PROD_WESTEUROPE_AZRGNAME_PROP}"
                         echo "PROD_WESTEUROPE_AZACRNAME_PROP ${PROD_WESTEUROPE_AZACRNAME_PROP}"
-                        
+
                         script {
                             //Get variables from project deployment.properties
                             deploymentProperties = readProperties file: './build/deployment.properties'
@@ -224,7 +224,8 @@ def call(Map pipelineParams) {
                 steps {
                     withCredentials(bindings: [usernamePassword(credentialsId: 'bc608fa5-71e6-4e08-b769-af3ca6024715', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
                         sh 'chmod +x ./mvnw'
-                        sh './mvnw -B -T 4 -fae -f pom.xml -Dmaven.test.skip=true clean install'
+                        sh """ export JAVA_HOME=$JAVA_HOME
+                               ./mvnw -B -T 4 -fae -f pom.xml -Dmaven.test.skip=true clean install"""
                     }
                 }
             }
