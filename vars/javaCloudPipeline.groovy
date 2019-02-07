@@ -301,21 +301,19 @@ docker login -u AWS -p eyJwYXlsb2FkIjoib1d3ZHhLaFZaL2FoTXcrSWkwbmV4YTUvOUJiYkZvN
                 }
             }
 
-            stage ('DEV Deploy - AWS') {
-                when {
-                    allOf {
-                        branch "develop*";
-                        expression { DEPLOY_TO_AWS == 'true' }
-                    }
-                }
-                steps {
-                    script {
-                        if (AWS_DEV_REGION != "") {
-                            executeDeploy(AWS_DEV_REGION_MAP)
-                        }
-                    }
-                }
-            }
+//            stage ('DEV Deploy - AWS') {
+//                when {
+//                    allOf {
+//                        branch "develop*";
+//                        expression { DEPLOY_TO_AWS == 'true' }
+//                    }
+//                }
+//                steps {
+//                    script {
+//                            executeDeploy(AWS_DEV_REGION_MAP)
+//                    }
+//                }
+//            }
 
             stage ('DEV Deploy - Azure') {
                 when {
