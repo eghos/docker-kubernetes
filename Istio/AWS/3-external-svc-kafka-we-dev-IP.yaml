@@ -1,24 +1,25 @@
 apiVersion: networking.istio.io/v1alpha3
 kind: ServiceEntry
 metadata:
-  name: external-kafka
+  name: test-ip-external-kafka
   namespace: ipimip
   labels:
-    app: kafka
+    app: ip-kafka
     version: v1
-    instance: test
+    instance: dev
 spec:
   hosts:
-  - broker01-eh-test-we.com
+  - kafka1.services.dev.eu-west-1.com
   addresses:
-  - 10.12.126.5/16  # Kafka CIDR
+  - 10.128.32.0/22
+  - 10.128.96.0/22
   ports:
-  - number: 9094
+  - number: 9092
     name:   kafka-we-test
     protocol: TCP
   location: MESH_EXTERNAL
   resolution: STATIC
   endpoints:
-  - address: 10.12.126.13
-  - address: 10.12.126.5
-  - address: 10.12.126.10
+  - address: 10.128.34.23
+  - address: 10.128.32.93
+  - address: 10.128.96.239

@@ -9,9 +9,12 @@ metadata:
     instance: dev
 spec:
   hosts:
-  - kafka.services.dev.eu-west-1.com
+  - kafka1.services.dev.eu-west-1.com
+  - kafka2.services.dev.eu-west-1.com
+  - kafka3.services.dev.eu-west-1.com
   ports:
   - number: 9092
     name: tcp-kafka
     protocol: tcp
   location: MESH_EXTERNAL
+  resolution: DNS
