@@ -16,9 +16,11 @@ spec:
       protocol: HTTP
     hosts:
     - ppe.eu-west-1.svc.hip.red.cdtapps.com
+    - ppe.eu-west-1.ui.hip.red.cdtapps.com
   - port:
       number: 443
       name: https
       protocol: HTTP
     hosts:
     - ppe.eu-west-1.svc.hip.red.cdtapps.com
+    - ppe.eu-west-1.ui.hip.red.cdtapps.com
