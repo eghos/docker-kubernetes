@@ -336,7 +336,7 @@ docker login -u AWS -p eyJwYXlsb2FkIjoiMGNRWHVSNXVjVUs3TkxaWWdRdGIzdllSOFlwVU12M
                 steps {
                     echo "PR created to Master Branch. PPE Deployment will be performed in this stage."
                     script {
-                        DOCKER_VERSION = ${RELEASE_NUMBER}
+                        DOCKER_VERSION = "${RELEASE_NUMBER}"
                     }
                     executeDeploy(AWS_PPE_REGION_MAP)
                 }
