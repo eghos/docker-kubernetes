@@ -9,9 +9,9 @@ metadata:
     instance: ppe
 spec:
   hosts:
-  - kafka1.services.ppe.eu-west-1.com
-  - kafka2.services.ppe.eu-west-1.com
-  - kafka3.services.ppe.eu-west-1.com
+  - kafka1.services.ppe.us-east-1.com
+  - kafka2.services.ppe.us-east-1.com
+  - kafka3.services.ppe.us-east-1.com
   ports:
   - number: 9092
     name: tcp-kafka
