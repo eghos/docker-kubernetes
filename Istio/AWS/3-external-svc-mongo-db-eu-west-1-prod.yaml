@@ -1,0 +1,13 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: ServiceEntry
+metadata:
+  name: external-svc-mongo-db
+  namespace: ipimip
+spec:
+  hosts:
+  - mongodb.services.inter.eu-west-1.com
+  ports:
+  - number: 27017
+    name: tcp-mongodb
+    protocol: tcp
+  location: MESH_EXTERNAL

@@ -1,0 +1,13 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: ServiceEntry
+metadata:
+  name: external-svc-oracle-rds
+  namespace: ipimip
+spec:
+  hosts:
+  - database.services.inter.eu-west-1.com
+  ports:
+  - number: 1521
+    name: tcp-rds
+    protocol: tcp
+  location: MESH_EXTERNAL
