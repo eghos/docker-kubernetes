@@ -355,7 +355,7 @@ docker login -u AWS -p eyJwYXlsb2FkIjoiQ3BHMlJIa2twdnIzK2lkandoUjZJT1QxaUxWRCtMY
                         DOCKER_VERSION = "${RELEASE_NUMBER}"
                     }
                     sh "az account set -s ${AZURE_LOWER_ENV_SUBSCRIPTION_ID_PROP}"
-//                    executeDeploy(AZURE_PPE_REGION_MAP)
+                    executeDeploy(AZURE_PPE_REGION_MAP)
                 }
             }
 
