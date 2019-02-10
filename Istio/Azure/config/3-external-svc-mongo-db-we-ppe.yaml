@@ -5,7 +5,7 @@ metadata:
   namespace: ipimip
 spec:
   hosts:
-  - cdbweppeafsibk.documents.azure.com
+  - cdbweppeezx62l.documents.azure.com
   ports:
   - number: 10255
     name:   mongo-we-ppe

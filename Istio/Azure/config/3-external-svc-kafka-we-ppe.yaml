@@ -19,6 +19,6 @@ spec:
   location: MESH_EXTERNAL
   resolution: STATIC
   endpoints:
-  - address: 10.13.126.6
-  - address: 10.13.126.12
+  - address: 10.13.126.11
   - address: 10.13.126.16
+  - address: 10.13.126.8
