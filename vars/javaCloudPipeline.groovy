@@ -80,6 +80,7 @@ def call(Map pipelineParams) {
                 steps {
                     withCredentials([azureServicePrincipal('sp-ipim-ip-aks')]) {
                         //stageSetupGeneral()
+                        sh 'rm ~/.kube/config'
                         sh 'which java'
                         sh 'java -version'
                         sh 'whoami'
