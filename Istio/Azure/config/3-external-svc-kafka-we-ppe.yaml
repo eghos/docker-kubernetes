@@ -10,15 +10,10 @@ metadata:
 spec:
   hosts:
   - broker01-eh-ppe-we.com
-  addresses:
-  - 10.13.126.6/16  # Kafka CIDR
+  - broker02-eh-ppe-we.com
+  - broker03-eh-ppe-we.com
   ports:
   - number: 9094
     name:   kafka-we-ppe
     protocol: TCP
   location: MESH_EXTERNAL
-  resolution: STATIC
-  endpoints:
-  - address: 10.13.126.11
-  - address: 10.13.126.16
-  - address: 10.13.126.8

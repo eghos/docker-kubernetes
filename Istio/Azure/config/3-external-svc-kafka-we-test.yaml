@@ -10,18 +10,10 @@ metadata:
 spec:
   hosts:
   - broker01-eh-test-we.com
-  addresses:
-  - 10.12.126.5/16  # Kafka CIDR
+  - broker02-eh-test-we.com
+  - broker03-eh-test-we.com
   ports:
   - number: 9094
     name:   kafka-we-test
     protocol: TCP
   location: MESH_EXTERNAL
-  resolution: STATIC
-  endpoints:
-  - address: 10.12.126.7
-  - address: 10.12.126.5
-  - address: 10.12.126.10
-#  - address: 10.12.126.13
-#  - address: 10.12.126.5
-#  - address: 10.12.126.10

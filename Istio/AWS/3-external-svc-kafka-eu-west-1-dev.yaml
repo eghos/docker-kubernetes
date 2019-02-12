@@ -17,4 +17,3 @@ spec:
     name: tcp-kafka
     protocol: tcp
   location: MESH_EXTERNAL
-  resolution: DNS
