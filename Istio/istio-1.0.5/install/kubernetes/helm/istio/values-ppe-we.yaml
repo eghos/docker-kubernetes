@@ -198,7 +198,7 @@ ingress:
   autoscaleMax: 5
   service:
     annotations: {}
-    loadBalancerIP: "40.115.3.198"
+    loadBalancerIP: "13.69.97.37"
     type: LoadBalancer #change to NodePort, ClusterIP or LoadBalancer if need be
     # Uncomment the following line to preserve client source ip.
     externalTrafficPolicy: Local
@@ -238,7 +238,7 @@ gateways:
         memory: 256Mi
     cpu:
       targetAverageUtilization: 80
-    loadBalancerIP: "40.68.59.151"
+    loadBalancerIP: "40.114.250.10"
     serviceAnnotations: {}
     type: LoadBalancer #change to NodePort, ClusterIP or LoadBalancer if need be
     # Uncomment the following line to preserve client source ip.
