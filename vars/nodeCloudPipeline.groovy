@@ -556,11 +556,18 @@ def generateAwsDeployStage(region, env) {
 //                sh "aws eks update-kubeconfig --kubeconfig awskubeconfig --name ${AWS_DEPLOY_EKS_CLUSTER_NAME}"
 //                sh "aws eks update-kubeconfig --kubeconfig awskubeconfig --name cluster1 --region eu-west-1"
 
-                AWS_ENV_REGION_SVC_HOSTNAME = "${AWS_SVC_HOSTNAME_PROP}".replace('<ENV>', "${env}").replace('<REGION>', "${region}")
+                if (${env}.startsWith("prod")) {
+                    ENV_LATEST = "inter"
+                } else {
+                    ENV_LATEST = ${env}
+                }
+
+                AWS_ENV_REGION_SVC_HOSTNAME = "${AWS_SVC_HOSTNAME_PROP}".replace('<ENV>', "${ENV_LATEST}").replace('<REGION>', "${region}")
 
                 //To generate te docker login command, need to use  $(aws ecr get-login --no-include-email --region eu-west-1)
                 //docker tag acrweprod01.azurecr.io/${DOCKER_ORG_IMAGE}:${DOCKER_VERSION} 603698310563.dkr.ecr.eu-west-1.amazonaws.com/${DOCKER_ORG_IMAGE}:${DOCKER_VERSION}
                 //docker push 603698310563.dkr.ecr.eu-west-1.amazonaws.com/${DOCKER_ORG_IMAGE}:${DOCKER_VERSION}
+
                 sh 'chmod +x ./build/istio/*.yaml'
                 sh """
                         mkdir -p ~/.aws
