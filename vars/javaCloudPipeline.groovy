@@ -650,7 +650,7 @@ def generateAzureDeployStage(region, env) {
             withCredentials([azureServicePrincipal('sp-ipim-ip-aks')]) {
                 script {
 
-                    if (${env}.startsWith("prod")) {
+                    if ("${env}".startsWith("prod")) {
                         ENV_LATEST = "inter"
                     } else {
                         ENV_LATEST = "${env}"
