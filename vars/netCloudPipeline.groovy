@@ -370,7 +370,7 @@ docker login -u AWS -p eyJwYXlsb2FkIjoiWGtNUjN1Nld3TFluTXlCN1FqQkYzMnptNmZ1aklDd
                 steps {
                     echo 'Merge request to Master Branch has been approved. PROD Deployment will be performed in this stage.'
                     script {
-                        DOCKER_VERSION = ${RELEASE_NUMBER}
+                        DOCKER_VERSION = "${RELEASE_NUMBER}"
                     }
                     sh "az account set -s ${AZURE_PROD_SUBSCRIPTION_ID_PROP}"
                     executeDeploy(AZURE_PROD_REGION_MAP)
@@ -387,7 +387,7 @@ docker login -u AWS -p eyJwYXlsb2FkIjoiWGtNUjN1Nld3TFluTXlCN1FqQkYzMnptNmZ1aklDd
                 steps {
                     echo 'Merge request to Master Branch has been approved. PROD Deployment will be performed in this stage.'
                     script {
-                        DOCKER_VERSION = ${RELEASE_NUMBER}
+                        DOCKER_VERSION = "${RELEASE_NUMBER}"
                     }
                     executeDeploy(AWS_PPE_REGION_MAP)
                 }
@@ -403,7 +403,7 @@ docker login -u AWS -p eyJwYXlsb2FkIjoiWGtNUjN1Nld3TFluTXlCN1FqQkYzMnptNmZ1aklDd
                 steps {
                     echo 'HotFix change has been implemented. PROD Deployment will be performed in this stage.'
                     script {
-                        DOCKER_VERSION = ${RELEASE_NUMBER}
+                        DOCKER_VERSION = "${RELEASE_NUMBER}"
                     }
                     sh "az account set -s ${AZURE_PROD_SUBSCRIPTION_ID_PROP}"
                     executeDeploy(AZURE_PROD_REGION_MAP)
@@ -420,7 +420,7 @@ docker login -u AWS -p eyJwYXlsb2FkIjoiWGtNUjN1Nld3TFluTXlCN1FqQkYzMnptNmZ1aklDd
                 steps {
                     echo 'HotFix change has been implemented. PROD Deployment will be performed in this stage.'
                     script {
-                        DOCKER_VERSION = ${RELEASE_NUMBER}
+                        DOCKER_VERSION = "${RELEASE_NUMBER}"
                     }
                     executeDeploy(AWS_PROD_REGION_MAP)
                 }
