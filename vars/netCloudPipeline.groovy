@@ -389,7 +389,7 @@ docker login -u AWS -p eyJwYXlsb2FkIjoiWGtNUjN1Nld3TFluTXlCN1FqQkYzMnptNmZ1aklDd
                     script {
                         DOCKER_VERSION = "${RELEASE_NUMBER}"
                     }
-                    executeDeploy(AWS_PPE_REGION_MAP)
+                    executeDeploy(AWS_PROD_REGION_MAP)
                 }
             }
 
