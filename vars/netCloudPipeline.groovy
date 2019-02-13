@@ -479,6 +479,7 @@ def generateAwsDeployStage(region, env) {
 //                AWS_DEPLOY_EKS_CLUSTER_NAME = sh(returnStdout: true, script: "aws ssm get-parameter --name /ipimip/cluster/cluster1/name --query 'Parameter.Value' --output text").trim()
 //                sh "aws eks update-kubeconfig --kubeconfig awskubeconfig --name ${AWS_DEPLOY_EKS_CLUSTER_NAME}"
 //                sh "aws eks update-kubeconfig --kubeconfig awskubeconfig --name cluster1 --region eu-west-1"
+
                 if ("${env}".startsWith("prod")) {
                     ENV_LATEST = "inter"
                 } else {
