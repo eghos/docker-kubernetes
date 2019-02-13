@@ -603,7 +603,7 @@ def generateAwsDeployStage(region, env) {
                         sed -i -e \"s|INTERNAL_SVC_HOSTNAME_VAR|${AWS_ENV_REGION_SVC_HOSTNAME}|g\" virtual-service-aws.yaml
                         sed -i -e \"s|SERVICE_NAME_VAR|${IMAGE_NAME}-${SERVICE_VERSION}|g\" virtual-service-aws.yaml
                         sed -i -e \"s|SVC_PATH_VAR|${URI_ROOT_PATH}|g\" virtual-service-aws.yaml
-                        sed -i -e \"s|ENV_VAR|${env}|g\" virtual-service-aws.yaml
+                        sed -i -e \"s|ENV_VAR|${ENV_LATEST}|g\" virtual-service-aws.yaml
                         sed -i -e \"s|REGION_VAR|${region}|g\" virtual-service-aws.yaml
                         kubectl --kubeconfig ../aws/awskubeconfig apply -f virtual-service-aws.yaml
                         
@@ -656,7 +656,7 @@ def generateAzureDeployStage(region, env) {
                         sed -i -e \"s|INTERNAL_SVC_HOSTNAME_VAR|${AZ_ENV_REGION_SVC_HOSTNAME}|g\" virtual-service-azure.yaml
                         sed -i -e \"s|SERVICE_NAME_VAR|${IMAGE_NAME}-${SERVICE_VERSION}|g\" virtual-service-azure.yaml
                         sed -i -e \"s|SVC_PATH_VAR|${URI_ROOT_PATH}|g\" virtual-service-azure.yaml
-                        sed -i -e \"s|ENV_VAR|${env}|g\" virtual-service-azure.yaml
+                        sed -i -e \"s|ENV_VAR|${ENV_LATEST}|g\" virtual-service-azure.yaml
                         sed -i -e \"s|REGION_VAR|${region}|g\" virtual-service-azure.yaml
                         kubectl apply -f virtual-service-azure.yaml
                         
