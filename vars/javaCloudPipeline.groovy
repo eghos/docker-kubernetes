@@ -648,13 +648,14 @@ def generateAzureDeployStage(region, env) {
     return {
         stage("${env} - ${region}") {
             withCredentials([azureServicePrincipal('sp-ipim-ip-aks')]) {
-                if (${env}.startsWith("prod")) {
-                    ENV_LATEST = "inter"
-                } else {
-                    ENV_LATEST = ${env}
-                }
-                
                 script {
+                    
+                    if (${env}.startsWith("prod")) {
+                        ENV_LATEST = "inter"
+                    } else {
+                        ENV_LATEST = ${env}
+                    }
+
                     AZ_DEPLOY_RG_NAME = sh(returnStdout: true, script: "az group list --query \"[?tags.Env=='${env}' && tags.Region=='${region}'].{name:name}\" --output tsv").trim()
                     AZ_DEPLOY_AKS_CLUSTER_NAME = sh(returnStdout: true, script: "az resource list --query \"[?tags.Env=='${env}' && tags.Region=='${region}' && tags.Cluster=='default' && tags.ServiceType=='aks'].{name:name}\" --output tsv").trim()
 
