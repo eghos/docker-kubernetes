@@ -6,10 +6,12 @@ metadata:
   labels:
     app: kafka
     version: v1
-    instance: dev
+    instance: prod
 spec:
   hosts:
-  - kafka.services.inter.eu-west-1.com
+  - kafka1.services.inter.eu-west-1.com
+  - kafka2.services.inter.eu-west-1.com
+  - kafka3.services.inter.eu-west-1.com
   ports:
   - number: 9092
     name: tcp-kafka
