@@ -5,7 +5,7 @@ metadata:
   namespace: ipimip
 spec:
   hosts:
-  - cdbcusppexrwdi4.documents.azure.com
+  - cdbcuppexquiye.documents.azure.com
   ports:
   - number: 10255
     name:   mongo-cus-ppe

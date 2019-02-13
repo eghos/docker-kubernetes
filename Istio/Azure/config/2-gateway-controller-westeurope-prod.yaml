@@ -15,14 +15,14 @@ spec:
       name: http
       protocol: HTTP
     hosts:
-     - prod-az-svc.westeurope.cloudapp.azure.com
-     - prod.westeurope.ui.hip.red.cdtapps.com
-     - prod.westeurope.svc.hip.red.cdtapps.com
+     - inter-az-svc.westeurope.cloudapp.azure.com
+     - inter.westeurope.ui.hip.red.cdtapps.com
+     - inter.westeurope.svc.hip.red.cdtapps.com
   - port:
       number: 443
       name: https
       protocol: HTTP
     hosts:
-      - prod-az-svc.westeurope.cloudapp.azure.com
-      - prod.westeurope.ui.hip.red.cdtapps.com
-      - prod.westeurope.svc.hip.red.cdtapps.com
+      - inter-az-svc.westeurope.cloudapp.azure.com
+      - inter.westeurope.ui.hip.red.cdtapps.com
+      - inter.westeurope.svc.hip.red.cdtapps.com

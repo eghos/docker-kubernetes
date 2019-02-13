@@ -5,9 +5,9 @@ metadata:
   namespace: ipimip
 spec:
   hosts:
-  - oracle-we-prod.ipimip.io # not used
+  - oradb-1-prod-we.ipimip.io # not used
   addresses:
-  - 10.14.126.17/32 # VIPs
+  - 10.14.126.0/24 # VIPs
   ports:
   - number: 1521
     name:   oracle-we-prod

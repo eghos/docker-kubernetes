@@ -5,7 +5,7 @@ metadata:
   namespace: ipimip
 spec:
   hosts:
-  - cdbweprodhkyv5s.documents.azure.com
+  - cdbweprody3qy3j.documents.azure.com
   ports:
   - number: 10255
     name:   mongo-we-prod
