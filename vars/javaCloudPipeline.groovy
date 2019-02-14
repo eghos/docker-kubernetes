@@ -14,7 +14,7 @@ def call(Map pipelineParams) {
 
             GIT_URL_MODIFIED         = env.GIT_URL.replace('https://', 'git@').replace('com/', 'com:')
 
-            JAVA_HOME                = "/usr/lib/jvm/java-10-oracle"
+            JAVA_HOME                = "/usr/lib/jvm/java-11-oracle"
             JAVA_HOME8               = "/usr/lib/jvm/java-8-oracle"
 
             DEPLOY_TO_AWS            = ""
