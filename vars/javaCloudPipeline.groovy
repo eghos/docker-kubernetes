@@ -7,7 +7,7 @@ def call(Map pipelineParams) {
             BRANCH_NAME_FULL         = env.BRANCH_NAME.replace('', '')
             IMAGE_NAME               = readMavenPom().getArtifactId()
             VERSION_FROM_POM         = readMavenPom().getVersion()
-            DEV_SNAPSHOT_VERSION     = "1.0.${BUILD_NUMBER}-SNAPSHOT"
+            DEV_SNAPSHOT_VERSION     = "1.0.${BUILD_NUMBER}-snapshot"
             RELEASE_NUMBER           = env.BRANCH_NAME.replace('release/', '')
             RELEASE_VERSION          = "${RELEASE_NUMBER}.RELEASE"
             PROD_RELEASE_NUMBER      = readMavenPom().getVersion().replace('.RELEASE', '')
