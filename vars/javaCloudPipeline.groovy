@@ -7,7 +7,7 @@ def call(Map pipelineParams) {
             BRANCH_NAME_FULL         = env.BRANCH_NAME.replace('', '')
             IMAGE_NAME               = readMavenPom().getArtifactId()
             VERSION_FROM_POM         = readMavenPom().getVersion()
-            DEV_SNAPSHOT_VERSION     = "1.0.${BUILD_NUMBER}-snapshot"
+            DEV_SNAPSHOT_VERSION     = "1.0.${BUILD_NUMBER}-SNAPSHOT"
             RELEASE_NUMBER           = env.BRANCH_NAME.replace('release/', '')
             RELEASE_VERSION          = "${RELEASE_NUMBER}.RELEASE"
             PROD_RELEASE_NUMBER      = readMavenPom().getVersion().replace('.RELEASE', '')
@@ -330,6 +330,8 @@ def call(Map pipelineParams) {
                 steps {
                     script {
                         sh "~/oc/openshift-origin-client-tools-v3.11.0-0cbc58b-linux-64bit/./oc project ${OPENSHIFT_DEV}"
+
+                        sh "~/oc/openshift-origin-client-tools-v3.11.0-0cbc58b-linux-64bit/./oc apply -f ./build/istio/configmap-os-onprem-dev.yaml"
                         sh "~/oc/openshift-origin-client-tools-v3.11.0-0cbc58b-linux-64bit/./oc new-app --image=${DOCKER_OPENSHIFT_IMAGE}:${DOCKER_VERSION} --name=${DOCKER_OPENSHIFT_IMAGE}"
                         sh "~/oc/openshift-origin-client-tools-v3.11.0-0cbc58b-linux-64bit/./oc create route edge ${DOCKER_OPENSHIFT_IMAGE}-route --service=${DOCKER_OPENSHIFT_IMAGE}"
                     }
