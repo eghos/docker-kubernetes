@@ -330,7 +330,7 @@ def call(Map pipelineParams) {
                 steps {
                     script {
                         sh "~/oc/openshift-origin-client-tools-v3.11.0-0cbc58b-linux-64bit/./oc project ${OPENSHIFT_DEV}"
-                        sh "~/oc/openshift-origin-client-tools-v3.11.0-0cbc58b-linux-64bit/./oc new-app --image=${DOCKER_OPENSHIFT_IMAGE}:${DOCKER_VERSION} --name=${DOCKER_OPENSHIFT_IMAGE}:${DOCKER_VERSION}"
+                        sh "~/oc/openshift-origin-client-tools-v3.11.0-0cbc58b-linux-64bit/./oc new-app --image=${DOCKER_OPENSHIFT_IMAGE}:${DOCKER_VERSION} --name=${DOCKER_OPENSHIFT_IMAGE}"
                         sh "~/oc/openshift-origin-client-tools-v3.11.0-0cbc58b-linux-64bit/./oc create route edge ${DOCKER_OPENSHIFT_IMAGE}-route --service=${DOCKER_OPENSHIFT_IMAGE}"
                     }
                 }
