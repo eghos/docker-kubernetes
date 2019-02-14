@@ -114,8 +114,14 @@ def call(Map pipelineParams) {
                             //Get variables from project deployment.properties
                             deploymentProperties = readProperties file: './build/deployment.properties'
 
+                            //Collect On-prem OpenShift Deployment variables
+                            DEPLOY_TO_ON_PREM_OPENSHIFT = deploymentProperties['DEPLOY_TO_ON_PREM_OPENSHIFT']
+                            OPENSHIFT_DEV               = deploymentProperties['OPENSHIFT_DEV']
+                            OPENSHIFT_TEST              = deploymentProperties['OPENSHIFT_TEST']
+                            OPENSHIFT_PPE               = deploymentProperties['OPENSHIFT_PPE']
+
                             //Collect AWS Deployment variables
-                            DEPLOY_TO_AWS = deploymentProperties['DEPLOY_TO_AWS']
+                            DEPLOY_TO_AWS     = deploymentProperties['DEPLOY_TO_AWS']
                             AWS_DEV_REGION    = deploymentProperties['AWS_DEV_REGION'].split(',').collect { it as String }
                             AWS_TEST_REGION   = deploymentProperties['AWS_TEST_REGION'].split(',').collect { it as String }
                             AWS_PPE_REGION    = deploymentProperties['AWS_PPE_REGION'].split(',').collect { it as String }
@@ -314,6 +320,22 @@ def call(Map pipelineParams) {
                 }
             }
 
+            stage ('DEV Deploy - OnPrem OpenShift') {
+                when {
+                    allOf {
+                        branch "develop*";
+                        expression { DEPLOY_TO_ON_PREM_OPENSHIFT == 'true' }
+                    }
+                }
+                steps {
+                    script {
+                        sh "~/oc/openshift-origin-client-tools-v3.11.0-0cbc58b-linux-64bit/./oc project ${OPENSHIFT_DEV}"
+                        sh "~/oc/openshift-origin-client-tools-v3.11.0-0cbc58b-linux-64bit/./oc new-app --image=${DOCKER_OPENSHIFT_IMAGE}:${DOCKER_VERSION} --name=${DOCKER_OPENSHIFT_IMAGE}:${DOCKER_VERSION}"
+                        sh "~/oc/openshift-origin-client-tools-v3.11.0-0cbc58b-linux-64bit/./oc create route edge ${DOCKER_OPENSHIFT_IMAGE}-route --service=${DOCKER_OPENSHIFT_IMAGE}:${DOCKER_VERSION}"
+                    }
+                }
+            }
+
             stage ('DEV Deploy - AWS') {
                 when {
                     allOf {
@@ -323,7 +345,7 @@ def call(Map pipelineParams) {
                 }
                 steps {
                     script {
-                            executeDeploy(AWS_DEV_REGION_MAP)
+                        executeDeploy(AWS_DEV_REGION_MAP)
                     }
                 }
             }
