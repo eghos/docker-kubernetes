@@ -79,6 +79,12 @@ def call(Map pipelineParams) {
                             //Get variables from project deployment.properties
                             deploymentProperties = readProperties file: './build/deployment.properties'
 
+                            //Collect On-prem OpenShift Deployment variables
+                            DEPLOY_TO_ON_PREM_OPENSHIFT = deploymentProperties['DEPLOY_TO_ON_PREM_OPENSHIFT']
+                            OPENSHIFT_DEV               = deploymentProperties['OPENSHIFT_DEV']
+                            OPENSHIFT_TEST              = deploymentProperties['OPENSHIFT_TEST']
+                            OPENSHIFT_PPE               = deploymentProperties['OPENSHIFT_PPE']
+
                             //Collect AWS Deployment variables
                             DEPLOY_TO_AWS = deploymentProperties['DEPLOY_TO_AWS']
                             AWS_DEV_REGION    = deploymentProperties['AWS_DEV_REGION'].split(',').collect { it as String }
