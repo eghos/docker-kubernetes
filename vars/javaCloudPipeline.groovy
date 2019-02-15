@@ -313,8 +313,6 @@ def call(Map pipelineParams) {
                            cp ./build/aws/config ~/.aws/config
                            export AWS_PROFILE=ikea-tools-system
 
-
-
                            """
                     }
                 }
