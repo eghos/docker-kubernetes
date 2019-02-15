@@ -515,7 +515,8 @@ def call(Map pipelineParams) {
 
 def logIntoAzure(){
     //Log into ACR/ECR etc
-    sh "az login --service-principal -u ${AZURE_CLIENT_ID} -p ${AZURE_CLIENT_SECRET} -t ${AZURE_TENANT_ID}"
+//    sh "az login --service-principal -u ${AZURE_CLIENT_ID} -p ${AZURE_CLIENT_SECRET} -t ${AZURE_TENANT_ID}"
+    sh "az login --service-principal -u aed28a46-e479-40ad-92f1-14e723c2f8f4 -p yi1ACwcv4myWis8fKsH1cQJL1whLPqJcZDCN1RSukCQ= -t 720b637a-655a-40cf-816a-f22f40755c2c"
 //    sh "az account set -s ${AZURE_SUBSCRIPTION_ID}"
     //Use Prod Subscription ID
     sh "az account set -s ${AZURE_PROD_SUBSCRIPTION_ID_PROP}"
