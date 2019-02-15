@@ -8,7 +8,7 @@ def call(Map pipelineParams) {
             BRANCH_NAME_FULL         = env.BRANCH_NAME.replace('', '')
             IMAGE_NAME               = "fxrateapi"
             DEV_SNAPSHOT_VERSION     = "1.0.${BUILD_NUMBER}-SNAPSHOT"
-//            RELEASE_NUMBER           = env.BRANCH_NAME.replace('release/', '')
+//            RELEASE_NUMBER           = env.BRANCH_NAME.replace('release/', '')tmp
             RELEASE_NUMBER           = "1.0.0"
             RELEASE_VERSION          = "${RELEASE_NUMBER}.RELEASE"
 
