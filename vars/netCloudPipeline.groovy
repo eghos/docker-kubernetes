@@ -35,6 +35,7 @@ def call(Map pipelineParams) {
             AWS_CONTAINER_REPOSITORY_URL_PROP        = cloudEnvironmentProps.getAwsContainerRepositoryUrl()
 
             DOCKER_ORG_IMAGE         = "${DOCKER_IMAGE_ORG_PROP}/${IMAGE_NAME}"
+            DOCKER_OPENSHIFT_IMAGE   = "${IMAGE_NAME}"
         }
 
         stages {
