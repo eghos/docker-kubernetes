@@ -230,21 +230,21 @@ def call(Map pipelineParams) {
                 }
             }
 
-            stage('Code Deploy to Nexus') {
-               when {
-                   anyOf {
-                       branch "develop*";
-                       branch "release/*"
-                   }
-               }
-               steps {
-                  nodejs(nodeJSInstallationName: 'latest-node', configId: 'eb9d09bd-11d9-4fbb-88e4-45b12cc7a19f') {
-                      //sh "npm publish --registry https://nexus.hip.red.cdtapps.com/repository/npm-internal/ "
-                      sh "npm publish --registry ${NPM_NEXUS_REPOSITORY_URL_PROP}"
-
-                  }
-               }
-            }
+//            stage('Code Deploy to Nexus') {
+//               when {
+//                   anyOf {
+//                       branch "develop*";
+//                       branch "release/*"
+//                   }
+//               }
+//               steps {
+//                  nodejs(nodeJSInstallationName: 'latest-node', configId: 'eb9d09bd-11d9-4fbb-88e4-45b12cc7a19f') {
+//                      //sh "npm publish --registry https://nexus.hip.red.cdtapps.com/repository/npm-internal/ "
+//                      sh "npm publish --registry ${NPM_NEXUS_REPOSITORY_URL_PROP}"
+//
+//                  }
+//               }
+//            }
 
 //            stage('Docker Build') {
 //                when {
