@@ -116,9 +116,11 @@ def call(Map pipelineParams) {
 
                             //Collect On-prem OpenShift Deployment variables
                             DEPLOY_TO_ON_PREM_OPENSHIFT = deploymentProperties['DEPLOY_TO_ON_PREM_OPENSHIFT']
-                            OPENSHIFT_DEV               = deploymentProperties['OPENSHIFT_DEV']
-                            OPENSHIFT_TEST              = deploymentProperties['OPENSHIFT_TEST']
-                            OPENSHIFT_PPE               = deploymentProperties['OPENSHIFT_PPE']
+                            OPENSHIFT_ON_PREM_REGION    = deploymentProperties['OPENSHIFT_ON_PREM_REGION']
+                            OPENSHIFT_DEV_NAMESPACE     = deploymentProperties['OPENSHIFT_DEV_NAMESPACE']
+                            OPENSHIFT_TEST_NAMESPACE    = deploymentProperties['OPENSHIFT_TEST_NAMESPACE']
+                            OPENSHIFT_PPE_NAMESPACE     = deploymentProperties['OPENSHIFT_PPE_NAMESPACE']
+                            OPENSHIFT_PROD_NAMESPACE    = deploymentProperties['OPENSHIFT_PROD_NAMESPACE']
 
                             //Collect AWS Deployment variables
                             DEPLOY_TO_AWS     = deploymentProperties['DEPLOY_TO_AWS']
@@ -133,10 +135,6 @@ def call(Map pipelineParams) {
                             AZURE_TEST_REGION = deploymentProperties['AZURE_TEST_REGION'].split(',').collect {it as String }
                             AZURE_PPE_REGION  = deploymentProperties['AZURE_PPE_REGION'].split(',').collect { it as String }
                             AZURE_PROD_REGION = deploymentProperties['AZURE_PROD_REGION'].split(',').collect { it as String }
-
-                            //Collect On Prem Deployment variables
-                            DEPLOY_TO_ON_PREM = deploymentProperties['DEPLOY_TO_ON_PREM']
-                            ON_PREM_REGION    = deploymentProperties['ON_PREM_REGION']
 
                             //Collect Deployment related variables
                             APIARY_PROJECT_NAME  = deploymentProperties['APIARY_PROJECT_NAME']
@@ -174,10 +172,22 @@ def call(Map pipelineParams) {
                                 ["${it}": generateAzureDeployStage(it, "prod")]
                             }
 
+                            //Set up OpenShift deployment region map properties
+                            OPENSHIFT_DEV_REGION_MAP = AZURE_DEV_REGION.collectEntries {
+                                ["${it}": generateOnPremOpenShiftDeployStage("${OPENSHIFT_DEV}",it,"dev")]
+                            }
+                            OPENSHIFT_TEST_REGION_MAP = AZURE_TEST_REGION.collectEntries {
+                                ["${it}": generateOnPremOpenShiftDeployStage( "${OPENSHIFT_TEST}",it,"test")]
+                            }
+                            OPENSHIFT_PPE_REGION_MAP = AZURE_PPE_REGION.collectEntries {
+                                ["${it}": generateOnPremOpenShiftDeployStage("${OPENSHIFT_PPE}",it,"ppe")]
+                            }
+                            OPENSHIFT_PROD_REGION_MAP = AZURE_PROD_REGION.collectEntries {
+                                ["${it}": generateOnPremOpenShiftDeployStage("${OPENSHIFT_PROD}",it,"prod")]
+                            }
+
                             //Log into Central Container Repository (ACR)
-                            logIntoAzure()
-
-
+                           //logIntoAzure()
                         }
                     }
                 }
@@ -288,6 +298,19 @@ def call(Map pipelineParams) {
                 steps {
                     withCredentials([azureServicePrincipal('sp-ipim-ip-aks')]) {
                         script {
+
+                            //TODO add if statements, so docker builds are done and pushed to those environments where the deploy to flag is True
+
+                            //Log into ACR/ECR etc
+//                            sh "az login --service-principal -u ${AZURE_CLIENT_ID} -p ${AZURE_CLIENT_SECRET} -t ${AZURE_TENANT_ID}"
+                            sh "az login --service-principal -u aed28a46-e479-40ad-92f1-14e723c2f8f4 -p yi1ACwcv4myWis8fKsH1cQJL1whLPqJcZDCN1RSukCQ= -t 720b637a-655a-40cf-816a-f22f40755c2c"
+//                            sh "az account set -s ${AZURE_SUBSCRIPTION_ID}"
+                            //Use Prod Subscription ID
+                            sh "az account set -s ${AZURE_PROD_SUBSCRIPTION_ID_PROP}"
+                            sh "az acr login --name ${PROD_WESTEUROPE_AZACRNAME_PROP}"
+                            ACRLOGINSERVER = sh(returnStdout: true, script: "az acr show --resource-group ${PROD_WESTEUROPE_AZRGNAME_PROP} --name ${PROD_WESTEUROPE_AZACRNAME_PROP} --query \"loginServer\" --output tsv").trim()
+
+
                             //Build Docker image for Azure
                             sh "docker build -t ${ACRLOGINSERVER}/${DOCKER_ORG_IMAGE}:${DOCKER_VERSION} ."
                             //Push Docker image to ACR.
@@ -299,7 +322,9 @@ def call(Map pipelineParams) {
 
                             sh "docker login -p eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJvY3AtcGlwZWxpbmVzLWlwaW0taXAiLCJrdWJlcm5ldGVzLmlvL3NlcnZpY2VhY2NvdW50L3NlY3JldC5uYW1lIjoiamVua2lucy10b2tlbi1tMjVkZyIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VydmljZS1hY2NvdW50Lm5hbWUiOiJqZW5raW5zIiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9zZXJ2aWNlLWFjY291bnQudWlkIjoiM2EzNjhjOTktZTk4MS0xMWU4LTgyZTQtMDA1MDU2ODUxMmM3Iiwic3ViIjoic3lzdGVtOnNlcnZpY2VhY2NvdW50Om9jcC1waXBlbGluZXMtaXBpbS1pcDpqZW5raW5zIn0.DUM8sW_mhH67NEHSa854qyrdSwmDWPqqCw6yCF5Wg1vkWM3wgpndfHMHbi5ULW2RkghqwrBzO0RCAFAcOW38AwGoqkcOtmlEgBQN5z_9qoXcQw00ze8EkPz0paVDV4Qw1NJ6iI0Z6mYlZNV8OdUKkySPvu4kRDJdqNL20xBnJLkc1Zx2Rh_OfJXtcSutqm2FHBEIzadM_kAezhr_4Awj4YP5aLdosQUqYHi9C4UBdggTrTQpYV-2A3LbNZ0VHYHqG6y6k5XD8hPKOFZFQvlU1jATjk5FG50KCbqyIzUAeoPq7tGI26rTsXYLS_d4sW4-BMwRGYbDzFPIBXrSXoXWng -u unused docker-registry-default.ocp-02.ikeadt.com"
 
+                            //Tag image for Openshift
                             sh "docker tag ${ACRLOGINSERVER}/${DOCKER_ORG_IMAGE}:${DOCKER_VERSION} docker-registry-default.ocp-02.ikeadt.com/${OPENSHIFT_DEV}/${DOCKER_OPENSHIFT_IMAGE}:${DOCKER_VERSION}"
+                            //Push image to OpenShift
                             sh "docker push docker-registry-default.ocp-02.ikeadt.com/${OPENSHIFT_DEV}/${DOCKER_OPENSHIFT_IMAGE}:${DOCKER_VERSION}"
 
                             //Add the following lines back under export AWS_PROFILE once aws cli issue is resolved on new jenkins vm
@@ -327,11 +352,7 @@ def call(Map pipelineParams) {
                 }
                 steps {
                     script {
-                        sh "~/oc/openshift-origin-client-tools-v3.11.0-0cbc58b-linux-64bit/./oc project ${OPENSHIFT_DEV}"
-
-                        //sh "~/oc/openshift-origin-client-tools-v3.11.0-0cbc58b-linux-64bit/./oc apply -f ./build/istio/configmap-os-onprem-dev.yaml"
-                        sh "~/oc/openshift-origin-client-tools-v3.11.0-0cbc58b-linux-64bit/./oc new-app --image=${DOCKER_OPENSHIFT_IMAGE}:${DOCKER_VERSION} --name=${DOCKER_OPENSHIFT_IMAGE}"
-                        sh "~/oc/openshift-origin-client-tools-v3.11.0-0cbc58b-linux-64bit/./oc create route edge ${DOCKER_OPENSHIFT_IMAGE} --service=${DOCKER_OPENSHIFT_IMAGE}"
+                        generateOnPremOpenShiftDeployStage("$OPENSHIFT_DEV_NAMESPACE","${OPENSHIFT_ON_PREM_REGION}",dev)
                     }
                 }
             }
@@ -734,20 +755,28 @@ def generateAzureDeployStage(region, env) {
     }
 }
 
-def generateOnPremOpenShiftDeployStage(region, env) {
-    return {
-        stage("${env} - ${region}") {
-            script {
-                sh """
-                   export TOKEN=eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJvY3AtcGlwZWxpbmVzLWlwaW0taXAiLCJrdWJlcm5ldGVzLmlvL3NlcnZpY2VhY2NvdW50L3NlY3JldC5uYW1lIjoiamVua2lucy10b2tlbi1tMjVkZyIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VydmljZS1hY2NvdW50Lm5hbWUiOiJqZW5raW5zIiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9zZXJ2aWNlLWFjY291bnQudWlkIjoiM2EzNjhjOTktZTk4MS0xMWU4LTgyZTQtMDA1MDU2ODUxMmM3Iiwic3ViIjoic3lzdGVtOnNlcnZpY2VhY2NvdW50Om9jcC1waXBlbGluZXMtaXBpbS1pcDpqZW5raW5zIn0.DUM8sW_mhH67NEHSa854qyrdSwmDWPqqCw6yCF5Wg1vkWM3wgpndfHMHbi5ULW2RkghqwrBzO0RCAFAcOW38AwGoqkcOtmlEgBQN5z_9qoXcQw00ze8EkPz0paVDV4Qw1NJ6iI0Z6mYlZNV8OdUKkySPvu4kRDJdqNL20xBnJLkc1Zx2Rh_OfJXtcSutqm2FHBEIzadM_kAezhr_4Awj4YP5aLdosQUqYHi9C4UBdggTrTQpYV-2A3LbNZ0VHYHqG6y6k5XD8hPKOFZFQvlU1jATjk5FG50KCbqyIzUAeoPq7tGI26rTsXYLS_d4sW4-BMwRGYbDzFPIBXrSXoXWng
-                   ~/oc/openshift-origin-client-tools-v3.11.0-0cbc58b-linux-64bit/./oc login --token \$(echo $TOKEN) ocm-02.ikeadt.com:8443
+def generateOnPremOpenShiftDeployStage(namespace, region, env) {
+        sh "~/oc/openshift-origin-client-tools-v3.11.0-0cbc58b-linux-64bit/./oc project ${namespace}"
 
-                   ~/oc/openshift-origin-client-tools-v3.11.0-0cbc58b-linux-64bit/./oc new-app --image=${IMAGE_NAME}-${SERVICE_VERSION} --name=${IMAGE_NAME}-${SERVICE_VERSION}
-                   ~/oc/openshift-origin-client-tools-v3.11.0-0cbc58b-linux-64bit/./oc create route ${IMAGE_NAME}-${SERVICE_VERSION}-route --service=${IMAGE_NAME}-${SERVICE_VERSION}
-                   """
-            }
-        }
-    }
+        //Update and deploy Configmap
+        sh """
+           cd build/openshift
+           cp \"configmap-os-${region}-${env}.yaml\" \"configmap-os-${region}-${env}-openshift.yaml\"
+                        
+           sed -i -e \"s|KUBERNETES_NAMESPACE_VAR|${KUBERNETES_NAMESPACE}|g\" configmap-os-${region}-${env}-openshift.yaml
+           sed -i -e \"s|SERVICE_NAME_VAR|${IMAGE_NAME}-${SERVICE_VERSION}|g\" configmap-os-${region}-${env}-openshift.yaml
+           ~/oc/openshift-origin-client-tools-v3.11.0-0cbc58b-linux-64bit/./oc apply -f configmap-os-${region}-${env}-openshift.yaml
+           """
+
+        //Deploy the new app
+        sh "~/oc/openshift-origin-client-tools-v3.11.0-0cbc58b-linux-64bit/./oc new-app --image=${DOCKER_OPENSHIFT_IMAGE}:${DOCKER_VERSION} --name=${DOCKER_OPENSHIFT_IMAGE}"
+
+//      ./oc create route edge --service platform-test --path /testapi --port 8080 --hostname sandbox-ipim-ip.ocp-02.ikeadt.com
+        sh "~/oc/openshift-origin-client-tools-v3.11.0-0cbc58b-linux-64bit/./oc create route edge --service=${DOCKER_OPENSHIFT_IMAGE} --hostname ${namespace}.ocp-02.ikeadt.com --path ${URI_ROOT_PATH} --port 8080 "
+//      sh "~/oc/openshift-origin-client-tools-v3.11.0-0cbc58b-linux-64bit/./oc create route edge ${DOCKER_OPENSHIFT_IMAGE} --service=${DOCKER_OPENSHIFT_IMAGE}"
+
+        //Add configmap to deploymentconfig
+        sh "~/oc/openshift-origin-client-tools-v3.11.0-0cbc58b-linux-64bit/./oc set volumes dc/${DOCKER_OPENSHIFT_IMAGE} --add --overwrite=true --name=config-volume --mount-path=/data -t configmap --configmap-name=${IMAGE_NAME}-${SERVICE_VERSION}-configmap --all"
 }
 
 def logIntoAzure(){
