@@ -172,20 +172,6 @@ def call(Map pipelineParams) {
                                 ["${it}": generateAzureDeployStage(it, "prod")]
                             }
 
-                            //Set up OpenShift deployment region map properties
-                            OPENSHIFT_DEV_REGION_MAP = AZURE_DEV_REGION.collectEntries {
-                                ["${it}": generateOnPremOpenShiftDeployStage("${OPENSHIFT_DEV_NAMESPACE}",it,"dev")]
-                            }
-                            OPENSHIFT_TEST_REGION_MAP = AZURE_TEST_REGION.collectEntries {
-                                ["${it}": generateOnPremOpenShiftDeployStage( "${OPENSHIFT_TEST_NAMESPACE}",it,"test")]
-                            }
-                            OPENSHIFT_PPE_REGION_MAP = AZURE_PPE_REGION.collectEntries {
-                                ["${it}": generateOnPremOpenShiftDeployStage("${OPENSHIFT_PPE_NAMESPACE}",it,"ppe")]
-                            }
-                            OPENSHIFT_PROD_REGION_MAP = AZURE_PROD_REGION.collectEntries {
-                                ["${it}": generateOnPremOpenShiftDeployStage("${OPENSHIFT_PROD_NAMESPACE}",it,"prod")]
-                            }
-
                             //Log into Central Container Repository (ACR)
                            //logIntoAzure()
                         }
