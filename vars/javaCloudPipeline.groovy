@@ -753,6 +753,8 @@ def generateOnPremOpenShiftDeployStage(openshift_namespace, region, env) {
     //Select respective namespace
     sh "~/oc/openshift-origin-client-tools-v3.11.0-0cbc58b-linux-64bit/./oc project ${openshift_namespace}"
 
+    sh "~/oc/openshift-origin-client-tools-v3.11.0-0cbc58b-linux-64bit/./oc delete all --selector app=${IMAGE_NAME}-${SERVICE_VERSION}"
+
         //Update and deploy Configmap
     sh """
        cd build/openshift
