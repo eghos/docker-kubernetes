@@ -59,6 +59,6 @@ class cloudEnvironmentProps{
         return AWS_CONTAINER_REPOSITORY_URL
     }
     def getOpenshiftServiceAccountToken(){
-        return OPENSHIFT_SERVICE_ACCOUNT_TOKEN()
+        return OPENSHIFT_SERVICE_ACCOUNT_TOKEN
     }
 }
