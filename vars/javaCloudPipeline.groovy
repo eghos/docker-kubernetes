@@ -304,10 +304,10 @@ def call(Map pipelineParams) {
 
 
                             //Build Docker image for Azure
-                            sh "docker build -t ${ACRLOGINSERVER}/${DOCKER_ORG_IMAGE}:${DOCKER_VERSION} ."
+                            sh "docker build -t ${ACRLOGINSERVER}/${DOCKER_ORG_IMAGE}-${SERVICE_VERSION}:${DOCKER_VERSION} ."
                             //Push Docker image to ACR.
                             //todo uncomment when needed to push to ACR (saving space whilst testing openshift)
-//                            sh "docker push ${ACRLOGINSERVER}/${DOCKER_ORG_IMAGE}:${DOCKER_VERSION}"
+//                            sh "docker push ${ACRLOGINSERVER}/${DOCKER_ORG_IMAGE}-${SERVICE_VERSION}:${DOCKER_VERSION}"
 
                             //Openshift
 //                            sh "~/oc/openshift-origin-client-tools-v3.11.0-0cbc58b-linux-64bit/./oc login --token eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJvY3AtcGlwZWxpbmVzLWlwaW0taXAiLCJrdWJlcm5ldGVzLmlvL3NlcnZpY2VhY2NvdW50L3NlY3JldC5uYW1lIjoiamVua2lucy10b2tlbi1tMjVkZyIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VydmljZS1hY2NvdW50Lm5hbWUiOiJqZW5raW5zIiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9zZXJ2aWNlLWFjY291bnQudWlkIjoiM2EzNjhjOTktZTk4MS0xMWU4LTgyZTQtMDA1MDU2ODUxMmM3Iiwic3ViIjoic3lzdGVtOnNlcnZpY2VhY2NvdW50Om9jcC1waXBlbGluZXMtaXBpbS1pcDpqZW5raW5zIn0.DUM8sW_mhH67NEHSa854qyrdSwmDWPqqCw6yCF5Wg1vkWM3wgpndfHMHbi5ULW2RkghqwrBzO0RCAFAcOW38AwGoqkcOtmlEgBQN5z_9qoXcQw00ze8EkPz0paVDV4Qw1NJ6iI0Z6mYlZNV8OdUKkySPvu4kRDJdqNL20xBnJLkc1Zx2Rh_OfJXtcSutqm2FHBEIzadM_kAezhr_4Awj4YP5aLdosQUqYHi9C4UBdggTrTQpYV-2A3LbNZ0VHYHqG6y6k5XD8hPKOFZFQvlU1jATjk5FG50KCbqyIzUAeoPq7tGI26rTsXYLS_d4sW4-BMwRGYbDzFPIBXrSXoXWng ${OPENSHIFT_DEV_DOCKER_LOGIN_URL} --insecure-skip-tls-verify"
@@ -317,14 +317,14 @@ def call(Map pipelineParams) {
                             sh "docker login -p ${OPENSHIFT_SERVICE_ACCOUNT_TOKEN} -u unused ${OPENSHIFT_DEV_DOCKER_REGISTRY}"
 
                             //Tag image for Openshift
-                            sh "docker tag ${ACRLOGINSERVER}/${DOCKER_ORG_IMAGE}:${DOCKER_VERSION} ${OPENSHIFT_DEV_DOCKER_REGISTRY}/${OPENSHIFT_DEV_NAMESPACE}/${DOCKER_OPENSHIFT_IMAGE}:${DOCKER_VERSION}"
+                            sh "docker tag ${ACRLOGINSERVER}/${DOCKER_ORG_IMAGE}-${SERVICE_VERSION}:${DOCKER_VERSION} ${OPENSHIFT_DEV_DOCKER_REGISTRY}/${OPENSHIFT_DEV_NAMESPACE}/${DOCKER_OPENSHIFT_IMAGE}:${DOCKER_VERSION}"
                             //Push image to OpenShift
-                            sh "docker push ${OPENSHIFT_DEV_DOCKER_REGISTRY}/${OPENSHIFT_DEV_NAMESPACE}/${DOCKER_OPENSHIFT_IMAGE}:${DOCKER_VERSION}"
+                            sh "docker push ${OPENSHIFT_DEV_DOCKER_REGISTRY}/${OPENSHIFT_DEV_NAMESPACE}/${DOCKER_OPENSHIFT_IMAGE}-${SERVICE_VERSION}:${DOCKER_VERSION}"
 
                             //todo Add the following lines back under export AWS_PROFILE once aws cli issue is resolved on new jenkins vm
                             //  \$(aws ecr get-login --no-include-email --region eu-west-1)
-//                            docker tag ${ACRLOGINSERVER}/${DOCKER_ORG_IMAGE}:${DOCKER_VERSION} ${AWS_CONTAINER_REPOSITORY_URL_PROP}/${DOCKER_ORG_IMAGE}:${DOCKER_VERSION}
-//                            docker push ${AWS_CONTAINER_REPOSITORY_URL_PROP}/${DOCKER_ORG_IMAGE}:${DOCKER_VERSION}
+//                            docker tag ${ACRLOGINSERVER}/${DOCKER_ORG_IMAGE}-${SERVICE_VERSION}:${DOCKER_VERSION} ${AWS_CONTAINER_REPOSITORY_URL_PROP}/${DOCKER_ORG_IMAGE}-${SERVICE_VERSION}:${DOCKER_VERSION}
+//                            docker push ${AWS_CONTAINER_REPOSITORY_URL_PROP}/${DOCKER_ORG_IMAGE}-${SERVICE_VERSION}:${DOCKER_VERSION}
                         }
                         sh """
                            mkdir -p ~/.aws
@@ -669,7 +669,7 @@ def generateAwsDeployStage(region, env) {
                         sed -i -e \"s|SERVICE_NAME_VAR|${IMAGE_NAME}-${SERVICE_VERSION}|g\" configmap-aws-${region}-${env}-aws.yaml
                         kubectl --kubeconfig ../aws/awskubeconfig apply -f configmap-aws-${region}-${env}-aws.yaml
 
-                        sed -i -e \"s|IMAGE_NAME_VAR|${AWS_CONTAINER_REPOSITORY_URL_PROP}/${DOCKER_ORG_IMAGE}:${DOCKER_VERSION}|g\" deploy-service-aws.yaml
+                        sed -i -e \"s|IMAGE_NAME_VAR|${AWS_CONTAINER_REPOSITORY_URL_PROP}/${DOCKER_ORG_IMAGE}-${SERVICE_VERSION}:${DOCKER_VERSION}|g\" deploy-service-aws.yaml
                         sed -i -e \"s|SERVICE_NAME_VAR|${IMAGE_NAME}-${SERVICE_VERSION}|g\" deploy-service-aws.yaml
                         sed -i -e \"s|KUBERNETES_NAMESPACE_VAR|${KUBERNETES_NAMESPACE}|g\" deploy-service-aws.yaml
                         sed -i -e \"s|CONFIGMAP_NAME_VAR|${IMAGE_NAME}-${SERVICE_VERSION}-configmap|g\" deploy-service-aws.yaml
@@ -723,7 +723,7 @@ def generateAzureDeployStage(region, env) {
                         sed -i -e \"s|SERVICE_NAME_VAR|${IMAGE_NAME}-${SERVICE_VERSION}|g\" configmap-az-${region}-${env}-azure.yaml
                         kubectl apply -f configmap-az-${region}-${env}-azure.yaml
 
-                        sed -i -e \"s|IMAGE_NAME_VAR|${ACRLOGINSERVER}/${DOCKER_ORG_IMAGE}:${DOCKER_VERSION}|g\" deploy-service-azure.yaml
+                        sed -i -e \"s|IMAGE_NAME_VAR|${ACRLOGINSERVER}/${DOCKER_ORG_IMAGE}-${SERVICE_VERSION}:${DOCKER_VERSION}|g\" deploy-service-azure.yaml
                         sed -i -e \"s|SERVICE_NAME_VAR|${IMAGE_NAME}-${SERVICE_VERSION}|g\" deploy-service-azure.yaml 
                         sed -i -e \"s|KUBERNETES_NAMESPACE_VAR|${KUBERNETES_NAMESPACE}|g\" deploy-service-azure.yaml
                         sed -i -e \"s|CONFIGMAP_NAME_VAR|${IMAGE_NAME}-${SERVICE_VERSION}-configmap|g\" deploy-service-azure.yaml
@@ -764,17 +764,17 @@ def generateOnPremOpenShiftDeployStage(openshift_namespace, region, env) {
        """
 
     //Deploy the new app
-    sh "~/oc/openshift-origin-client-tools-v3.11.0-0cbc58b-linux-64bit/./oc new-app --image=${DOCKER_OPENSHIFT_IMAGE}:${DOCKER_VERSION} --name=${DOCKER_OPENSHIFT_IMAGE}"
+    sh "~/oc/openshift-origin-client-tools-v3.11.0-0cbc58b-linux-64bit/./oc new-app --image=${DOCKER_OPENSHIFT_IMAGE}-${SERVICE_VERSION}:${DOCKER_VERSION} --name=${DOCKER_OPENSHIFT_IMAGE}-${SERVICE_VERSION}"
 
 //      ./oc create route edge --service platform-test --path /testapi --port 8080 --hostname sandbox-ipim-ip.ocp-02.ikeadt.com
-    sh "~/oc/openshift-origin-client-tools-v3.11.0-0cbc58b-linux-64bit/./oc create route edge --service=${DOCKER_OPENSHIFT_IMAGE} --hostname ${openshift_namespace}.${OPENSHIFT_DNS_IKEADT} --path ${URI_ROOT_PATH} --port 8080 "
+    sh "~/oc/openshift-origin-client-tools-v3.11.0-0cbc58b-linux-64bit/./oc create route edge --service=${DOCKER_OPENSHIFT_IMAGE}-${SERVICE_VERSION} --hostname ${openshift_namespace}.${OPENSHIFT_DNS_IKEADT} --path ${URI_ROOT_PATH} --port 8080 "
 //      sh "~/oc/openshift-origin-client-tools-v3.11.0-0cbc58b-linux-64bit/./oc create route edge ${DOCKER_OPENSHIFT_IMAGE} --service=${DOCKER_OPENSHIFT_IMAGE}"
 
     //Add configmap to deploymentconfig
-    sh "~/oc/openshift-origin-client-tools-v3.11.0-0cbc58b-linux-64bit/./oc set volumes dc/${DOCKER_OPENSHIFT_IMAGE} --add --overwrite=true --name=config-volume --mount-path=/data -t configmap --configmap-name=${IMAGE_NAME}-${SERVICE_VERSION}-configmap --all"
+    sh "~/oc/openshift-origin-client-tools-v3.11.0-0cbc58b-linux-64bit/./oc set volumes dc/${DOCKER_OPENSHIFT_IMAGE}-${SERVICE_VERSION} --add --overwrite=true --name=config-volume --mount-path=/data -t configmap --configmap-name=${IMAGE_NAME}-${SERVICE_VERSION}-configmap --all"
 
     //Update the CPU and RAM allocated to the deployment
-    sh "~/oc/openshift-origin-client-tools-v3.11.0-0cbc58b-linux-64bit/./oc set resources dc/${DOCKER_OPENSHIFT_IMAGE} --limits=cpu=${OPENSHIFT_DOCKER_IMAGE_CPU},memory=${OPENSHIFT_DOCKER_IMAGE_MEMORY}"
+    sh "~/oc/openshift-origin-client-tools-v3.11.0-0cbc58b-linux-64bit/./oc set resources dc/${DOCKER_OPENSHIFT_IMAGE}-${SERVICE_VERSION} --limits=cpu=${OPENSHIFT_DOCKER_IMAGE_CPU},memory=${OPENSHIFT_DOCKER_IMAGE_MEMORY}"
 }
 
 def logIntoAzure(){
