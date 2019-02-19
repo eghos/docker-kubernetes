@@ -338,7 +338,7 @@ def call(Map pipelineParams) {
                 }
                 steps {
                     script {
-                        generateOnPremOpenShiftDeployStage("$OPENSHIFT_DEV_NAMESPACE","${OPENSHIFT_ON_PREM_REGION}",dev)
+                        generateOnPremOpenShiftDeployStage("$OPENSHIFT_DEV_NAMESPACE","${OPENSHIFT_ON_PREM_REGION}","dev")
                     }
                 }
             }
@@ -741,17 +741,17 @@ def generateAzureDeployStage(region, env) {
     }
 }
 
-def generateOnPremOpenShiftDeployStage(namespace, onpremregion, env) {
+def generateOnPremOpenShiftDeployStage(namespace, region, env) {
         sh "~/oc/openshift-origin-client-tools-v3.11.0-0cbc58b-linux-64bit/./oc project ${namespace}"
 
         //Update and deploy Configmap
         sh """
            cd build/openshift
-           cp \"configmap-os-${onpremregion}-${env}.yaml\" \"configmap-os-${onpremregion}-${env}-openshift.yaml\"
+           cp \"configmap-os-${region}-${env}.yaml\" \"configmap-os-${region}-${env}-openshift.yaml\"
                         
-           sed -i -e \"s|KUBERNETES_NAMESPACE_VAR|${KUBERNETES_NAMESPACE}|g\" configmap-os-${onpremregion}-${env}-openshift.yaml
-           sed -i -e \"s|SERVICE_NAME_VAR|${IMAGE_NAME}-${SERVICE_VERSION}|g\" configmap-os-${onpremregion}-${env}-openshift.yaml
-           ~/oc/openshift-origin-client-tools-v3.11.0-0cbc58b-linux-64bit/./oc apply -f configmap-os-${onpremregion}-${env}-openshift.yaml
+           sed -i -e \"s|KUBERNETES_NAMESPACE_VAR|${KUBERNETES_NAMESPACE}|g\" configmap-os-${region}-${env}-openshift.yaml
+           sed -i -e \"s|SERVICE_NAME_VAR|${IMAGE_NAME}-${SERVICE_VERSION}|g\" configmap-os-${region}-${env}-openshift.yaml
+           ~/oc/openshift-origin-client-tools-v3.11.0-0cbc58b-linux-64bit/./oc apply -f configmap-os-${region}-${env}-openshift.yaml
            """
 
         //Deploy the new app
