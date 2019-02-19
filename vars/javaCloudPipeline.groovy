@@ -390,6 +390,18 @@ def call(Map pipelineParams) {
                 }
             }
 
+            stage ('TEST Deploy - OnPrem OpenShift') {
+                when {
+                    allOf {
+                        branch "release/*";
+                        expression { DEPLOY_TO_ON_PREM_OPENSHIFT == 'true' }
+                    }
+                }
+                steps {
+                    generateOnPremOpenShiftDeployStage("$OPENSHIFT_TEST_NAMESPACE","${OPENSHIFT_ON_PREM_REGION}","test")
+                }
+            }
+
             stage ('TEST Deploy - AWS') {
                 when {
                     allOf {
