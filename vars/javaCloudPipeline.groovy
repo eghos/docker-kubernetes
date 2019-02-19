@@ -741,28 +741,29 @@ def generateAzureDeployStage(region, env) {
     }
 }
 
-def generateOnPremOpenShiftDeployStage(namespace, region, env) {
-        sh "~/oc/openshift-origin-client-tools-v3.11.0-0cbc58b-linux-64bit/./oc project ${namespace}"
+def generateOnPremOpenShiftDeployStage(openshift_namespace, region, env) {
+    //Select respective namespace
+    sh "~/oc/openshift-origin-client-tools-v3.11.0-0cbc58b-linux-64bit/./oc project ${openshift_namespace}"
 
         //Update and deploy Configmap
-        sh """
-           cd build/openshift
-           cp \"configmap-os-${region}-${env}.yaml\" \"configmap-os-${region}-${env}-openshift.yaml\"
+    sh """
+       cd build/openshift
+       cp \"configmap-os-${region}-${env}.yaml\" \"configmap-os-${region}-${env}-openshift.yaml\"
                         
-           sed -i -e \"s|KUBERNETES_NAMESPACE_VAR|${KUBERNETES_NAMESPACE}|g\" configmap-os-${region}-${env}-openshift.yaml
-           sed -i -e \"s|SERVICE_NAME_VAR|${IMAGE_NAME}-${SERVICE_VERSION}|g\" configmap-os-${region}-${env}-openshift.yaml
-           ~/oc/openshift-origin-client-tools-v3.11.0-0cbc58b-linux-64bit/./oc apply -f configmap-os-${region}-${env}-openshift.yaml
-           """
+       sed -i -e \"s|KUBERNETES_NAMESPACE_VAR|${openshift_namespace}|g\" configmap-os-${region}-${env}-openshift.yaml
+       sed -i -e \"s|SERVICE_NAME_VAR|${IMAGE_NAME}-${SERVICE_VERSION}|g\" configmap-os-${region}-${env}-openshift.yaml
+       ~/oc/openshift-origin-client-tools-v3.11.0-0cbc58b-linux-64bit/./oc apply -f configmap-os-${region}-${env}-openshift.yaml
+       """
 
-        //Deploy the new app
-        sh "~/oc/openshift-origin-client-tools-v3.11.0-0cbc58b-linux-64bit/./oc new-app --image=${DOCKER_OPENSHIFT_IMAGE}:${DOCKER_VERSION} --name=${DOCKER_OPENSHIFT_IMAGE}"
+    //Deploy the new app
+    sh "~/oc/openshift-origin-client-tools-v3.11.0-0cbc58b-linux-64bit/./oc new-app --image=${DOCKER_OPENSHIFT_IMAGE}:${DOCKER_VERSION} --name=${DOCKER_OPENSHIFT_IMAGE}"
 
 //      ./oc create route edge --service platform-test --path /testapi --port 8080 --hostname sandbox-ipim-ip.ocp-02.ikeadt.com
-        sh "~/oc/openshift-origin-client-tools-v3.11.0-0cbc58b-linux-64bit/./oc create route edge --service=${DOCKER_OPENSHIFT_IMAGE} --hostname ${namespace}.ocp-02.ikeadt.com --path ${URI_ROOT_PATH} --port 8080 "
+    sh "~/oc/openshift-origin-client-tools-v3.11.0-0cbc58b-linux-64bit/./oc create route edge --service=${DOCKER_OPENSHIFT_IMAGE} --hostname ${openshift_namespace}.ocp-02.ikeadt.com --path ${URI_ROOT_PATH} --port 8080 "
 //      sh "~/oc/openshift-origin-client-tools-v3.11.0-0cbc58b-linux-64bit/./oc create route edge ${DOCKER_OPENSHIFT_IMAGE} --service=${DOCKER_OPENSHIFT_IMAGE}"
 
-        //Add configmap to deploymentconfig
-        sh "~/oc/openshift-origin-client-tools-v3.11.0-0cbc58b-linux-64bit/./oc set volumes dc/${DOCKER_OPENSHIFT_IMAGE} --add --overwrite=true --name=config-volume --mount-path=/data -t configmap --configmap-name=${IMAGE_NAME}-${SERVICE_VERSION}-configmap --all"
+    //Add configmap to deploymentconfig
+    sh "~/oc/openshift-origin-client-tools-v3.11.0-0cbc58b-linux-64bit/./oc set volumes dc/${DOCKER_OPENSHIFT_IMAGE} --add --overwrite=true --name=config-volume --mount-path=/data -t configmap --configmap-name=${IMAGE_NAME}-${SERVICE_VERSION}-configmap --all"
 }
 
 def logIntoAzure(){
