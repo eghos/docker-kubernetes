@@ -479,6 +479,27 @@ def call(Map pipelineParams) {
                 }
             }
 
+            stage ('PPE Deploy - OnPrem OpenShift') {
+                when {
+                    allOf {
+                        changeRequest target: 'master'
+                        expression { DEPLOY_TO_ON_PREM_OPENSHIFT == 'true' }
+                    }
+                }
+                steps {
+                    sh "~/oc/openshift-origin-client-tools-v3.11.0-0cbc58b-linux-64bit/./oc login --token ${OPENSHIFT_SERVICE_ACCOUNT_TOKEN} ${OPENSHIFT_DEV_DOCKER_LOGIN_URL} --insecure-skip-tls-verify"
+                    sh "docker login -p ${OPENSHIFT_SERVICE_ACCOUNT_TOKEN} -u unused ${OPENSHIFT_PPE_DOCKER_REGISTRY}"
+
+                    //Openshift images per OpenShift repo
+                    //Tag image for Openshift
+                    sh "docker tag ${OPENSHIFT_DEV_DOCKER_REGISTRY}/${OPENSHIFT_TEST_NAMESPACE}/${DOCKER_OPENSHIFT_IMAGE}-${SERVICE_VERSION}:${DOCKER_VERSION} ${OPENSHIFT_DEV_DOCKER_REGISTRY}/${OPENSHIFT_PPE_NAMESPACE}/${DOCKER_OPENSHIFT_IMAGE}-${SERVICE_VERSION}:${DOCKER_VERSION}"
+                    //Push image to OpenShift
+                    sh "docker push ${OPENSHIFT_DEV_DOCKER_REGISTRY}/${OPENSHIFT_PPE_NAMESPACE}/${DOCKER_OPENSHIFT_IMAGE}-${SERVICE_VERSION}:${DOCKER_VERSION}"
+
+                    generateOnPremOpenShiftDeployStage("$OPENSHIFT_PPW_NAMESPACE","${OPENSHIFT_ON_PREM_REGION}","ppe")
+                }
+            }
+
             stage('PPE Deploy - Azure') {
                 when {
                     allOf {
