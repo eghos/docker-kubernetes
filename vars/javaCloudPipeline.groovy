@@ -487,6 +487,8 @@ def call(Map pipelineParams) {
                     }
                 }
                 steps {
+                    DOCKER_VERSION = "${PROD_RELEASE_NUMBER}"
+                    
                     sh "~/oc/openshift-origin-client-tools-v3.11.0-0cbc58b-linux-64bit/./oc login --token ${OPENSHIFT_SERVICE_ACCOUNT_TOKEN} ${OPENSHIFT_DEV_DOCKER_LOGIN_URL} --insecure-skip-tls-verify"
                     sh "docker login -p ${OPENSHIFT_SERVICE_ACCOUNT_TOKEN} -u unused ${OPENSHIFT_DEV_DOCKER_REGISTRY}"
 
