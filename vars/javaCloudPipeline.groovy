@@ -451,6 +451,9 @@ def call(Map pipelineParams) {
                                 //Collect AWS Deployment variables
                                 API_FORTRESS_TEST_ID = functionalTestProperties['API_FORTRESS_TEST_ID']
                             }
+                            sh "pip --version"
+                            sh "pip show urllib3"
+                            sh "pip show ordereddict"
                             sh "python ./build/api-functional-testing/apif-run.py run-by-id config_key -c ./build/api-functional-testing/config.yml -i ${API_FORTRESS_TEST_ID} -e \"apif_env:dev-environment\" -o test-result.json"
 
                         }
