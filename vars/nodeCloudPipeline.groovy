@@ -39,6 +39,7 @@ def call(Map pipelineParams) {
             AZURE_PROD_SUBSCRIPTION_ID_PROP          = cloudEnvironmentProps.getAzureProdSubscriptionId()
             AZURE_LOWER_ENV_SUBSCRIPTION_ID_PROP     = cloudEnvironmentProps.getAzureLowerEnvSubscriptionId()
             AWS_CONTAINER_REPOSITORY_URL_PROP        = cloudEnvironmentProps.getAwsContainerRepositoryUrl()
+            OPENSHIFT_SERVICE_ACCOUNT_TOKEN          = cloudEnvironmentProps.getOpenshiftServiceAccountToken()
 
             DOCKER_ORG_IMAGE         = "${DOCKER_IMAGE_ORG_PROP}/${IMAGE_NAME}"
             DOCKER_OPENSHIFT_IMAGE   = "${IMAGE_NAME}"
