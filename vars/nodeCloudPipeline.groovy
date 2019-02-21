@@ -459,7 +459,7 @@ def call(Map pipelineParams) {
                 }
                 steps {
                     script {
-                        DOCKER_VERSION = "${PROD_RELEASE_NUMBER}"
+                        DOCKER_VERSION = "${VERSION_FROM_PJ}"
                     }
 
                     sh "~/oc/openshift-origin-client-tools-v3.11.0-0cbc58b-linux-64bit/./oc login --token ${OPENSHIFT_SERVICE_ACCOUNT_TOKEN} ${OPENSHIFT_DEV_DOCKER_LOGIN_URL} --insecure-skip-tls-verify"

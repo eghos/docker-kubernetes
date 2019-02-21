@@ -179,7 +179,7 @@ def call(Map pipelineParams) {
                             }
 
                             //Log into Central Container Repository (ACR)
-                           //logIntoAzure()
+                           logIntoAzure()
                         }
                     }
                 }
