@@ -310,10 +310,7 @@ def call(Map pipelineParams) {
 //                            sh "docker push ${ACRLOGINSERVER}/${DOCKER_ORG_IMAGE}-${SERVICE_VERSION}:${DOCKER_VERSION}"
 
                             //Openshift
-//                            sh "~/oc/openshift-origin-client-tools-v3.11.0-0cbc58b-linux-64bit/./oc login --token eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJvY3AtcGlwZWxpbmVzLWlwaW0taXAiLCJrdWJlcm5ldGVzLmlvL3NlcnZpY2VhY2NvdW50L3NlY3JldC5uYW1lIjoiamVua2lucy10b2tlbi1tMjVkZyIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VydmljZS1hY2NvdW50Lm5hbWUiOiJqZW5raW5zIiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9zZXJ2aWNlLWFjY291bnQudWlkIjoiM2EzNjhjOTktZTk4MS0xMWU4LTgyZTQtMDA1MDU2ODUxMmM3Iiwic3ViIjoic3lzdGVtOnNlcnZpY2VhY2NvdW50Om9jcC1waXBlbGluZXMtaXBpbS1pcDpqZW5raW5zIn0.DUM8sW_mhH67NEHSa854qyrdSwmDWPqqCw6yCF5Wg1vkWM3wgpndfHMHbi5ULW2RkghqwrBzO0RCAFAcOW38AwGoqkcOtmlEgBQN5z_9qoXcQw00ze8EkPz0paVDV4Qw1NJ6iI0Z6mYlZNV8OdUKkySPvu4kRDJdqNL20xBnJLkc1Zx2Rh_OfJXtcSutqm2FHBEIzadM_kAezhr_4Awj4YP5aLdosQUqYHi9C4UBdggTrTQpYV-2A3LbNZ0VHYHqG6y6k5XD8hPKOFZFQvlU1jATjk5FG50KCbqyIzUAeoPq7tGI26rTsXYLS_d4sW4-BMwRGYbDzFPIBXrSXoXWng ${OPENSHIFT_DEV_DOCKER_LOGIN_URL} --insecure-skip-tls-verify"
                             sh "~/oc/openshift-origin-client-tools-v3.11.0-0cbc58b-linux-64bit/./oc login --token ${OPENSHIFT_SERVICE_ACCOUNT_TOKEN} ${OPENSHIFT_DEV_DOCKER_LOGIN_URL} --insecure-skip-tls-verify"
-
-//                            sh "docker login -p eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJvY3AtcGlwZWxpbmVzLWlwaW0taXAiLCJrdWJlcm5ldGVzLmlvL3NlcnZpY2VhY2NvdW50L3NlY3JldC5uYW1lIjoiamVua2lucy10b2tlbi1tMjVkZyIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VydmljZS1hY2NvdW50Lm5hbWUiOiJqZW5raW5zIiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9zZXJ2aWNlLWFjY291bnQudWlkIjoiM2EzNjhjOTktZTk4MS0xMWU4LTgyZTQtMDA1MDU2ODUxMmM3Iiwic3ViIjoic3lzdGVtOnNlcnZpY2VhY2NvdW50Om9jcC1waXBlbGluZXMtaXBpbS1pcDpqZW5raW5zIn0.DUM8sW_mhH67NEHSa854qyrdSwmDWPqqCw6yCF5Wg1vkWM3wgpndfHMHbi5ULW2RkghqwrBzO0RCAFAcOW38AwGoqkcOtmlEgBQN5z_9qoXcQw00ze8EkPz0paVDV4Qw1NJ6iI0Z6mYlZNV8OdUKkySPvu4kRDJdqNL20xBnJLkc1Zx2Rh_OfJXtcSutqm2FHBEIzadM_kAezhr_4Awj4YP5aLdosQUqYHi9C4UBdggTrTQpYV-2A3LbNZ0VHYHqG6y6k5XD8hPKOFZFQvlU1jATjk5FG50KCbqyIzUAeoPq7tGI26rTsXYLS_d4sW4-BMwRGYbDzFPIBXrSXoXWng -u unused ${OPENSHIFT_DEV_DOCKER_REGISTRY}"
                             sh "docker login -p ${OPENSHIFT_SERVICE_ACCOUNT_TOKEN} -u unused ${OPENSHIFT_DEV_DOCKER_REGISTRY}"
 
                             //Openshift images per OpenShift repo
@@ -356,9 +353,6 @@ def call(Map pipelineParams) {
                 }
                 steps {
                     script {
-//                        sh "docker login -p ${OPENSHIFT_SERVICE_ACCOUNT_TOKEN} -u unused ${OPENSHIFT_DEV_DOCKER_REGISTRY}"
-//                        sh "docker build -t ${OPENSHIFT_DEV_DOCKER_REGISTRY}/${OPENSHIFT_DEV_NAMESPACE}/${DOCKER_OPENSHIFT_IMAGE}-${SERVICE_VERSION}:${DOCKER_VERSION}"
-//                        sh "docker push ${OPENSHIFT_DEV_DOCKER_REGISTRY}/${OPENSHIFT_DEV_NAMESPACE}/${DOCKER_OPENSHIFT_IMAGE}-${SERVICE_VERSION}:${DOCKER_VERSION}"
                         generateOnPremOpenShiftDeployStage("$OPENSHIFT_DEV_NAMESPACE","${OPENSHIFT_ON_PREM_REGION}","dev")
                     }
                 }
@@ -490,7 +484,7 @@ def call(Map pipelineParams) {
                     script {
                         DOCKER_VERSION = "${PROD_RELEASE_NUMBER}"
                     }
-                    
+
                     sh "~/oc/openshift-origin-client-tools-v3.11.0-0cbc58b-linux-64bit/./oc login --token ${OPENSHIFT_SERVICE_ACCOUNT_TOKEN} ${OPENSHIFT_DEV_DOCKER_LOGIN_URL} --insecure-skip-tls-verify"
                     sh "docker login -p ${OPENSHIFT_SERVICE_ACCOUNT_TOKEN} -u unused ${OPENSHIFT_DEV_DOCKER_REGISTRY}"
 
@@ -823,7 +817,9 @@ def generateOnPremOpenShiftDeployStage(openshift_namespace, region, env) {
 //      sh "~/oc/openshift-origin-client-tools-v3.11.0-0cbc58b-linux-64bit/./oc create route edge ${DOCKER_OPENSHIFT_IMAGE} --service=${DOCKER_OPENSHIFT_IMAGE}"
 
     //Add configmap to deploymentconfig
-    sh "~/oc/openshift-origin-client-tools-v3.11.0-0cbc58b-linux-64bit/./oc set volumes dc/${DOCKER_OPENSHIFT_IMAGE}-${SERVICE_VERSION} --add --overwrite=true --name=config-volume --mount-path=/data -t configmap --configmap-name=${IMAGE_NAME}-${SERVICE_VERSION}-configmap --all"
+//    sh "~/oc/openshift-origin-client-tools-v3.11.0-0cbc58b-linux-64bit/./oc set volumes dc/${DOCKER_OPENSHIFT_IMAGE}-${SERVICE_VERSION} --add --overwrite=true --name=config-volume --mount-path=/data -t configmap --configmap-name=${IMAGE_NAME}-${SERVICE_VERSION}-configmap --all"
+    sh "~/oc/openshift-origin-client-tools-v3.11.0-0cbc58b-linux-64bit/./oc set env --from=configmap/${IMAGE_NAME}-${SERVICE_VERSION}-configmap dc/${DOCKER_OPENSHIFT_IMAGE}-${SERVICE_VERSION} --overwrite=true"
+
 
     //Update the CPU and RAM allocated to the deployment
     sh "~/oc/openshift-origin-client-tools-v3.11.0-0cbc58b-linux-64bit/./oc set resources dc/${DOCKER_OPENSHIFT_IMAGE}-${SERVICE_VERSION} --limits=cpu=${OPENSHIFT_DOCKER_IMAGE_CPU},memory=${OPENSHIFT_DOCKER_IMAGE_MEMORY}"
