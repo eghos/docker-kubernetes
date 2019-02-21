@@ -78,148 +78,148 @@ def call(Map pipelineParams) {
                 }
             }
 
-//            stage('Setup General') {
-//                steps {
-//                    withCredentials([azureServicePrincipal('sp-ipim-ip-aks')]) {
-//                        //stageSetupGeneral()
-//                        sh 'which java'
-//                        sh 'java -version'
-//                        sh 'whoami'
-//
-//                        echo "GIT_URL: ${GIT_URL}"
-//                        echo "GIT_URL_MODIFIED: ${GIT_URL_MODIFIED}"
-//                        echo "BUILD_NUMBER ${BUILD_NUMBER}"
-//                        echo "BUILD_ID ${BUILD_ID}"
-//                        echo "BUILD_DISPLAY_NAME ${BUILD_DISPLAY_NAME}"
-//                        echo "JOB_NAME ${JOB_NAME}"
-//                        echo "JOB_BASE_NAME ${JOB_BASE_NAME}"
-//                        echo "BUILD_TAG ${BUILD_TAG}"
-//                        echo "EXECUTOR_NUMBER ${EXECUTOR_NUMBER}"
-//                        echo "NODE_NAME ${NODE_NAME}"
-//                        echo "NODE_LABELS ${NODE_LABELS}"
-//                        echo "WORKSPACE ${WORKSPACE}"
-//                        echo "JENKINS_HOME ${JENKINS_HOME}"
-//                        echo "JENKINS_URL ${JENKINS_URL}"
-//                        echo "BUILD_URL ${BUILD_URL}"
-//                        echo "JOB_URL ${JOB_URL}"
-//                        echo "CHANGE_AUTHOR_EMAIL ${GIT_COMMIT}"
-//                        echo "APIARY_IO_TOKEN_PROP ${APIARY_IO_TOKEN_PROP}"
-//                        echo "AZURE_SVC_HOSTNAME_PROP ${AZURE_SVC_HOSTNAME_PROP}"
-//                        echo "AZURE_SVC_HOSTNAME_PROP ${AZURE_SVC_HOSTNAME_PROP}"
-//                        echo "GIT_SVC_ACOUNT_EMAIL_PROP ${GIT_SVC_ACOUNT_EMAIL_PROP}"
-//                        echo "GIT_SVC_ACCOUNT_USER_PROP ${GIT_SVC_ACCOUNT_USER_PROP}"
-//                        echo "PROD_WESTEUROPE_AZRGNAME_PROP ${PROD_WESTEUROPE_AZRGNAME_PROP}"
-//                        echo "PROD_WESTEUROPE_AZACRNAME_PROP ${PROD_WESTEUROPE_AZACRNAME_PROP}"
-//
-//                        script {
-//                            //Get variables from project deployment.properties
-//                            deploymentProperties = readProperties file: './build/deployment.properties'
-//
-//                            //Collect On-prem OpenShift Deployment variables
-//                            DEPLOY_TO_ON_PREM_OPENSHIFT    = deploymentProperties['DEPLOY_TO_ON_PREM_OPENSHIFT']
-//                            OPENSHIFT_ON_PREM_REGION       = deploymentProperties['OPENSHIFT_ON_PREM_REGION']
-//                            OPENSHIFT_DEV_NAMESPACE        = deploymentProperties['OPENSHIFT_DEV_NAMESPACE']
-//                            OPENSHIFT_TEST_NAMESPACE       = deploymentProperties['OPENSHIFT_TEST_NAMESPACE']
-//                            OPENSHIFT_PPE_NAMESPACE        = deploymentProperties['OPENSHIFT_PPE_NAMESPACE']
-//                            OPENSHIFT_PROD_NAMESPACE       = deploymentProperties['OPENSHIFT_PROD_NAMESPACE']
-//                            OPENSHIFT_DOCKER_IMAGE_CPU     = deploymentProperties['OPENSHIFT_DOCKER_IMAGE_CPU']
-//                            OPENSHIFT_DOCKER_IMAGE_MEMORY  = deploymentProperties['OPENSHIFT_DOCKER_IMAGE_MEMORY']
-//                            OPENSHIFT_DNS_IKEADT           = deploymentProperties['OPENSHIFT_DNS_IKEADT']
-//                            OPENSHIFT_DEV_DOCKER_LOGIN_URL = deploymentProperties['OPENSHIFT_DEV_DOCKER_LOGIN_URL']
-//                            OPENSHIFT_DEV_DOCKER_REGISTRY  = deploymentProperties['OPENSHIFT_DEV_DOCKER_REGISTRY']
-//
-//                            //Collect AWS Deployment variables
-//                            DEPLOY_TO_AWS     = deploymentProperties['DEPLOY_TO_AWS']
-//                            AWS_DEV_REGION    = deploymentProperties['AWS_DEV_REGION'].split(',').collect { it as String }
-//                            AWS_TEST_REGION   = deploymentProperties['AWS_TEST_REGION'].split(',').collect { it as String }
-//                            AWS_PPE_REGION    = deploymentProperties['AWS_PPE_REGION'].split(',').collect { it as String }
-//                            AWS_PROD_REGION   = deploymentProperties['AWS_PROD_REGION'].split(',').collect { it as String }
-//
-//                            //Collect Azure Deployment variables
-//                            DEPLOY_TO_AZURE   = deploymentProperties['DEPLOY_TO_AZURE']
-//                            AZURE_DEV_REGION  = deploymentProperties['AZURE_DEV_REGION'].split(',').collect { it as String }
-//                            AZURE_TEST_REGION = deploymentProperties['AZURE_TEST_REGION'].split(',').collect {it as String }
-//                            AZURE_PPE_REGION  = deploymentProperties['AZURE_PPE_REGION'].split(',').collect { it as String }
-//                            AZURE_PROD_REGION = deploymentProperties['AZURE_PROD_REGION'].split(',').collect { it as String }
-//
-//                            //Collect Deployment related variables
-//                            APIARY_PROJECT_NAME  = deploymentProperties['APIARY_PROJECT_NAME']
-//                            URI_ROOT_PATH        = deploymentProperties['URI_ROOT_PATH']
-//                            KUBERNETES_NAMESPACE = deploymentProperties['KUBERNETES_NAMESPACE']
-//                            IS_API_APPLICATION   = deploymentProperties['IS_API_APPLICATION']
-//                            SERVICE_VERSION      = deploymentProperties['SERVICE_VERSION']
-//                            AWS_CLUSTER_NAME     = deploymentProperties['AWS_CLUSTER_NAME']
-//
-//                            //Set up AWS deployment region map properties
-//                            AWS_DEV_REGION_MAP = AWS_DEV_REGION.collectEntries {
-//                                ["${it}": generateAwsDeployStage(it, "dev")]
-//                            }
-//                            AWS_TEST_REGION_MAP = AWS_TEST_REGION.collectEntries {
-//                                ["${it}": generateAwsDeployStage(it, "test")]
-//                            }
-//                            AWS_PPE_REGION_MAP = AWS_PPE_REGION.collectEntries {
-//                                ["${it}": generateAwsDeployStage(it, "ppe")]
-//                            }
-//                            AWS_PROD_REGION_MAP = AWS_PROD_REGION.collectEntries {
-//                                ["${it}": generateAwsDeployStage(it, "prod")]
-//                            }
-//
-//                            //Set up Azure deployment region map properties
-//                            AZURE_DEV_REGION_MAP = AZURE_DEV_REGION.collectEntries {
-//                                ["${it}": generateAzureDeployStage(it, "dev")]
-//                            }
-//                            AZURE_TEST_REGION_MAP = AZURE_TEST_REGION.collectEntries {
-//                                ["${it}": generateAzureDeployStage(it, "test")]
-//                            }
-//                            AZURE_PPE_REGION_MAP = AZURE_PPE_REGION.collectEntries {
-//                                ["${it}": generateAzureDeployStage(it, "ppe")]
-//                            }
-//                            AZURE_PROD_REGION_MAP = AZURE_PROD_REGION.collectEntries {
-//                                ["${it}": generateAzureDeployStage(it, "prod")]
-//                            }
-//
-//                            //Log into Central Container Repository (ACR)
-//                           //logIntoAzure()
-//                        }
-//                    }
-//                }
-//            }
+            stage('Setup General') {
+                steps {
+                    withCredentials([azureServicePrincipal('sp-ipim-ip-aks')]) {
+                        //stageSetupGeneral()
+                        sh 'which java'
+                        sh 'java -version'
+                        sh 'whoami'
 
-//            stage('Update Versions') {
-//                steps {
-//                        sh 'chmod +x ./mvnw'
-//                        script {
-//                            if (env.BRANCH_NAME.startsWith("PR")) {
-//                                echo 'This is a PR Branch'
-//                            }
-//
-//                            if (env.BRANCH_NAME.startsWith("develop")) {
-//                                echo 'This is a develop Branch'
-//                                //Update pom.xml version
-//                                // sh './mvnw -B org.codehaus.mojo:versions-maven-plugin:2.5:set -DprocessAllModules -DnewVersion=1.0.${BUILD_NUMBER}-SNAPSHOT'
-//                                DOCKER_VERSION = "${DEV_SNAPSHOT_VERSION}"
-//                            }
-//
-//                            if (env.BRANCH_NAME.startsWith("release/")) {
-//                                echo 'This is a release Branch'
-//                                //Update pom.xml version
-//                                sh './mvnw -B org.codehaus.mojo:versions-maven-plugin:2.5:set -DprocessAllModules -DnewVersion=${RELEASE_VERSION}'
-//                                DOCKER_VERSION = "${RELEASE_NUMBER}"
-//                            }
-//
-//                            if (env.BRANCH_NAME.startsWith("master")) {
-//                                echo 'This is a master Branch'
-//                                DOCKER_VERSION = "${PROD_RELEASE_NUMBER}"
-//                            }
-//
-//                            if (env.BRANCH_NAME.startsWith("hotfix")) {
-//                                echo 'This is a hotfix Branch - TODO Inc Hotfix PATCH'
-//                                sh './mvnw -B org.codehaus.mojo:versions-maven-plugin:2.5:set -DprocessAllModules -DnewVersion=${RELEASE_VERSION}'
-//                                DOCKER_VERSION = "${RELEASE_NUMBER}"
-//                            }
-//                        }
-//                }
-//            }
+                        echo "GIT_URL: ${GIT_URL}"
+                        echo "GIT_URL_MODIFIED: ${GIT_URL_MODIFIED}"
+                        echo "BUILD_NUMBER ${BUILD_NUMBER}"
+                        echo "BUILD_ID ${BUILD_ID}"
+                        echo "BUILD_DISPLAY_NAME ${BUILD_DISPLAY_NAME}"
+                        echo "JOB_NAME ${JOB_NAME}"
+                        echo "JOB_BASE_NAME ${JOB_BASE_NAME}"
+                        echo "BUILD_TAG ${BUILD_TAG}"
+                        echo "EXECUTOR_NUMBER ${EXECUTOR_NUMBER}"
+                        echo "NODE_NAME ${NODE_NAME}"
+                        echo "NODE_LABELS ${NODE_LABELS}"
+                        echo "WORKSPACE ${WORKSPACE}"
+                        echo "JENKINS_HOME ${JENKINS_HOME}"
+                        echo "JENKINS_URL ${JENKINS_URL}"
+                        echo "BUILD_URL ${BUILD_URL}"
+                        echo "JOB_URL ${JOB_URL}"
+                        echo "CHANGE_AUTHOR_EMAIL ${GIT_COMMIT}"
+                        echo "APIARY_IO_TOKEN_PROP ${APIARY_IO_TOKEN_PROP}"
+                        echo "AZURE_SVC_HOSTNAME_PROP ${AZURE_SVC_HOSTNAME_PROP}"
+                        echo "AZURE_SVC_HOSTNAME_PROP ${AZURE_SVC_HOSTNAME_PROP}"
+                        echo "GIT_SVC_ACOUNT_EMAIL_PROP ${GIT_SVC_ACOUNT_EMAIL_PROP}"
+                        echo "GIT_SVC_ACCOUNT_USER_PROP ${GIT_SVC_ACCOUNT_USER_PROP}"
+                        echo "PROD_WESTEUROPE_AZRGNAME_PROP ${PROD_WESTEUROPE_AZRGNAME_PROP}"
+                        echo "PROD_WESTEUROPE_AZACRNAME_PROP ${PROD_WESTEUROPE_AZACRNAME_PROP}"
+
+                        script {
+                            //Get variables from project deployment.properties
+                            deploymentProperties = readProperties file: './build/deployment.properties'
+
+                            //Collect On-prem OpenShift Deployment variables
+                            DEPLOY_TO_ON_PREM_OPENSHIFT    = deploymentProperties['DEPLOY_TO_ON_PREM_OPENSHIFT']
+                            OPENSHIFT_ON_PREM_REGION       = deploymentProperties['OPENSHIFT_ON_PREM_REGION']
+                            OPENSHIFT_DEV_NAMESPACE        = deploymentProperties['OPENSHIFT_DEV_NAMESPACE']
+                            OPENSHIFT_TEST_NAMESPACE       = deploymentProperties['OPENSHIFT_TEST_NAMESPACE']
+                            OPENSHIFT_PPE_NAMESPACE        = deploymentProperties['OPENSHIFT_PPE_NAMESPACE']
+                            OPENSHIFT_PROD_NAMESPACE       = deploymentProperties['OPENSHIFT_PROD_NAMESPACE']
+                            OPENSHIFT_DOCKER_IMAGE_CPU     = deploymentProperties['OPENSHIFT_DOCKER_IMAGE_CPU']
+                            OPENSHIFT_DOCKER_IMAGE_MEMORY  = deploymentProperties['OPENSHIFT_DOCKER_IMAGE_MEMORY']
+                            OPENSHIFT_DNS_IKEADT           = deploymentProperties['OPENSHIFT_DNS_IKEADT']
+                            OPENSHIFT_DEV_DOCKER_LOGIN_URL = deploymentProperties['OPENSHIFT_DEV_DOCKER_LOGIN_URL']
+                            OPENSHIFT_DEV_DOCKER_REGISTRY  = deploymentProperties['OPENSHIFT_DEV_DOCKER_REGISTRY']
+
+                            //Collect AWS Deployment variables
+                            DEPLOY_TO_AWS     = deploymentProperties['DEPLOY_TO_AWS']
+                            AWS_DEV_REGION    = deploymentProperties['AWS_DEV_REGION'].split(',').collect { it as String }
+                            AWS_TEST_REGION   = deploymentProperties['AWS_TEST_REGION'].split(',').collect { it as String }
+                            AWS_PPE_REGION    = deploymentProperties['AWS_PPE_REGION'].split(',').collect { it as String }
+                            AWS_PROD_REGION   = deploymentProperties['AWS_PROD_REGION'].split(',').collect { it as String }
+
+                            //Collect Azure Deployment variables
+                            DEPLOY_TO_AZURE   = deploymentProperties['DEPLOY_TO_AZURE']
+                            AZURE_DEV_REGION  = deploymentProperties['AZURE_DEV_REGION'].split(',').collect { it as String }
+                            AZURE_TEST_REGION = deploymentProperties['AZURE_TEST_REGION'].split(',').collect {it as String }
+                            AZURE_PPE_REGION  = deploymentProperties['AZURE_PPE_REGION'].split(',').collect { it as String }
+                            AZURE_PROD_REGION = deploymentProperties['AZURE_PROD_REGION'].split(',').collect { it as String }
+
+                            //Collect Deployment related variables
+                            APIARY_PROJECT_NAME  = deploymentProperties['APIARY_PROJECT_NAME']
+                            URI_ROOT_PATH        = deploymentProperties['URI_ROOT_PATH']
+                            KUBERNETES_NAMESPACE = deploymentProperties['KUBERNETES_NAMESPACE']
+                            IS_API_APPLICATION   = deploymentProperties['IS_API_APPLICATION']
+                            SERVICE_VERSION      = deploymentProperties['SERVICE_VERSION']
+                            AWS_CLUSTER_NAME     = deploymentProperties['AWS_CLUSTER_NAME']
+
+                            //Set up AWS deployment region map properties
+                            AWS_DEV_REGION_MAP = AWS_DEV_REGION.collectEntries {
+                                ["${it}": generateAwsDeployStage(it, "dev")]
+                            }
+                            AWS_TEST_REGION_MAP = AWS_TEST_REGION.collectEntries {
+                                ["${it}": generateAwsDeployStage(it, "test")]
+                            }
+                            AWS_PPE_REGION_MAP = AWS_PPE_REGION.collectEntries {
+                                ["${it}": generateAwsDeployStage(it, "ppe")]
+                            }
+                            AWS_PROD_REGION_MAP = AWS_PROD_REGION.collectEntries {
+                                ["${it}": generateAwsDeployStage(it, "prod")]
+                            }
+
+                            //Set up Azure deployment region map properties
+                            AZURE_DEV_REGION_MAP = AZURE_DEV_REGION.collectEntries {
+                                ["${it}": generateAzureDeployStage(it, "dev")]
+                            }
+                            AZURE_TEST_REGION_MAP = AZURE_TEST_REGION.collectEntries {
+                                ["${it}": generateAzureDeployStage(it, "test")]
+                            }
+                            AZURE_PPE_REGION_MAP = AZURE_PPE_REGION.collectEntries {
+                                ["${it}": generateAzureDeployStage(it, "ppe")]
+                            }
+                            AZURE_PROD_REGION_MAP = AZURE_PROD_REGION.collectEntries {
+                                ["${it}": generateAzureDeployStage(it, "prod")]
+                            }
+
+                            //Log into Central Container Repository (ACR)
+                           //logIntoAzure()
+                        }
+                    }
+                }
+            }
+
+            stage('Update Versions') {
+                steps {
+                        sh 'chmod +x ./mvnw'
+                        script {
+                            if (env.BRANCH_NAME.startsWith("PR")) {
+                                echo 'This is a PR Branch'
+                            }
+
+                            if (env.BRANCH_NAME.startsWith("develop")) {
+                                echo 'This is a develop Branch'
+                                //Update pom.xml version
+                                // sh './mvnw -B org.codehaus.mojo:versions-maven-plugin:2.5:set -DprocessAllModules -DnewVersion=1.0.${BUILD_NUMBER}-SNAPSHOT'
+                                DOCKER_VERSION = "${DEV_SNAPSHOT_VERSION}"
+                            }
+
+                            if (env.BRANCH_NAME.startsWith("release/")) {
+                                echo 'This is a release Branch'
+                                //Update pom.xml version
+                                sh './mvnw -B org.codehaus.mojo:versions-maven-plugin:2.5:set -DprocessAllModules -DnewVersion=${RELEASE_VERSION}'
+                                DOCKER_VERSION = "${RELEASE_NUMBER}"
+                            }
+
+                            if (env.BRANCH_NAME.startsWith("master")) {
+                                echo 'This is a master Branch'
+                                DOCKER_VERSION = "${PROD_RELEASE_NUMBER}"
+                            }
+
+                            if (env.BRANCH_NAME.startsWith("hotfix")) {
+                                echo 'This is a hotfix Branch - TODO Inc Hotfix PATCH'
+                                sh './mvnw -B org.codehaus.mojo:versions-maven-plugin:2.5:set -DprocessAllModules -DnewVersion=${RELEASE_VERSION}'
+                                DOCKER_VERSION = "${RELEASE_NUMBER}"
+                            }
+                        }
+                }
+            }
 
 //            stage('Code Build') {
 //                when {
