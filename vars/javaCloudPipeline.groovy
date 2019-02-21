@@ -221,51 +221,51 @@ def call(Map pipelineParams) {
                 }
             }
 
-//            stage('Code Build') {
-//                when {
-//                    anyOf {
-//                        branch "develop*";
-//                        branch "PR*"
-//                        branch "release/*"
-//                        branch "hotfix/*"
-//                    }
-//                }
-//                steps {
-//                    withCredentials(bindings: [usernamePassword(credentialsId: 'bc608fa5-71e6-4e08-b769-af3ca6024715', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
-//                        sh 'chmod +x ./mvnw'
-//                        sh """ export JAVA_HOME=$JAVA_HOME
-//                               ./mvnw -B -T 4 -fae -f pom.xml -Dmaven.test.skip=true clean install"""
-//                    }
-//                }
-//            }
-//
-//             stage('Code Test') {
-//                 when {
-//                     anyOf {
-//                         branch "develop*";
-//                         branch "PR*"
-//                         branch "release/*"
-//                         branch "hotfix/*"
-//                     }
-//                 }
-//                 steps {
-//                     withCredentials(bindings: [usernamePassword(credentialsId: 'bc608fa5-71e6-4e08-b769-af3ca6024715', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
-//                         sh 'chmod +x ./mvnw'
-////                         sh './mvnw -f pom.xml test'
-//
-//                         // Ensure project exists:
-//                         // curl -u 2d43347374b1c08e2e718edce7001c638f533869: -X POST “https://staging2.sonarqube.blue.azure.cdtapps.com/api/projects/create?key=ipimip.product-service.dev&name=ipimip.product-service.dev” -d ” ”  
-//                        // sh ''' export JAVA_HOME=$JAVA_HOME8
-//                         //./mvnw -f pom.xml sonar:sonar -Dsonar.login=2d43347374b1c08e2e718edce7001c638f533869 -Dsonar.projectKey=ipimip.${IMAGE_NAME}.Dev'''
-//
-//                         //2d43347374b1c08e2e718edce7001c638f533869 = staging2 6.7.4
-//
-//                         //aws instance 7.2
-////                         sh './mvnw -f pom.xml sonar:sonar -Dsonar.login=$USERNAME -Dsonar.password=$PASSWORD'
-//
-//                     }
-//                 }
-//             }
+            stage('Code Build') {
+                when {
+                    anyOf {
+                        branch "develop*";
+                        branch "PR*"
+                        branch "release/*"
+                        branch "hotfix/*"
+                    }
+                }
+                steps {
+                    withCredentials(bindings: [usernamePassword(credentialsId: 'bc608fa5-71e6-4e08-b769-af3ca6024715', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
+                        sh 'chmod +x ./mvnw'
+                        sh """ export JAVA_HOME=$JAVA_HOME
+                               ./mvnw -B -T 4 -fae -f pom.xml -Dmaven.test.skip=true clean install"""
+                    }
+                }
+            }
+
+             stage('Code Test') {
+                 when {
+                     anyOf {
+                         branch "develop*";
+                         branch "PR*"
+                         branch "release/*"
+                         branch "hotfix/*"
+                     }
+                 }
+                 steps {
+                     withCredentials(bindings: [usernamePassword(credentialsId: 'bc608fa5-71e6-4e08-b769-af3ca6024715', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
+                         sh 'chmod +x ./mvnw'
+//                         sh './mvnw -f pom.xml test'
+
+                         // Ensure project exists:
+                         // curl -u 2d43347374b1c08e2e718edce7001c638f533869: -X POST “https://staging2.sonarqube.blue.azure.cdtapps.com/api/projects/create?key=ipimip.product-service.dev&name=ipimip.product-service.dev” -d ” ”  
+                        // sh ''' export JAVA_HOME=$JAVA_HOME8
+                         //./mvnw -f pom.xml sonar:sonar -Dsonar.login=2d43347374b1c08e2e718edce7001c638f533869 -Dsonar.projectKey=ipimip.${IMAGE_NAME}.Dev'''
+
+                         //2d43347374b1c08e2e718edce7001c638f533869 = staging2 6.7.4
+
+                         //aws instance 7.2
+//                         sh './mvnw -f pom.xml sonar:sonar -Dsonar.login=$USERNAME -Dsonar.password=$PASSWORD'
+
+                     }
+                 }
+             }
 
 //            stage('Code Deploy to Nexus') {
 //                when {
@@ -280,69 +280,69 @@ def call(Map pipelineParams) {
 //                }
 //            }
 
-//            stage('Docker Build') {
-//                when {
-//                    anyOf {
-//                        branch "develop*";
-//                        branch "release/*";
-//                    }
-//                }
-//                steps {
-//                    withCredentials([azureServicePrincipal('sp-ipim-ip-aks')]) {
-//                        script {
-//
-//                            //TODO add if statements, so docker builds are done and pushed to those environments where the deploy to flag is True
-//
-//                            //Log into ACR/ECR etc
-////                            sh "az login --service-principal -u ${AZURE_CLIENT_ID} -p ${AZURE_CLIENT_SECRET} -t ${AZURE_TENANT_ID}"
-//                            sh "az login --service-principal -u aed28a46-e479-40ad-92f1-14e723c2f8f4 -p yi1ACwcv4myWis8fKsH1cQJL1whLPqJcZDCN1RSukCQ= -t 720b637a-655a-40cf-816a-f22f40755c2c"
-////                            sh "az account set -s ${AZURE_SUBSCRIPTION_ID}"
-//                            //Use Prod Subscription ID
-//                            sh "az account set -s ${AZURE_PROD_SUBSCRIPTION_ID_PROP}"
-//                            sh "az acr login --name ${PROD_WESTEUROPE_AZACRNAME_PROP}"
-//                            ACRLOGINSERVER = sh(returnStdout: true, script: "az acr show --resource-group ${PROD_WESTEUROPE_AZRGNAME_PROP} --name ${PROD_WESTEUROPE_AZACRNAME_PROP} --query \"loginServer\" --output tsv").trim()
-//
-//
-//                            //Build Docker image for Azure
-//                            sh "docker build -t ${ACRLOGINSERVER}/${DOCKER_ORG_IMAGE}-${SERVICE_VERSION}:${DOCKER_VERSION} ."
-//                            //Push Docker image to ACR.
-//                            //todo uncomment when needed to push to ACR (saving space whilst testing openshift)
-////                            sh "docker push ${ACRLOGINSERVER}/${DOCKER_ORG_IMAGE}-${SERVICE_VERSION}:${DOCKER_VERSION}"
-//
-//                            //Openshift
-//                            sh "~/oc/openshift-origin-client-tools-v3.11.0-0cbc58b-linux-64bit/./oc login --token ${OPENSHIFT_SERVICE_ACCOUNT_TOKEN} ${OPENSHIFT_DEV_DOCKER_LOGIN_URL} --insecure-skip-tls-verify"
-//                            sh "docker login -p ${OPENSHIFT_SERVICE_ACCOUNT_TOKEN} -u unused ${OPENSHIFT_DEV_DOCKER_REGISTRY}"
-//
-//                            //Openshift images per OpenShift repo
-//                            if (env.BRANCH_NAME.startsWith("develop")) {
-//                                //Tag image for Openshift
-//                                sh "docker tag ${ACRLOGINSERVER}/${DOCKER_ORG_IMAGE}-${SERVICE_VERSION}:${DOCKER_VERSION} ${OPENSHIFT_DEV_DOCKER_REGISTRY}/${OPENSHIFT_DEV_NAMESPACE}/${DOCKER_OPENSHIFT_IMAGE}-${SERVICE_VERSION}:${DOCKER_VERSION}"
-//                                //Push image to OpenShift
-//                                sh "docker push ${OPENSHIFT_DEV_DOCKER_REGISTRY}/${OPENSHIFT_DEV_NAMESPACE}/${DOCKER_OPENSHIFT_IMAGE}-${SERVICE_VERSION}:${DOCKER_VERSION}"
-//                            }
-//
-//                            if (env.BRANCH_NAME.startsWith("release/")) {
-//                                sh "docker tag ${ACRLOGINSERVER}/${DOCKER_ORG_IMAGE}-${SERVICE_VERSION}:${DOCKER_VERSION} ${OPENSHIFT_DEV_DOCKER_REGISTRY}/${OPENSHIFT_TEST_NAMESPACE}/${DOCKER_OPENSHIFT_IMAGE}-${SERVICE_VERSION}:${DOCKER_VERSION}"
-//                                //Push image to OpenShift
-//                                sh "docker push ${OPENSHIFT_DEV_DOCKER_REGISTRY}/${OPENSHIFT_TEST_NAMESPACE}/${DOCKER_OPENSHIFT_IMAGE}-${SERVICE_VERSION}:${DOCKER_VERSION}"
-//                            }
-//
-//
-//                            //todo Add the following lines back under export AWS_PROFILE once aws cli issue is resolved on new jenkins vm
-//                            //  \$(aws ecr get-login --no-include-email --region eu-west-1)
-////                            docker tag ${ACRLOGINSERVER}/${DOCKER_ORG_IMAGE}-${SERVICE_VERSION}:${DOCKER_VERSION} ${AWS_CONTAINER_REPOSITORY_URL_PROP}/${DOCKER_ORG_IMAGE}-${SERVICE_VERSION}:${DOCKER_VERSION}
-////                            docker push ${AWS_CONTAINER_REPOSITORY_URL_PROP}/${DOCKER_ORG_IMAGE}-${SERVICE_VERSION}:${DOCKER_VERSION}
-//                        }
-//                        sh """
-//                           mkdir -p ~/.aws
-//                           cp ./build/aws/credentials ~/.aws/credentials
-//                           cp ./build/aws/config ~/.aws/config
-//                           export AWS_PROFILE=ikea-tools-system
-//
-//                           """
-//                    }
-//                }
-//            }
+            stage('Docker Build') {
+                when {
+                    anyOf {
+                        branch "develop*";
+                        branch "release/*";
+                    }
+                }
+                steps {
+                    withCredentials([azureServicePrincipal('sp-ipim-ip-aks')]) {
+                        script {
+
+                            //TODO add if statements, so docker builds are done and pushed to those environments where the deploy to flag is True
+
+                            //Log into ACR/ECR etc
+//                            sh "az login --service-principal -u ${AZURE_CLIENT_ID} -p ${AZURE_CLIENT_SECRET} -t ${AZURE_TENANT_ID}"
+                            sh "az login --service-principal -u aed28a46-e479-40ad-92f1-14e723c2f8f4 -p yi1ACwcv4myWis8fKsH1cQJL1whLPqJcZDCN1RSukCQ= -t 720b637a-655a-40cf-816a-f22f40755c2c"
+//                            sh "az account set -s ${AZURE_SUBSCRIPTION_ID}"
+                            //Use Prod Subscription ID
+                            sh "az account set -s ${AZURE_PROD_SUBSCRIPTION_ID_PROP}"
+                            sh "az acr login --name ${PROD_WESTEUROPE_AZACRNAME_PROP}"
+                            ACRLOGINSERVER = sh(returnStdout: true, script: "az acr show --resource-group ${PROD_WESTEUROPE_AZRGNAME_PROP} --name ${PROD_WESTEUROPE_AZACRNAME_PROP} --query \"loginServer\" --output tsv").trim()
+
+
+                            //Build Docker image for Azure
+                            sh "docker build -t ${ACRLOGINSERVER}/${DOCKER_ORG_IMAGE}-${SERVICE_VERSION}:${DOCKER_VERSION} ."
+                            //Push Docker image to ACR.
+                            //todo uncomment when needed to push to ACR (saving space whilst testing openshift)
+//                            sh "docker push ${ACRLOGINSERVER}/${DOCKER_ORG_IMAGE}-${SERVICE_VERSION}:${DOCKER_VERSION}"
+
+                            //Openshift
+                            sh "~/oc/openshift-origin-client-tools-v3.11.0-0cbc58b-linux-64bit/./oc login --token ${OPENSHIFT_SERVICE_ACCOUNT_TOKEN} ${OPENSHIFT_DEV_DOCKER_LOGIN_URL} --insecure-skip-tls-verify"
+                            sh "docker login -p ${OPENSHIFT_SERVICE_ACCOUNT_TOKEN} -u unused ${OPENSHIFT_DEV_DOCKER_REGISTRY}"
+
+                            //Openshift images per OpenShift repo
+                            if (env.BRANCH_NAME.startsWith("develop")) {
+                                //Tag image for Openshift
+                                sh "docker tag ${ACRLOGINSERVER}/${DOCKER_ORG_IMAGE}-${SERVICE_VERSION}:${DOCKER_VERSION} ${OPENSHIFT_DEV_DOCKER_REGISTRY}/${OPENSHIFT_DEV_NAMESPACE}/${DOCKER_OPENSHIFT_IMAGE}-${SERVICE_VERSION}:${DOCKER_VERSION}"
+                                //Push image to OpenShift
+                                sh "docker push ${OPENSHIFT_DEV_DOCKER_REGISTRY}/${OPENSHIFT_DEV_NAMESPACE}/${DOCKER_OPENSHIFT_IMAGE}-${SERVICE_VERSION}:${DOCKER_VERSION}"
+                            }
+
+                            if (env.BRANCH_NAME.startsWith("release/")) {
+                                sh "docker tag ${ACRLOGINSERVER}/${DOCKER_ORG_IMAGE}-${SERVICE_VERSION}:${DOCKER_VERSION} ${OPENSHIFT_DEV_DOCKER_REGISTRY}/${OPENSHIFT_TEST_NAMESPACE}/${DOCKER_OPENSHIFT_IMAGE}-${SERVICE_VERSION}:${DOCKER_VERSION}"
+                                //Push image to OpenShift
+                                sh "docker push ${OPENSHIFT_DEV_DOCKER_REGISTRY}/${OPENSHIFT_TEST_NAMESPACE}/${DOCKER_OPENSHIFT_IMAGE}-${SERVICE_VERSION}:${DOCKER_VERSION}"
+                            }
+
+
+                            //todo Add the following lines back under export AWS_PROFILE once aws cli issue is resolved on new jenkins vm
+                            //  \$(aws ecr get-login --no-include-email --region eu-west-1)
+//                            docker tag ${ACRLOGINSERVER}/${DOCKER_ORG_IMAGE}-${SERVICE_VERSION}:${DOCKER_VERSION} ${AWS_CONTAINER_REPOSITORY_URL_PROP}/${DOCKER_ORG_IMAGE}-${SERVICE_VERSION}:${DOCKER_VERSION}
+//                            docker push ${AWS_CONTAINER_REPOSITORY_URL_PROP}/${DOCKER_ORG_IMAGE}-${SERVICE_VERSION}:${DOCKER_VERSION}
+                        }
+                        sh """
+                           mkdir -p ~/.aws
+                           cp ./build/aws/credentials ~/.aws/credentials
+                           cp ./build/aws/config ~/.aws/config
+                           export AWS_PROFILE=ikea-tools-system
+
+                           """
+                    }
+                }
+            }
 
             stage ('DEV Deploy - OnPrem OpenShift') {
                 when {
@@ -397,17 +397,17 @@ def call(Map pipelineParams) {
                 }
             }
 
-//            stage ('TEST Deploy - OnPrem OpenShift') {
-//                when {
-//                    allOf {
-//                        branch "release/*";
-//                        expression { DEPLOY_TO_ON_PREM_OPENSHIFT == 'true' }
-//                    }
-//                }
-//                steps {
-//                    generateOnPremOpenShiftDeployStage("$OPENSHIFT_TEST_NAMESPACE","${OPENSHIFT_ON_PREM_REGION}","test")
-//                }
-//            }
+            stage ('TEST Deploy - OnPrem OpenShift') {
+                when {
+                    allOf {
+                        branch "release/*";
+                        expression { DEPLOY_TO_ON_PREM_OPENSHIFT == 'true' }
+                    }
+                }
+                steps {
+                    generateOnPremOpenShiftDeployStage("$OPENSHIFT_TEST_NAMESPACE","${OPENSHIFT_ON_PREM_REGION}","test")
+                }
+            }
 
             stage ('TEST Deploy - AWS') {
                 when {
@@ -451,9 +451,6 @@ def call(Map pipelineParams) {
                                 //Collect AWS Deployment variables
                                 API_FORTRESS_TEST_ID = functionalTestProperties['API_FORTRESS_TEST_ID']
                             }
-                            sh "pip --version"
-                            sh "pip show urllib3"
-                            sh "pip show ordereddict"
                             sh "python ./build/api-functional-testing/apif-run.py run-by-id config_key -c ./build/api-functional-testing/config.yml -i ${API_FORTRESS_TEST_ID} -e \"apif_env:dev-environment\" -o test-result.json"
 
                         }
