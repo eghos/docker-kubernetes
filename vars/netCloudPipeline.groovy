@@ -148,7 +148,7 @@ def call(Map pipelineParams) {
                             }
 
                             //Log into ACR/ECR etc
-//                            logIntoAzure()
+                            logIntoAzure()
                         }
                     }
                 }
