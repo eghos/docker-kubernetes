@@ -234,7 +234,7 @@ def call(Map pipelineParams) {
                     withCredentials(bindings: [usernamePassword(credentialsId: 'bc608fa5-71e6-4e08-b769-af3ca6024715', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
                         sh 'chmod +x ./mvnw'
                         sh """ export JAVA_HOME=$JAVA_HOME
-                               ./mvnw -B -T 4 -fae -f pom.xml -Dmaven.test.skip=true clean install -U"""
+                               ./mvnw -B -T 4 -fae -f pom.xml -Dmaven.test.skip=true -e clean install -U"""
                     }
                 }
             }
