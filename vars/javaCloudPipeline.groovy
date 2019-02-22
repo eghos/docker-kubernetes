@@ -14,7 +14,7 @@ def call(Map pipelineParams) {
 
             GIT_URL_MODIFIED         = env.GIT_URL.replace('https://', 'git@').replace('com/', 'com:')
 
-            JAVA_HOME                = "/usr/lib/jvm/java-11-oracle"
+            JAVA_HOME                = "/usr/lib/jvm/java-10-oracle"
             JAVA_HOME8               = "/usr/lib/jvm/java-8-oracle"
 
             DEPLOY_TO_AWS            = ""
@@ -234,7 +234,7 @@ def call(Map pipelineParams) {
                     withCredentials(bindings: [usernamePassword(credentialsId: 'bc608fa5-71e6-4e08-b769-af3ca6024715', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
                         sh 'chmod +x ./mvnw'
                         sh """ export JAVA_HOME=$JAVA_HOME
-                               ./mvnw -f pom.xml -Dmaven.test.skip=true -e clean install -U"""
+                               ./mvnw -B -T 4 -fae -f pom.xml -Dmaven.test.skip=true -e clean install -U"""
                     }
                     //./mvnw -B -T 4 -fae -f pom.xml -Dmaven.test.skip=true -e clean install -U"""
                 }
