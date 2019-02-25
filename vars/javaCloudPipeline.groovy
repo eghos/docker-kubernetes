@@ -239,18 +239,33 @@ def call(Map pipelineParams) {
 //                }
 //            }
 
+            stage('Is PPE Deploy?'){
+                when {
+                    changeRequest target: 'master'
+                }
+                steps {
+                    PPE_DEPLOYMENT = "Y";
+                }
+            }
+
             stage('test') {
                 when {
                     anyOf {
-                        changeRequest target: 'develop*'
-                        changeRequest target: 'release/*'
+                        branch "develop*";
+                        branch "PR*"
+                        branch "release/*"
+                        branch "hotfix/*"
                     }
                 }
                 steps {
-                    echo 'Code build and test'
-                    sh 'chmod +x ./mvnw'
-                    sh """ export JAVA_HOME=$JAVA_HOME
+                    if ("${PPE_DEPLOYMENT}" == 'Y'){
+                        echo 'Do nothing'
+                    } else {
+                        echo 'Code build and test'
+                        sh 'chmod +x ./mvnw'
+                        sh """ export JAVA_HOME=$JAVA_HOME
                                ./mvnw -B -T 4 -fae -f pom.xml -Dmaven.test.skip=true clean install -U"""
+                    }
                 }
             }
 
