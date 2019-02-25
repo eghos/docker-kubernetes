@@ -221,24 +221,23 @@ def call(Map pipelineParams) {
                 }
             }
 
-            stage('Code Build') {
-                when {
-                    anyOf {
-                        branch "develop*";
-                        branch "PR*"
-                        branch "release/*"
-                        branch "hotfix/*"
-                    }
-                }
-                steps {
-                    withCredentials(bindings: [usernamePassword(credentialsId: 'bc608fa5-71e6-4e08-b769-af3ca6024715', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
-                        sh 'chmod +x ./mvnw'
-                        sh """ export JAVA_HOME=$JAVA_HOME
-                               ./mvnw -B -T 4 -fae -f pom.xml -Dmaven.test.skip=true clean install -U"""
-                    }
-                    //./mvnw -B -T 4 -fae -f pom.xml -Dmaven.test.skip=true -e clean install -U"""
-                }
-            }
+//            stage('Code Build') {
+//                when {
+//                    anyOf {
+//                        branch "develop*";
+//                        branch "PR*"
+//                        branch "release/*"
+//                        branch "hotfix/*"
+//                    }
+//                }
+//                steps {
+//                    withCredentials(bindings: [usernamePassword(credentialsId: 'bc608fa5-71e6-4e08-b769-af3ca6024715', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
+//                        sh 'chmod +x ./mvnw'
+//                        sh """ export JAVA_HOME=$JAVA_HOME
+//                               ./mvnw -B -T 4 -fae -f pom.xml -Dmaven.test.skip=true clean install -U"""
+//                    }
+//                }
+//            }
 
             stage('test') {
                 when {
@@ -249,36 +248,39 @@ def call(Map pipelineParams) {
                 }
                 steps {
                     echo 'Code build and test'
+                    sh 'chmod +x ./mvnw'
+                    sh """ export JAVA_HOME=$JAVA_HOME
+                               ./mvnw -B -T 4 -fae -f pom.xml -Dmaven.test.skip=true clean install -U"""
                 }
             }
 
-             stage('Code Test') {
-                 when {
-                     anyOf {
-                         branch "develop*";
-                         branch "PR*"
-                         branch "release/*"
-                         branch "hotfix/*"
-                     }
-                 }
-                 steps {
-                     withCredentials(bindings: [usernamePassword(credentialsId: 'bc608fa5-71e6-4e08-b769-af3ca6024715', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
-                         sh 'chmod +x ./mvnw'
-//                         sh './mvnw -f pom.xml test'
-
-                         // Ensure project exists:
-                         // curl -u 2d43347374b1c08e2e718edce7001c638f533869: -X POST “https://staging2.sonarqube.blue.azure.cdtapps.com/api/projects/create?key=ipimip.product-service.dev&name=ipimip.product-service.dev” -d ” ”  
-                        // sh ''' export JAVA_HOME=$JAVA_HOME8
-                         //./mvnw -f pom.xml sonar:sonar -Dsonar.login=2d43347374b1c08e2e718edce7001c638f533869 -Dsonar.projectKey=ipimip.${IMAGE_NAME}.Dev'''
-
-                         //2d43347374b1c08e2e718edce7001c638f533869 = staging2 6.7.4
-
-                         //aws instance 7.2
-//                         sh './mvnw -f pom.xml sonar:sonar -Dsonar.login=$USERNAME -Dsonar.password=$PASSWORD'
-
-                     }
-                 }
-             }
+//             stage('Code Test') {
+//                 when {
+//                     anyOf {
+//                         branch "develop*";
+//                         branch "PR*"
+//                         branch "release/*"
+//                         branch "hotfix/*"
+//                     }
+//                 }
+//                 steps {
+//                     withCredentials(bindings: [usernamePassword(credentialsId: 'bc608fa5-71e6-4e08-b769-af3ca6024715', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
+//                         sh 'chmod +x ./mvnw'
+////                         sh './mvnw -f pom.xml test'
+//
+//                         // Ensure project exists:
+//                         // curl -u 2d43347374b1c08e2e718edce7001c638f533869: -X POST “https://staging2.sonarqube.blue.azure.cdtapps.com/api/projects/create?key=ipimip.product-service.dev&name=ipimip.product-service.dev” -d ” ”  
+//                        // sh ''' export JAVA_HOME=$JAVA_HOME8
+//                         //./mvnw -f pom.xml sonar:sonar -Dsonar.login=2d43347374b1c08e2e718edce7001c638f533869 -Dsonar.projectKey=ipimip.${IMAGE_NAME}.Dev'''
+//
+//                         //2d43347374b1c08e2e718edce7001c638f533869 = staging2 6.7.4
+//
+//                         //aws instance 7.2
+////                         sh './mvnw -f pom.xml sonar:sonar -Dsonar.login=$USERNAME -Dsonar.password=$PASSWORD'
+//
+//                     }
+//                 }
+//             }
 
 //            stage('Code Deploy to Nexus') {
 //                when {
