@@ -240,6 +240,18 @@ def call(Map pipelineParams) {
                 }
             }
 
+            stage('test') {
+                when {
+                    anyOf {
+                        changeRequest target: 'develop*'
+                        changeRequest target: 'release/*'
+                    }
+                }
+                steps {
+                    echo 'Code build and test'
+                }
+            }
+
              stage('Code Test') {
                  when {
                      anyOf {
