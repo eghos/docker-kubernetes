@@ -435,25 +435,55 @@ def call(Map pipelineParams) {
                 }
             }
 
+//            stage('Service Tests') {
+//                when {
+//                    allOf {
+//                        branch "release/*";
+//                        expression { IS_API_APPLICATION == 'true' }
+//                    }
+//                }
+//                parallel {
+//                    stage('API Fortress Tests') {
+//                        steps {
+//                            script {
+//                                //Get variables from project deployment.properties
+//                                functionalTestProperties = readProperties file: './build/api-functional-testing/functional-test.properties'
+//
+//                                //Collect AWS Deployment variables
+//                                API_FORTRESS_TEST_ID = functionalTestProperties['API_FORTRESS_TEST_ID']
+//                            }
+//                            sh "python ./build/api-functional-testing/apif-run.py run-by-id config_key -c ./build/api-functional-testing/config.yml -i ${API_FORTRESS_TEST_ID} -e \"apif_env:dev-environment\" -o test-result.json"
+//
+//                        }
+//                    }
+//                    stage('Dredd Test)') {
+//                        steps {
+//                            runDreddTest()
+//                        }
+//                    }
+//                    stage('Security-Test') {
+//                        steps {
+//                            sh 'echo - Todo'
+//                        }
+//                    }
+//                    stage('Load-Test') {
+//                        steps {
+//                            sh 'echo - Todo'
+//                        }
+//                    }
+//                }
+//            }
+
             stage('Service Tests') {
                 when {
                     allOf {
                         branch "release/*";
-                        expression { IS_API_APPLICATION == 'true' }
                     }
                 }
                 parallel {
                     stage('API Fortress Tests') {
                         steps {
-                            script {
-                                //Get variables from project deployment.properties
-                                functionalTestProperties = readProperties file: './build/api-functional-testing/functional-test.properties'
-
-                                //Collect AWS Deployment variables
-                                API_FORTRESS_TEST_ID = functionalTestProperties['API_FORTRESS_TEST_ID']
-                            }
-                            sh "python ./build/api-functional-testing/apif-run.py run-by-id config_key -c ./build/api-functional-testing/config.yml -i ${API_FORTRESS_TEST_ID} -e \"apif_env:dev-environment\" -o test-result.json"
-
+                            sh 'echo - Todo'
                         }
                     }
                     stage('Dredd Test)') {
