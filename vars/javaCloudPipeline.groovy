@@ -655,23 +655,23 @@ def call(Map pipelineParams) {
                     }
                 }
             }
-
-            stage('GIT PR from Release to Dev') {
-                when {
-                    changeRequest target: 'master'
-                }
-                steps {
-                    echo "Creating a PR from Release Branch to Develop Branch"
-                    script {
-                        try {
-                            sh 'hub pull-request --push -b develop -m "PR Created from Release Branch to Develop Branch."'
-                        } catch (err) {
-                            echo 'Develop Branch does not exist? Trying Development Branch'
-                            sh 'hub pull-request -b development -m "PR Created from Release Branch to Develop Branch."'
-                        }
-                    }
-                }
-            }
+//todo add back in with a push to origin
+//            stage('GIT PR from Release to Dev') {
+//                when {
+//                    changeRequest target: 'master'
+//                }
+//                steps {
+//                    echo "Creating a PR from Release Branch to Develop Branch"
+//                    script {
+//                        try {
+//                            sh 'hub pull-request -b develop -m "PR Created from Release Branch to Develop Branch."'
+//                        } catch (err) {
+//                            echo 'Develop Branch does not exist? Trying Development Branch'
+//                            sh 'hub pull-request -b development -m "PR Created from Release Branch to Develop Branch."'
+//                        }
+//                    }
+//                }
+//            }
 
             stage('GIT Create Tag from Release') {
                 when {
