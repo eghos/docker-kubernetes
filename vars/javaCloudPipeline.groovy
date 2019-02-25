@@ -664,11 +664,7 @@ def call(Map pipelineParams) {
                     echo "Creating a PR from Release Branch to Develop Branch"
                     script {
                         try {
-                            sh 'git remote rm origin'
-                            sh "git remote add origin ${GIT_URL_MODIFIED}"
-                            sh 'git config --global user.email "l-apimgt-u-itsehbg@ikea.com"'
-                            sh 'git config --global user.name "l-apimgt-u-itsehbg"'
-
+                            sh 'git push origin "${BRANCH_NAME_FULL}" -f'
                             sh 'hub pull-request -b develop -m "PR Created from Release Branch to Develop Branch."'
                         } catch (err) {
                             echo 'Develop Branch does not exist? Trying Development Branch'
@@ -688,11 +684,6 @@ def call(Map pipelineParams) {
                     withCredentials([sshUserPrivateKey(credentialsId: 'l-apimgt-u-itsehbgATikea.com', keyFileVariable: 'SSH_KEY')]) {
                         withEnv(["GIT_SSH_COMMAND=ssh -o StrictHostKeyChecking=no -o User=${GIT_SVC_ACCOUNT_USER_PROP} -i ${SSH_KEY}"]) {
                             echo 'Merge request to Master Branch has been approved. PROD Deployment will be performed in this stage.'
-                            sh 'git remote rm origin'
-                            sh "git remote add origin ${GIT_URL_MODIFIED}"
-                            sh 'git config --global user.email "l-apimgt-u-itsehbg@ikea.com"'
-                            sh 'git config --global user.name "l-apimgt-u-itsehbg"'
-
                             sh "git tag ${PROD_RELEASE_NUMBER}"
                             sh 'git push origin --tags'
                         }
