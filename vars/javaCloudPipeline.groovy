@@ -252,7 +252,7 @@ def call(Map pipelineParams) {
 //                }
 //            }
 
-            stage('test') {
+            stage('Code Build & Test') {
                 when {
                     anyOf {
                         branch "develop*";
@@ -264,7 +264,7 @@ def call(Map pipelineParams) {
                 steps {
                     script {
                         if ("${PPE_DEPLOYMENT}" == 'Y') {
-                            echo 'Do nothing'
+                            echo 'Do nothing - We do not want to Build and Test the PR created for PPE Deployment.'
                         } else {
                             echo 'Code build and test'
                             sh 'chmod +x ./mvnw'
