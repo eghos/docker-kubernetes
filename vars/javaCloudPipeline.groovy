@@ -664,8 +664,7 @@ def call(Map pipelineParams) {
                     echo "Creating a PR from Release Branch to Develop Branch"
                     script {
                         try {
-                            sh 'git push origin "${BRANCH_NAME_FULL}" -f'
-                            sh 'hub pull-request -b develop -m "PR Created from Release Branch to Develop Branch."'
+                            sh 'hub pull-request --push -b develop -m "PR Created from Release Branch to Develop Branch."'
                         } catch (err) {
                             echo 'Develop Branch does not exist? Trying Development Branch'
                             sh 'hub pull-request -b development -m "PR Created from Release Branch to Develop Branch."'
