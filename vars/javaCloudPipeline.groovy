@@ -78,6 +78,17 @@ def call(Map pipelineParams) {
                 }
             }
 
+            stage('Is PPE Deployment?'){
+                when {
+                    changeRequest target: 'master'
+                }
+                steps {
+                    script {
+                        PPE_DEPLOYMENT = "Y";
+                    }
+                }
+            }
+
             stage('Setup General') {
                 steps {
                     withCredentials([azureServicePrincipal('sp-ipim-ip-aks')]) {
@@ -238,15 +249,6 @@ def call(Map pipelineParams) {
 //                    }
 //                }
 //            }
-
-            stage('Is PPE Deploy?'){
-                when {
-                    changeRequest target: 'master'
-                }
-                steps {
-                    PPE_DEPLOYMENT = "Y";
-                }
-            }
 
             stage('test') {
                 when {
