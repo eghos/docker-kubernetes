@@ -258,13 +258,15 @@ def call(Map pipelineParams) {
                     }
                 }
                 steps {
-                    if ("${PPE_DEPLOYMENT}" == 'Y'){
-                        echo 'Do nothing'
-                    } else {
-                        echo 'Code build and test'
-                        sh 'chmod +x ./mvnw'
-                        sh """ export JAVA_HOME=$JAVA_HOME
+                    script {
+                        if ("${PPE_DEPLOYMENT}" == 'Y') {
+                            echo 'Do nothing'
+                        } else {
+                            echo 'Code build and test'
+                            sh 'chmod +x ./mvnw'
+                            sh """ export JAVA_HOME=$JAVA_HOME
                                ./mvnw -B -T 4 -fae -f pom.xml -Dmaven.test.skip=true clean install -U"""
+                        }
                     }
                 }
             }
