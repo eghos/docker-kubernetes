@@ -17,6 +17,8 @@ def call(Map pipelineParams) {
             JAVA_HOME                = "/usr/lib/jvm/java-11-oracle"
             JAVA_HOME8               = "/usr/lib/jvm/java-8-oracle"
 
+            PPE_DEPLOYMENT           = "N"
+
             DEPLOY_TO_AWS            = ""
             DEPLOY_TO_AZURE          = ""
             DEPLOY_TO_ON_PREM        = ""
