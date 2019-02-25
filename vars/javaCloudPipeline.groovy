@@ -488,7 +488,7 @@ def call(Map pipelineParams) {
                     }
                     stage('Dredd Test)') {
                         steps {
-                            runDreddTest()
+                            sh 'echo - Todo'
                         }
                     }
                     stage('Security-Test') {
