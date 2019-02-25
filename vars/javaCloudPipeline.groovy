@@ -627,7 +627,7 @@ def call(Map pipelineParams) {
                         branch "release/*"
                         branch "hotfix/*"
                         branch "master"
-                        changeRequest target: 'master'
+                        //changeRequest target: 'master'
                     }
                 }
                 steps {
