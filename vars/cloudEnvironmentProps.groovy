@@ -3,8 +3,14 @@ class cloudEnvironmentProps{
     def APIARY_IO_TOKEN                     = "890e555a1d3107539c130f23b9494155"
     def APIARY_DREDD_TOKEN                  = "ce16ad7641d98a84d231ebb0b1a14292"
 
-    def PROD_WESTEUROPE_AZRGNAME            = "ipimip-prod-westEurope-rg"
+    def PROD_WESTEUROPE_AZRGNAME            = "ipimip-prod-westeurope-rg"
+    def PPE_WESTEUROPE_AZRGNAME             = "ipimip-ppe-westEurope-rg"
+    def PPE_CENTRALUS_AZRGNAME              = "ipimip-ppe-centralUS-rg"
+    def TEST_WESTEUROPE_AZRGNAME            = "ipimip-test-westEurope-rg"
+    def DEV_WESTEUROPE_AZRGNAME             = "ipimip-dev-westEurope-rg"
+
     def PROD_WESTEUROPE_AZACRNAME           = "acrweprody3qy3j"
+
     def AWS_CONTAINER_REPOSITORY_URL        = "318063795105.dkr.ecr.eu-west-1.amazonaws.com"
 
     def AZURE_SVC_HOSTNAME                  = "<ENV>.<REGION>.svc.hip.red.cdtapps.com"
