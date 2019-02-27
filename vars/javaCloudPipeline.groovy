@@ -441,7 +441,6 @@ def call(Map pipelineParams) {
                                     executeDeploy(AWS_DEV_REGION_MAP)
                                 }
                             }
-                            }
                         }
                     }
                     stage('Azure)') {
@@ -462,6 +461,7 @@ def call(Map pipelineParams) {
                             }
                         }
                     }
+                }
             }
 
             stage('Dredd Test') {
