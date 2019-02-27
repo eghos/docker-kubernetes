@@ -864,7 +864,7 @@ def generateAzureDeployStage(region, env) {
 
                     AZ_ENV_REGION_SVC_HOSTNAME = "${AZURE_SVC_HOSTNAME_PROP}".replace('<ENV>', "${ENV_LATEST}").replace('<REGION>', "${region}")
 //                    sh "az aks get-credentials --resource-group=${AZ_DEPLOY_RG_NAME} --name=${AZ_DEPLOY_AKS_CLUSTER_NAME}"
-                    sh "az aks get-credentials --resource-group==ipimip-dev-westeurope-rg --name=akswedevrcbt7h"
+                    sh "az aks get-credentials --resource-group=ipimip-dev-westeurope-rg --name=akswedevrcbt7h"
 
                     sh 'chmod +x ./build/istio/*.yaml'
                     sh """
