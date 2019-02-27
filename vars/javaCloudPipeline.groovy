@@ -386,83 +386,83 @@ def call(Map pipelineParams) {
                 }
             }
 
-//            stage ('DEV Deploy - OnPrem OpenShift') {
-//                when {
-//                    allOf {
-//                        branch "develop*";
-//                        expression { DEPLOY_TO_ON_PREM_OPENSHIFT == 'true' }
-//                    }
-//                }
-//                steps {
-//                    script {
-//                        generateOnPremOpenShiftDeployStage("$OPENSHIFT_DEV_NAMESPACE","${OPENSHIFT_ON_PREM_REGION}","dev")
-//                    }
-//                }
-//            }
-//
-//            stage ('DEV Deploy - AWS') {
-//                when {
-//                    allOf {
-//                        branch "develop*";
-//                        expression { DEPLOY_TO_AWS == 'true' }
-//                    }
-//                }
-//                steps {
-//                    script {
-//                        executeDeploy(AWS_DEV_REGION_MAP)
-//                    }
-//                }
-//            }
-//
-//            stage ('DEV Deploy - Azure') {
-//                when {
-//                    allOf {
-//                        branch "develop*";
-//                        expression { DEPLOY_TO_AZURE == 'true' }
-//                    }
-//                }
-//                steps {
-//                    sh "az account set -s ${AZURE_LOWER_ENV_SUBSCRIPTION_ID_PROP}"
-//                    executeDeploy(AZURE_DEV_REGION_MAP)
-//                }
-//            }
-
-            stage('DEV DEPLOY PARALLEL') {
+            stage ('DEV Deploy - OnPrem OpenShift') {
                 when {
                     allOf {
                         branch "develop*";
+                        expression { DEPLOY_TO_ON_PREM_OPENSHIFT == 'true' }
                     }
                 }
-                parallel {
-                    stage('AWS') {
-                        steps {
-                            script {
-                                if (DEPLOY_TO_AWS == 'true') {
-                                    executeDeploy(AWS_DEV_REGION_MAP)
-                                }
-                            }
-                        }
-                    }
-                    stage('Azure)') {
-                        steps {
-                            script {
-                                if (DEPLOY_TO_AZURE == 'true') {
-                                    executeDeploy(AZURE_DEV_REGION_MAP)
-                                }
-                            }
-                        }
-                    }
-                    stage('OpenShift') {
-                        steps {
-                            script {
-                                if (DEPLOY_TO_ON_PREM_OPENSHIFT == 'true') {
-                                    generateOnPremOpenShiftDeployStage("$OPENSHIFT_DEV_NAMESPACE", "${OPENSHIFT_ON_PREM_REGION}", "dev")
-                                }
-                            }
-                        }
+                steps {
+                    script {
+                        generateOnPremOpenShiftDeployStage("$OPENSHIFT_DEV_NAMESPACE","${OPENSHIFT_ON_PREM_REGION}","dev")
                     }
                 }
             }
+
+            stage ('DEV Deploy - AWS') {
+                when {
+                    allOf {
+                        branch "develop*";
+                        expression { DEPLOY_TO_AWS == 'true' }
+                    }
+                }
+                steps {
+                    script {
+                        executeDeploy(AWS_DEV_REGION_MAP)
+                    }
+                }
+            }
+
+            stage ('DEV Deploy - Azure') {
+                when {
+                    allOf {
+                        branch "develop*";
+                        expression { DEPLOY_TO_AZURE == 'true' }
+                    }
+                }
+                steps {
+                    sh "az account set -s ${AZURE_LOWER_ENV_SUBSCRIPTION_ID_PROP}"
+                    executeDeploy(AZURE_DEV_REGION_MAP)
+                }
+            }
+
+//            stage('DEV DEPLOY PARALLEL') {
+//                when {
+//                    allOf {
+//                        branch "develop*";
+//                    }
+//                }
+//                parallel {
+//                    stage('AWS') {
+//                        steps {
+//                            script {
+//                                if (DEPLOY_TO_AWS == 'true') {
+//                                    executeDeploy(AWS_DEV_REGION_MAP)
+//                                }
+//                            }
+//                        }
+//                    }
+//                    stage('Azure)') {
+//                        steps {
+//                            script {
+//                                if (DEPLOY_TO_AZURE == 'true') {
+//                                    executeDeploy(AZURE_DEV_REGION_MAP)
+//                                }
+//                            }
+//                        }
+//                    }
+//                    stage('OpenShift') {
+//                        steps {
+//                            script {
+//                                if (DEPLOY_TO_ON_PREM_OPENSHIFT == 'true') {
+//                                    generateOnPremOpenShiftDeployStage("$OPENSHIFT_DEV_NAMESPACE", "${OPENSHIFT_ON_PREM_REGION}", "dev")
+//                                }
+//                            }
+//                        }
+//                    }
+//                }
+//            }
 
             stage('Dredd Test') {
                 when {
@@ -863,8 +863,8 @@ def generateAzureDeployStage(region, env) {
                     AZ_DEPLOY_AKS_CLUSTER_NAME = sh(returnStdout: true, script: "az resource list --query \"[?tags.Env=='${env}' && tags.Region=='${region}' && tags.Cluster=='default' && tags.ServiceType=='aks'].{name:name}\" --output tsv").trim()
 
                     AZ_ENV_REGION_SVC_HOSTNAME = "${AZURE_SVC_HOSTNAME_PROP}".replace('<ENV>', "${ENV_LATEST}").replace('<REGION>', "${region}")
-//                    sh "az aks get-credentials --resource-group=${AZ_DEPLOY_RG_NAME} --name=${AZ_DEPLOY_AKS_CLUSTER_NAME}"
-                    sh "az aks get-credentials --resource-group=ipimip-dev-westeurope-rg --name=akswedevrcbt7h"
+                    sh "az aks get-credentials --resource-group=${AZ_DEPLOY_RG_NAME} --name=${AZ_DEPLOY_AKS_CLUSTER_NAME}"
+//                    sh "az aks get-credentials --resource-group=ipimip-dev-westeurope-rg --name=akswedevrcbt7"
 
                     sh 'chmod +x ./build/istio/*.yaml'
                     sh """
