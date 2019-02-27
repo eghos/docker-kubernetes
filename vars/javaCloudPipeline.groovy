@@ -386,44 +386,75 @@ def call(Map pipelineParams) {
                 }
             }
 
-            stage ('DEV Deploy - OnPrem OpenShift') {
-                when {
-                    allOf {
-                        branch "develop*";
-                        expression { DEPLOY_TO_ON_PREM_OPENSHIFT == 'true' }
-                    }
-                }
-                steps {
-                    script {
-                        generateOnPremOpenShiftDeployStage("$OPENSHIFT_DEV_NAMESPACE","${OPENSHIFT_ON_PREM_REGION}","dev")
-                    }
-                }
-            }
+//            stage ('DEV Deploy - OnPrem OpenShift') {
+//                when {
+//                    allOf {
+//                        branch "develop*";
+//                        expression { DEPLOY_TO_ON_PREM_OPENSHIFT == 'true' }
+//                    }
+//                }
+//                steps {
+//                    script {
+//                        generateOnPremOpenShiftDeployStage("$OPENSHIFT_DEV_NAMESPACE","${OPENSHIFT_ON_PREM_REGION}","dev")
+//                    }
+//                }
+//            }
+//
+//            stage ('DEV Deploy - AWS') {
+//                when {
+//                    allOf {
+//                        branch "develop*";
+//                        expression { DEPLOY_TO_AWS == 'true' }
+//                    }
+//                }
+//                steps {
+//                    script {
+//                        executeDeploy(AWS_DEV_REGION_MAP)
+//                    }
+//                }
+//            }
+//
+//            stage ('DEV Deploy - Azure') {
+//                when {
+//                    allOf {
+//                        branch "develop*";
+//                        expression { DEPLOY_TO_AZURE == 'true' }
+//                    }
+//                }
+//                steps {
+//                    sh "az account set -s ${AZURE_LOWER_ENV_SUBSCRIPTION_ID_PROP}"
+//                    executeDeploy(AZURE_DEV_REGION_MAP)
+//                }
+//            }
 
-            stage ('DEV Deploy - AWS') {
+            stage('DEV DEPLOY PARALLEL') {
                 when {
                     allOf {
                         branch "develop*";
-                        expression { DEPLOY_TO_AWS == 'true' }
                     }
                 }
-                steps {
-                    script {
-                        executeDeploy(AWS_DEV_REGION_MAP)
+                parallel {
+                    stage('AWS') {
+                        steps {
+                            if (DEPLOY_TO_AWS == 'true') {
+                                executeDeploy(AWS_DEV_REGION_MAP)
+                            }
+                        }
                     }
-                }
-            }
-
-            stage ('DEV Deploy - Azure') {
-                when {
-                    allOf {
-                        branch "develop*";
-                        expression { DEPLOY_TO_AZURE == 'true' }
+                    stage('Azure)') {
+                        steps {
+                            if (DEPLOY_TO_AZURE == 'true') {
+                                executeDeploy(AZURE_DEV_REGION_MAP)
+                            }
+                        }
                     }
-                }
-                steps {
-                    sh "az account set -s ${AZURE_LOWER_ENV_SUBSCRIPTION_ID_PROP}"
-                    executeDeploy(AZURE_DEV_REGION_MAP)
+                    stage('OpenShift') {
+                        steps {
+                            if (DEPLOY_TO_ON_PREM_OPENSHIFT == 'true') {
+                                generateOnPremOpenShiftDeployStage("$OPENSHIFT_DEV_NAMESPACE","${OPENSHIFT_ON_PREM_REGION}","dev")
+                            }
+                        }
+                    }
                 }
             }
 
