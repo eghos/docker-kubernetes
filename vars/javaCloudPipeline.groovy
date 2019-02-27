@@ -436,22 +436,29 @@ def call(Map pipelineParams) {
                 parallel {
                     stage('AWS') {
                         steps {
-                            if (DEPLOY_TO_AWS == 'true') {
-                                executeDeploy(AWS_DEV_REGION_MAP)
+                            script {
+                                if (DEPLOY_TO_AWS == 'true') {
+                                    executeDeploy(AWS_DEV_REGION_MAP)
+                                }
+                            }
                             }
                         }
                     }
                     stage('Azure)') {
                         steps {
-                            if (DEPLOY_TO_AZURE == 'true') {
-                                executeDeploy(AZURE_DEV_REGION_MAP)
+                            script {
+                                if (DEPLOY_TO_AZURE == 'true') {
+                                    executeDeploy(AZURE_DEV_REGION_MAP)
+                                }
                             }
                         }
                     }
                     stage('OpenShift') {
                         steps {
-                            if (DEPLOY_TO_ON_PREM_OPENSHIFT == 'true') {
-                                generateOnPremOpenShiftDeployStage("$OPENSHIFT_DEV_NAMESPACE","${OPENSHIFT_ON_PREM_REGION}","dev")
+                            script {
+                                if (DEPLOY_TO_ON_PREM_OPENSHIFT == 'true') {
+                                    generateOnPremOpenShiftDeployStage("$OPENSHIFT_DEV_NAMESPACE", "${OPENSHIFT_ON_PREM_REGION}", "dev")
+                                }
                             }
                         }
                     }
