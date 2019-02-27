@@ -462,7 +462,6 @@ def call(Map pipelineParams) {
                             }
                         }
                     }
-                }
             }
 
             stage('Dredd Test') {
