@@ -266,10 +266,13 @@ def call(Map pipelineParams) {
                         if ("${PPE_DEPLOYMENT}" == 'Y') {
                             echo 'Do nothing - We do not want to Build and Test the PR created for PPE Deployment.'
                         } else {
+                            //Build
                             echo 'Code build and test'
                             sh 'chmod +x ./mvnw'
                             sh """ export JAVA_HOME=$JAVA_HOME
                                ./mvnw -B -T 4 -fae -f pom.xml -Dmaven.test.skip=true clean install -U"""
+
+                            //Test
                         }
                     }
                 }
@@ -292,7 +295,7 @@ def call(Map pipelineParams) {
 //                         // Ensure project exists:
 //                         // curl -u 2d43347374b1c08e2e718edce7001c638f533869: -X POST “https://staging2.sonarqube.blue.azure.cdtapps.com/api/projects/create?key=ipimip.product-service.dev&name=ipimip.product-service.dev” -d ” ”  
 //                        // sh ''' export JAVA_HOME=$JAVA_HOME8
-//                         //./mvnw -f pom.xml sonar:sonar -Dsonar.login=2d43347374b1c08e2e718edce7001c638f533869 -Dsonar.projectKey=ipimip.${IMAGE_NAME}.Dev'''
+//                         //./mvnw -f pom.xml sonar:sonar -Dsonar.login=526979bd00ae947c700a98d52041d9d39d6d003f -Dsonar.projectKey=ipimip.${IMAGE_NAME}.Dev'''
 //
 //                         //2d43347374b1c08e2e718edce7001c638f533869 = staging2 6.7.4
 //
