@@ -366,22 +366,17 @@ def call(Map pipelineParams) {
                                 sh "docker push ${OPENSHIFT_DEV_DOCKER_REGISTRY}/${OPENSHIFT_TEST_NAMESPACE}/${DOCKER_OPENSHIFT_IMAGE}-${SERVICE_VERSION}:${DOCKER_VERSION}"
                             }
 
-
-                            //todo Add the following lines back under export AWS_PROFILE once aws cli issue is resolved on new jenkins vm
-                            //  \$(aws ecr get-login --no-include-email --region eu-west-1)
-//                            docker tag ${ACRLOGINSERVER}/${DOCKER_ORG_IMAGE}-${SERVICE_VERSION}:${DOCKER_VERSION} ${AWS_CONTAINER_REPOSITORY_URL_PROP}/${DOCKER_ORG_IMAGE}-${SERVICE_VERSION}:${DOCKER_VERSION}
-//                            docker push ${AWS_CONTAINER_REPOSITORY_URL_PROP}/${DOCKER_ORG_IMAGE}-${SERVICE_VERSION}:${DOCKER_VERSION}
                         }
-                        sh """
-                           mkdir -p ~/.aws
-                           cp ./build/aws/credentials ~/.aws/credentials
-                           cp ./build/aws/config ~/.aws/config
-                           export AWS_PROFILE=ikea-tools-system
-                           
-                           \$(aws ecr get-login --no-include-email --region eu-west-1)
-                           docker tag ${ACRLOGINSERVER}/${DOCKER_ORG_IMAGE}-${SERVICE_VERSION}:${DOCKER_VERSION} ${AWS_CONTAINER_REPOSITORY_URL_PROP}/${DOCKER_ORG_IMAGE}:${DOCKER_VERSION}
-                           docker push ${AWS_CONTAINER_REPOSITORY_URL_PROP}/${DOCKER_ORG_IMAGE}:${DOCKER_VERSION}
-                           """
+//                        sh """
+//                           mkdir -p ~/.aws
+//                           cp ./build/aws/credentials ~/.aws/credentials
+//                           cp ./build/aws/config ~/.aws/config
+//                           export AWS_PROFILE=ikea-tools-system
+//
+//                           \$(aws ecr get-login --no-include-email --region eu-west-1)
+//                           docker tag ${ACRLOGINSERVER}/${DOCKER_ORG_IMAGE}-${SERVICE_VERSION}:${DOCKER_VERSION} ${AWS_CONTAINER_REPOSITORY_URL_PROP}/${DOCKER_ORG_IMAGE}:${DOCKER_VERSION}
+//                           docker push ${AWS_CONTAINER_REPOSITORY_URL_PROP}/${DOCKER_ORG_IMAGE}:${DOCKER_VERSION}
+//                           """
                     }
                 }
             }
@@ -426,43 +421,6 @@ def call(Map pipelineParams) {
                     executeDeploy(AZURE_DEV_REGION_MAP)
                 }
             }
-
-//            stage('DEV DEPLOY PARALLEL') {
-//                when {
-//                    allOf {
-//                        branch "develop*";
-//                    }
-//                }
-//                parallel {
-//                    stage('AWS') {
-//                        steps {
-//                            script {
-//                                if (DEPLOY_TO_AWS == 'true') {
-//                                    executeDeploy(AWS_DEV_REGION_MAP)
-//                                }
-//                            }
-//                        }
-//                    }
-//                    stage('Azure)') {
-//                        steps {
-//                            script {
-//                                if (DEPLOY_TO_AZURE == 'true') {
-//                                    executeDeploy(AZURE_DEV_REGION_MAP)
-//                                }
-//                            }
-//                        }
-//                    }
-//                    stage('OpenShift') {
-//                        steps {
-//                            script {
-//                                if (DEPLOY_TO_ON_PREM_OPENSHIFT == 'true') {
-//                                    generateOnPremOpenShiftDeployStage("$OPENSHIFT_DEV_NAMESPACE", "${OPENSHIFT_ON_PREM_REGION}", "dev")
-//                                }
-//                            }
-//                        }
-//                    }
-//                }
-//            }
 
             stage('Dredd Test') {
                 when {
