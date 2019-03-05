@@ -799,7 +799,7 @@ def generateOnPremOpenShiftDeployStage(openshift_namespace, region, env) {
 
 
     //Update the CPU and RAM allocated to the deployment
-    sh "~/oc/openshift-origin-client-tools-v3.11.0-0cbc58b-linux-64bit/./oc set resources dc/${DOCKER_OPENSHIFT_IMAGE}-${SERVICE_VERSION} --limits=cpu=${OPENSHIFT_DOCKER_IMAGE_CPU},memory=${OPENSHIFT_DOCKER_IMAGE_MEMORY}"
+    sh "~/oc/openshift-origin-client-tools-v3.11.0-0cbc58b-linux-64bit/./oc set resources dc/${DOCKER_OPENSHIFT_IMAGE}-${SERVICE_VERSION} --limits=memory=${OPENSHIFT_DOCKER_IMAGE_MEMORY}"
 }
 
 
