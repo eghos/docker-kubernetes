@@ -311,9 +311,6 @@ def call(Map pipelineParams) {
                 steps {
                     withCredentials([azureServicePrincipal('sp-ipim-ip-aks')]) {
                         script {
-
-                            //TODO add if statements, so docker builds are done and pushed to those environments where the deploy to flag is True
-
                             //Log into ACR/ECR etc
 //                            sh "az login --service-principal -u ${AZURE_CLIENT_ID} -p ${AZURE_CLIENT_SECRET} -t ${AZURE_TENANT_ID}"
                             sh "az login --service-principal -u aed28a46-e479-40ad-92f1-14e723c2f8f4 -p yi1ACwcv4myWis8fKsH1cQJL1whLPqJcZDCN1RSukCQ= -t 720b637a-655a-40cf-816a-f22f40755c2c"
@@ -355,17 +352,15 @@ def call(Map pipelineParams) {
 
                             if ("${DEPLOY_TO_AWS}" == 'true') {
                                 sh """
-                           mkdir -p ~/.aws
-                           cp ./build/aws/credentials ~/.aws/credentials
-                           cp ./build/aws/config ~/.aws/config
-                           export AWS_PROFILE=ikea-tools-system
+                                   mkdir -p ~/.aws
+                                   cp ./build/aws/credentials ~/.aws/credentials
+                                   cp ./build/aws/config ~/.aws/config
+                                   export AWS_PROFILE=ikea-tools-system
 
-                           \$(aws ecr get-login --no-include-email --region eu-west-1)
-                           docker tag ${ACRLOGINSERVER}/${DOCKER_ORG_IMAGE}-${SERVICE_VERSION}:${DOCKER_VERSION} ${
-                                    AWS_CONTAINER_REPOSITORY_URL_PROP
-                                }/${DOCKER_ORG_IMAGE}:${DOCKER_VERSION}
-                           docker push ${AWS_CONTAINER_REPOSITORY_URL_PROP}/${DOCKER_ORG_IMAGE}:${DOCKER_VERSION}
-                           """
+                                   \$(aws ecr get-login --no-include-email --region eu-west-1)
+                                   docker tag ${ACRLOGINSERVER}/${DOCKER_ORG_IMAGE}-${SERVICE_VERSION}:${DOCKER_VERSION} ${AWS_CONTAINER_REPOSITORY_URL_PROP}/${DOCKER_ORG_IMAGE}:${DOCKER_VERSION}
+                                   docker push ${AWS_CONTAINER_REPOSITORY_URL_PROP}/${DOCKER_ORG_IMAGE}:${DOCKER_VERSION}
+                                   """
                             }
                         }
                     }
@@ -746,9 +741,6 @@ def generateAwsDeployStage(region, env) {
 
                 AWS_ENV_REGION_SVC_HOSTNAME = "${AWS_SVC_HOSTNAME_PROP}".replace('<ENV>', "${ENV_LATEST}").replace('<REGION>', "${region}")
 
-                //To generate te docker login command, need to use  $(aws ecr get-login --no-include-email --region eu-west-1)
-                //docker tag acrweprod01.azurecr.io/${DOCKER_ORG_IMAGE}:${DOCKER_VERSION} 603698310563.dkr.ecr.eu-west-1.amazonaws.com/${DOCKER_ORG_IMAGE}:${DOCKER_VERSION}
-                //docker push 603698310563.dkr.ecr.eu-west-1.amazonaws.com/${DOCKER_ORG_IMAGE}:${DOCKER_VERSION}
                 sh 'chmod +x ./build/istio/*.yaml'
                 sh """
                         mkdir -p ~/.aws
