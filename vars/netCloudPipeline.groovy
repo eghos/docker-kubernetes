@@ -8,7 +8,7 @@ def call(Map pipelineParams) {
             BRANCH_NAME_FULL         = env.BRANCH_NAME.replace('', '')
             IMAGE_NAME               = "fxrateapi"
             DEV_SNAPSHOT_VERSION     = "1.0.${BUILD_NUMBER}-SNAPSHOT"
-//            RELEASE_NUMBER           = env.BRANCH_NAME.replace('release/', '')
+//            RELEASE_NUMBER           = env.BRANCH_NAME.replace('release/', '')tmp
             RELEASE_NUMBER           = "1.0.0"
             RELEASE_VERSION          = "${RELEASE_NUMBER}.RELEASE"
 
@@ -33,8 +33,10 @@ def call(Map pipelineParams) {
             AZURE_PROD_SUBSCRIPTION_ID_PROP          = cloudEnvironmentProps.getAzureProdSubscriptionId()
             AZURE_LOWER_ENV_SUBSCRIPTION_ID_PROP     = cloudEnvironmentProps.getAzureLowerEnvSubscriptionId()
             AWS_CONTAINER_REPOSITORY_URL_PROP        = cloudEnvironmentProps.getAwsContainerRepositoryUrl()
+            OPENSHIFT_SERVICE_ACCOUNT_TOKEN          = cloudEnvironmentProps.getOpenshiftServiceAccountToken()
 
             DOCKER_ORG_IMAGE         = "${DOCKER_IMAGE_ORG_PROP}/${IMAGE_NAME}"
+            DOCKER_OPENSHIFT_IMAGE   = "${IMAGE_NAME}"
         }
 
         stages {
@@ -73,10 +75,23 @@ def call(Map pipelineParams) {
             stage('Setup General') {
                 steps {
                     withCredentials([azureServicePrincipal('sp-ipim-ip-aks')]) {
-                        stageSetupGeneral()
+//                        stageSetupGeneral()
                         script {
                             //Get variables from project deployment.properties
                             deploymentProperties = readProperties file: './build/deployment.properties'
+
+                            //Collect On-prem OpenShift Deployment variables
+                            DEPLOY_TO_ON_PREM_OPENSHIFT    = deploymentProperties['DEPLOY_TO_ON_PREM_OPENSHIFT']
+                            OPENSHIFT_ON_PREM_REGION       = deploymentProperties['OPENSHIFT_ON_PREM_REGION']
+                            OPENSHIFT_DEV_NAMESPACE        = deploymentProperties['OPENSHIFT_DEV_NAMESPACE']
+                            OPENSHIFT_TEST_NAMESPACE       = deploymentProperties['OPENSHIFT_TEST_NAMESPACE']
+                            OPENSHIFT_PPE_NAMESPACE        = deploymentProperties['OPENSHIFT_PPE_NAMESPACE']
+                            OPENSHIFT_PROD_NAMESPACE       = deploymentProperties['OPENSHIFT_PROD_NAMESPACE']
+                            OPENSHIFT_DOCKER_IMAGE_CPU     = deploymentProperties['OPENSHIFT_DOCKER_IMAGE_CPU']
+                            OPENSHIFT_DOCKER_IMAGE_MEMORY  = deploymentProperties['OPENSHIFT_DOCKER_IMAGE_MEMORY']
+                            OPENSHIFT_DNS_IKEADT           = deploymentProperties['OPENSHIFT_DNS_IKEADT']
+                            OPENSHIFT_DEV_DOCKER_LOGIN_URL = deploymentProperties['OPENSHIFT_DEV_DOCKER_LOGIN_URL']
+                            OPENSHIFT_DEV_DOCKER_REGISTRY  = deploymentProperties['OPENSHIFT_DEV_DOCKER_REGISTRY']
 
                             //Collect AWS Deployment variables
                             DEPLOY_TO_AWS = deploymentProperties['DEPLOY_TO_AWS']
@@ -225,21 +240,73 @@ def call(Map pipelineParams) {
                 steps {
                     withCredentials([azureServicePrincipal('sp-ipim-ip-aks')]) {
                         script {
-                            sh "docker build -t ${ACRLOGINSERVER}/${DOCKER_ORG_IMAGE}:${DOCKER_VERSION} ."
-                            sh "docker push ${ACRLOGINSERVER}/${DOCKER_ORG_IMAGE}:${DOCKER_VERSION}"
+
+                            //TODO add if statements, so docker builds are done and pushed to those environments where the deploy to flag is True
+
+                            //Log into ACR/ECR etc
+//                            sh "az login --service-principal -u ${AZURE_CLIENT_ID} -p ${AZURE_CLIENT_SECRET} -t ${AZURE_TENANT_ID}"
+                            sh "az login --service-principal -u aed28a46-e479-40ad-92f1-14e723c2f8f4 -p yi1ACwcv4myWis8fKsH1cQJL1whLPqJcZDCN1RSukCQ= -t 720b637a-655a-40cf-816a-f22f40755c2c"
+//                            sh "az account set -s ${AZURE_SUBSCRIPTION_ID}"
+                            //Use Prod Subscription ID
+                            sh "az account set -s ${AZURE_PROD_SUBSCRIPTION_ID_PROP}"
+                            sh "az acr login --name ${PROD_WESTEUROPE_AZACRNAME_PROP}"
+                            ACRLOGINSERVER = sh(returnStdout: true, script: "az acr show --resource-group ${PROD_WESTEUROPE_AZRGNAME_PROP} --name ${PROD_WESTEUROPE_AZACRNAME_PROP} --query \"loginServer\" --output tsv").trim()
+
+
+                            //Build Docker image for Azure
+                            sh "docker build -t ${ACRLOGINSERVER}/${DOCKER_ORG_IMAGE}-${SERVICE_VERSION}:${DOCKER_VERSION} ."
+                            //Push Docker image to ACR.
+                            //todo uncomment when needed to push to ACR (saving space whilst testing openshift)
+//                            sh "docker push ${ACRLOGINSERVER}/${DOCKER_ORG_IMAGE}-${SERVICE_VERSION}:${DOCKER_VERSION}"
+
+                            //Openshift
+                            sh "~/oc/openshift-origin-client-tools-v3.11.0-0cbc58b-linux-64bit/./oc login --token ${OPENSHIFT_SERVICE_ACCOUNT_TOKEN} ${OPENSHIFT_DEV_DOCKER_LOGIN_URL} --insecure-skip-tls-verify"
+                            sh "docker login -p ${OPENSHIFT_SERVICE_ACCOUNT_TOKEN} -u unused ${OPENSHIFT_DEV_DOCKER_REGISTRY}"
+
+                            //Openshift images per OpenShift repo
+                            if (env.BRANCH_NAME.startsWith("develop")) {
+                                //Tag image for Openshift
+                                sh "docker tag ${ACRLOGINSERVER}/${DOCKER_ORG_IMAGE}-${SERVICE_VERSION}:${DOCKER_VERSION} ${OPENSHIFT_DEV_DOCKER_REGISTRY}/${OPENSHIFT_DEV_NAMESPACE}/${DOCKER_OPENSHIFT_IMAGE}-${SERVICE_VERSION}:${DOCKER_VERSION}"
+                                //Push image to OpenShift
+                                sh "docker push ${OPENSHIFT_DEV_DOCKER_REGISTRY}/${OPENSHIFT_DEV_NAMESPACE}/${DOCKER_OPENSHIFT_IMAGE}-${SERVICE_VERSION}:${DOCKER_VERSION}"
+                            }
+
+                            if (env.BRANCH_NAME.startsWith("release/")) {
+                                sh "docker tag ${ACRLOGINSERVER}/${DOCKER_ORG_IMAGE}-${SERVICE_VERSION}:${DOCKER_VERSION} ${OPENSHIFT_DEV_DOCKER_REGISTRY}/${OPENSHIFT_TEST_NAMESPACE}/${DOCKER_OPENSHIFT_IMAGE}-${SERVICE_VERSION}:${DOCKER_VERSION}"
+                                //Push image to OpenShift
+                                sh "docker push ${OPENSHIFT_DEV_DOCKER_REGISTRY}/${OPENSHIFT_TEST_NAMESPACE}/${DOCKER_OPENSHIFT_IMAGE}-${SERVICE_VERSION}:${DOCKER_VERSION}"
+                            }
+
+
+                            //todo Add the following lines back under export AWS_PROFILE once aws cli issue is resolved on new jenkins vm
+                            //  \$(aws ecr get-login --no-include-email --region eu-west-1)
+//                            docker tag ${ACRLOGINSERVER}/${DOCKER_ORG_IMAGE}-${SERVICE_VERSION}:${DOCKER_VERSION} ${AWS_CONTAINER_REPOSITORY_URL_PROP}/${DOCKER_ORG_IMAGE}-${SERVICE_VERSION}:${DOCKER_VERSION}
+//                            docker push ${AWS_CONTAINER_REPOSITORY_URL_PROP}/${DOCKER_ORG_IMAGE}-${SERVICE_VERSION}:${DOCKER_VERSION}
                         }
                         sh """
                            mkdir -p ~/.aws
                            cp ./build/aws/credentials ~/.aws/credentials
                            cp ./build/aws/config ~/.aws/config
                            export AWS_PROFILE=ikea-tools-system
-
-docker login -u AWS -p eyJwYXlsb2FkIjoiWGtNUjN1Nld3TFluTXlCN1FqQkYzMnptNmZ1aklDditFRC9PTWdXQVkySS9WYjZ0MkwwaDMybitXL1N4UGV4MnA2enRuL0tmYU5leUhhdHFBTldaT2VaZU5VdlZkRmxoTlRnZ0xma21hSXpHeUQyQjlSSWlFeXJDUEdGbjJuNDRkZDJiYlJoN0JZbTVyNkdJNTV0ZUhaSlJ4N0svYmhXa05XV25GMHdGNGJnMTZLOFJrMUhHZ0hTZVBZUHhhek5ycjBVSll0WXEwMFRVS1N6T1ZudS9rZmVIT1NkYlFyNGZSdVBXcStONFFPOEQ1Q3RBc1l2T01xTmRucFZjQVdrWS9haWFaZzlDOEN2Q3MvMCtuWWJzZTJ0RHFrdFVnNmtVOUlzcEpnTzEwQjFNWkhJY2dNMGMwSVRPOXZ5MldteUpmZDQ0SVVhdTlWazF0U3BkT1ZEUnV6a1lRMjBhMzdpeDUwd3BUM2wyaFkzL3JDQ2hzR0w5UkkxeGpyTjNNcVdOL2xrekJIS3RNSnlvdWd2Q2hvSDNWeEgrOEM4ZTNHUytmVFBNSFp2NnJiaHpwNmM1OStFZlcrMDY0STV6T2pDQUxvbnFCR29Fd0ViMFUzdkRhY1FLL2tDaEVScVBSTFZ3Sm9DS0twQk5oQm5OdERaS3FSS0ZTejF5Qk01MytnNHoxNTgxRTNSZW04MGpxVDlkUCsvbDcwOXpnMVpiZDN5cUtpY3dZR0IyWklqelJIVGx2cU1peFJyZTJaNmgrajlscXlKT3JuQVliU082ZWNlaGtPeHNMRnZvMVYwS2F3WmZ3TjNqWXpsb3R0ZnhQSStmRnZ2NWRmMkJGWEY4Z0tHRFY3a2tRRXl1WCtOTFFIVHJ3UEgxbnltOEc5RzhTRSsrR0pab01qKzcwbCtQQ0NzdjFJb0hlcDFlU2VabG5VN3pUYjJPVy9PcGNQWUNPVGJzN09YblBSWU9FZHZkQVp1MHIzUnhhYk14M3FQQkR2NUM4N2dFTDRicStTUW5SWk0zTXArZ0FrVkNNRjVnTk4vWEQvQVBzV0NoL0lxdkNkbHc3RDlzdDhtZUNGL1BBN3hZV1ptNXdDVHRmSnd5ZktlTDFjTjFmcktad0ZOZVdlb0xXS3M3Z0czQ1BSbXQrV0JaMDF2L2xXTDZtdnpHTXhNclJjb1BZNHEwVy8rZGZBaytwbkhUSTdLZU1DNmczMmZGa3B0UVcvQUVnUWlORXAyNjlMWjI3ZmlLTnVYL1czdkMxa3hMank2aXBlNjlVRXVpWW9LMUpTNERud1plK2EyZ2MyWlp3RlVJVDZVZUdKNUZQVk5Jc1Z5KzZvWXY0eWFpbUwzQUZwZjhDUFl1SHdSdzRFUHZTelp6ckNFK0FtNmttTVpJMnZUdTF4UlFmV3N4YXU0RTlQZHRxWVQ4VmtVNXhPVkFvQmgwOVM0N3ZuRWlHTFFpemhNL2FoNVZtbFlmZm8rNzlhK2giLCJkYXRha2V5IjoiQVFFQkFIaCtkUytCbE51ME54blh3b3diSUxzMTE1eWpkK0xOQVpoQkxac3VuT3hrM0FBQUFINHdmQVlKS29aSWh2Y05BUWNHb0c4d2JRSUJBREJvQmdrcWhraUc5dzBCQndFd0hnWUpZSVpJQVdVREJBRXVNQkVFRE01RFQ0UXJwUU9NaE9TNEtBSUJFSUE3OHVEdm9oblBHKzdEekJ0dnhnZWt0VmpEMFgwT1lrLzFKK2ZzRHdLd2Z6eEJHc1JFTmppRkl1VUNsdFdpVElXS1lGd2p5S1Y0akJWaWtvaz0iLCJ2ZXJzaW9uIjoiMiIsInR5cGUiOiJEQVRBX0tFWSIsImV4cGlyYXRpb24iOjE1NTAwOTY1MDV9 https://318063795105.dkr.ecr.eu-west-1.amazonaws.com
-
-
-                           docker tag ${ACRLOGINSERVER}/${DOCKER_ORG_IMAGE}:${DOCKER_VERSION} ${AWS_CONTAINER_REPOSITORY_URL_PROP}/${DOCKER_ORG_IMAGE}:${DOCKER_VERSION}
+                           
+                           \$(aws ecr get-login --no-include-email --region eu-west-1)
+                           docker tag ${ACRLOGINSERVER}/${DOCKER_ORG_IMAGE}-${SERVICE_VERSION}:${DOCKER_VERSION} ${AWS_CONTAINER_REPOSITORY_URL_PROP}/${DOCKER_ORG_IMAGE}:${DOCKER_VERSION}
                            docker push ${AWS_CONTAINER_REPOSITORY_URL_PROP}/${DOCKER_ORG_IMAGE}:${DOCKER_VERSION}
                            """
+                    }
+                }
+            }
+
+            stage ('DEV Deploy - OnPrem OpenShift') {
+                when {
+                    allOf {
+                        branch "develop*";
+                        expression { DEPLOY_TO_ON_PREM_OPENSHIFT == 'true' }
+                    }
+                }
+                steps {
+                    script {
+                        generateOnPremOpenShiftDeployStage("$OPENSHIFT_DEV_NAMESPACE","${OPENSHIFT_ON_PREM_REGION}","dev")
                     }
                 }
             }
@@ -266,6 +333,18 @@ docker login -u AWS -p eyJwYXlsb2FkIjoiWGtNUjN1Nld3TFluTXlCN1FqQkYzMnptNmZ1aklDd
                 steps {
                     sh "az account set -s ${AZURE_LOWER_ENV_SUBSCRIPTION_ID_PROP}"
                     executeDeploy(AZURE_DEV_REGION_MAP)
+                }
+            }
+
+            stage ('TEST Deploy - OnPrem OpenShift') {
+                when {
+                    allOf {
+                        branch "release/*";
+                        expression { DEPLOY_TO_ON_PREM_OPENSHIFT == 'true' }
+                    }
+                }
+                steps {
+                    generateOnPremOpenShiftDeployStage("$OPENSHIFT_TEST_NAMESPACE","${OPENSHIFT_ON_PREM_REGION}","test")
                 }
             }
 
@@ -324,6 +403,31 @@ docker login -u AWS -p eyJwYXlsb2FkIjoiWGtNUjN1Nld3TFluTXlCN1FqQkYzMnptNmZ1aklDd
                             sh 'echo'
                         }
                     }
+                }
+            }
+
+            stage ('PPE Deploy - OnPrem OpenShift') {
+                when {
+                    allOf {
+                        changeRequest target: 'master'
+                        expression { DEPLOY_TO_ON_PREM_OPENSHIFT == 'true' }
+                    }
+                }
+                steps {
+                    script {
+                        DOCKER_VERSION = "${RELEASE_NUMBER}"
+                    }
+
+                    sh "~/oc/openshift-origin-client-tools-v3.11.0-0cbc58b-linux-64bit/./oc login --token ${OPENSHIFT_SERVICE_ACCOUNT_TOKEN} ${OPENSHIFT_DEV_DOCKER_LOGIN_URL} --insecure-skip-tls-verify"
+                    sh "docker login -p ${OPENSHIFT_SERVICE_ACCOUNT_TOKEN} -u unused ${OPENSHIFT_DEV_DOCKER_REGISTRY}"
+
+                    //Openshift images per OpenShift repo
+                    //Tag image for Openshift
+                    sh "docker tag ${OPENSHIFT_DEV_DOCKER_REGISTRY}/${OPENSHIFT_TEST_NAMESPACE}/${DOCKER_OPENSHIFT_IMAGE}-${SERVICE_VERSION}:${DOCKER_VERSION} ${OPENSHIFT_DEV_DOCKER_REGISTRY}/${OPENSHIFT_PPE_NAMESPACE}/${DOCKER_OPENSHIFT_IMAGE}-${SERVICE_VERSION}:${DOCKER_VERSION}"
+                    //Push image to OpenShift
+                    sh "docker push ${OPENSHIFT_DEV_DOCKER_REGISTRY}/${OPENSHIFT_PPE_NAMESPACE}/${DOCKER_OPENSHIFT_IMAGE}-${SERVICE_VERSION}:${DOCKER_VERSION}"
+
+                    generateOnPremOpenShiftDeployStage("$OPENSHIFT_PPE_NAMESPACE","${OPENSHIFT_ON_PREM_REGION}","ppe")
                 }
             }
 
@@ -450,7 +554,7 @@ docker login -u AWS -p eyJwYXlsb2FkIjoiWGtNUjN1Nld3TFluTXlCN1FqQkYzMnptNmZ1aklDd
 
         post {
             always {
-                slackNotifier(currentBuild.currentResult)
+                slackNotify(currentBuild.currentResult)
                 cleanWs()
             }
         }
@@ -459,7 +563,8 @@ docker login -u AWS -p eyJwYXlsb2FkIjoiWGtNUjN1Nld3TFluTXlCN1FqQkYzMnptNmZ1aklDd
 
 def logIntoAzure(){
     //Log into ACR/ECR etc
-    sh "az login --service-principal -u ${AZURE_CLIENT_ID} -p ${AZURE_CLIENT_SECRET} -t ${AZURE_TENANT_ID}"
+//    sh "az login --service-principal -u ${AZURE_CLIENT_ID} -p ${AZURE_CLIENT_SECRET} -t ${AZURE_TENANT_ID}"
+    sh "az login --service-principal -u aed28a46-e479-40ad-92f1-14e723c2f8f4 -p yi1ACwcv4myWis8fKsH1cQJL1whLPqJcZDCN1RSukCQ= -t 720b637a-655a-40cf-816a-f22f40755c2c"
 //    sh "az account set -s ${AZURE_SUBSCRIPTION_ID}"
     //Use Prod Subscription ID
     sh "az account set -s ${AZURE_PROD_SUBSCRIPTION_ID_PROP}"
@@ -594,6 +699,38 @@ def generateAzureDeployStage(region, env) {
     }
 }
 
+def generateOnPremOpenShiftDeployStage(openshift_namespace, region, env) {
+    //Select respective namespace
+    sh "~/oc/openshift-origin-client-tools-v3.11.0-0cbc58b-linux-64bit/./oc project ${openshift_namespace}"
+
+    sh "~/oc/openshift-origin-client-tools-v3.11.0-0cbc58b-linux-64bit/./oc delete all --selector app=${IMAGE_NAME}-${SERVICE_VERSION}"
+
+    //Update and deploy Configmap
+    sh """
+       cd build/openshift
+       cp \"configmap-os-${region}-${env}.yaml\" \"configmap-os-${region}-${env}-openshift.yaml\"
+                        
+       sed -i -e \"s|KUBERNETES_NAMESPACE_VAR|${openshift_namespace}|g\" configmap-os-${region}-${env}-openshift.yaml
+       sed -i -e \"s|SERVICE_NAME_VAR|${IMAGE_NAME}-${SERVICE_VERSION}|g\" configmap-os-${region}-${env}-openshift.yaml
+       ~/oc/openshift-origin-client-tools-v3.11.0-0cbc58b-linux-64bit/./oc apply -f configmap-os-${region}-${env}-openshift.yaml
+       """
+
+    //Deploy the new app
+    sh "~/oc/openshift-origin-client-tools-v3.11.0-0cbc58b-linux-64bit/./oc new-app --image=${DOCKER_OPENSHIFT_IMAGE}-${SERVICE_VERSION}:${DOCKER_VERSION} --name=${DOCKER_OPENSHIFT_IMAGE}-${SERVICE_VERSION}"
+
+//      ./oc create route edge --service platform-test --path /testapi --port 8080 --hostname sandbox-ipim-ip.ocp-02.ikeadt.com
+    sh "~/oc/openshift-origin-client-tools-v3.11.0-0cbc58b-linux-64bit/./oc create route edge --service=${DOCKER_OPENSHIFT_IMAGE}-${SERVICE_VERSION} --hostname ${openshift_namespace}.${OPENSHIFT_DNS_IKEADT} --path ${URI_ROOT_PATH} --port 8080 "
+//      sh "~/oc/openshift-origin-client-tools-v3.11.0-0cbc58b-linux-64bit/./oc create route edge ${DOCKER_OPENSHIFT_IMAGE} --service=${DOCKER_OPENSHIFT_IMAGE}"
+
+    //Add configmap to deploymentconfig
+//    sh "~/oc/openshift-origin-client-tools-v3.11.0-0cbc58b-linux-64bit/./oc set volumes dc/${DOCKER_OPENSHIFT_IMAGE}-${SERVICE_VERSION} --add --overwrite=true --name=config-volume --mount-path=/data -t configmap --configmap-name=${IMAGE_NAME}-${SERVICE_VERSION}-configmap --all"
+    sh "~/oc/openshift-origin-client-tools-v3.11.0-0cbc58b-linux-64bit/./oc set env --from=configmap/${IMAGE_NAME}-${SERVICE_VERSION}-configmap dc/${DOCKER_OPENSHIFT_IMAGE}-${SERVICE_VERSION} --overwrite=true"
+
+
+    //Update the CPU and RAM allocated to the deployment
+    sh "~/oc/openshift-origin-client-tools-v3.11.0-0cbc58b-linux-64bit/./oc set resources dc/${DOCKER_OPENSHIFT_IMAGE}-${SERVICE_VERSION} --limits=cpu=${OPENSHIFT_DOCKER_IMAGE_CPU},memory=${OPENSHIFT_DOCKER_IMAGE_MEMORY}"
+}
+
 void executeDeploy(Map inboundMap) {
 
     def mapValues = inboundMap.values();
@@ -602,4 +739,19 @@ void executeDeploy(Map inboundMap) {
         script customStage
     }
 
+}
+
+def slackNotify(String buildResult) {
+    JOB_URL_HTTPS = env.BUILD_URL.replace('http', 'https')
+
+    if (buildResult == "SUCCESS") {
+        slackSend color: "good", message: "Job: ${env.JOB_NAME} with Build Number ${env.BUILD_NUMBER} was Successful!\n Build URL: ${JOB_URL_HTTPS}"
+    } else if (buildResult == "FAILURE") {
+        slackSend color: "danger", message: "Job: ${env.JOB_NAME} with Build Number ${env.BUILD_NUMBER} has Failed!\n Build URL: ${JOB_URL_HTTPS}"
+    } else if (buildResult == "UNSTABLE") {
+        slackSend color: "warning", message: "Job: ${env.JOB_NAME} with Build Number ${env.BUILD_NUMBER} was Unstable!\n Build URL: ${JOB_URL_HTTPS}"
+    } else if (buildResult == "ABORTED") {
+    } else {
+        slackSend color: "danger", message: "Job: ${env.JOB_NAME} with Build Number ${env.BUILD_NUMBER} - its result was unclear. Please investigate!\n Build URL: ${JOB_URL_HTTPS}"
+    }
 }
