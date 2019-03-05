@@ -353,7 +353,7 @@ def call(Map pipelineParams) {
                                 }
                             }
 
-                            if ("${DEPLOY_TO_ON_PREM_AWS}" == 'true') {
+                            if ("${DEPLOY_TO_AWS}" == 'true') {
                                 sh """
                            mkdir -p ~/.aws
                            cp ./build/aws/credentials ~/.aws/credentials
