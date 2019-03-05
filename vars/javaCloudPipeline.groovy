@@ -234,24 +234,6 @@ def call(Map pipelineParams) {
                 }
             }
 
-//            stage('Code Build') {
-//                when {
-//                    anyOf {
-//                        branch "develop*";
-//                        branch "PR*"
-//                        branch "release/*"
-//                        branch "hotfix/*"
-//                    }
-//                }
-//                steps {
-//                    withCredentials(bindings: [usernamePassword(credentialsId: 'bc608fa5-71e6-4e08-b769-af3ca6024715', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
-//                        sh 'chmod +x ./mvnw'
-//                        sh """ export JAVA_HOME=$JAVA_HOME
-//                               ./mvnw -B -T 4 -fae -f pom.xml -Dmaven.test.skip=true clean install -U"""
-//                    }
-//                }
-//            }
-
             stage('Code Build & Test') {
                 when {
                     anyOf {
@@ -344,38 +326,48 @@ def call(Map pipelineParams) {
 
                             //Build Docker image for Azure
                             sh "docker build -t ${ACRLOGINSERVER}/${DOCKER_ORG_IMAGE}-${SERVICE_VERSION}:${DOCKER_VERSION} ."
-                            //Push Docker image to ACR.
-                            sh "docker push ${ACRLOGINSERVER}/${DOCKER_ORG_IMAGE}-${SERVICE_VERSION}:${DOCKER_VERSION}"
 
-                            //Openshift
-                            sh "~/oc/openshift-origin-client-tools-v3.11.0-0cbc58b-linux-64bit/./oc login --token ${OPENSHIFT_SERVICE_ACCOUNT_TOKEN} ${OPENSHIFT_DEV_DOCKER_LOGIN_URL} --insecure-skip-tls-verify"
-                            sh "docker login -p ${OPENSHIFT_SERVICE_ACCOUNT_TOKEN} -u unused ${OPENSHIFT_DEV_DOCKER_REGISTRY}"
-
-                            //Openshift images per OpenShift repo
-                            if (env.BRANCH_NAME.startsWith("develop")) {
-                                //Tag image for Openshift
-                                sh "docker tag ${ACRLOGINSERVER}/${DOCKER_ORG_IMAGE}-${SERVICE_VERSION}:${DOCKER_VERSION} ${OPENSHIFT_DEV_DOCKER_REGISTRY}/${OPENSHIFT_DEV_NAMESPACE}/${DOCKER_OPENSHIFT_IMAGE}-${SERVICE_VERSION}:${DOCKER_VERSION}"
-                                //Push image to OpenShift
-                                sh "docker push ${OPENSHIFT_DEV_DOCKER_REGISTRY}/${OPENSHIFT_DEV_NAMESPACE}/${DOCKER_OPENSHIFT_IMAGE}-${SERVICE_VERSION}:${DOCKER_VERSION}"
+                            if (${DEPLOY_TO_AZURE} == 'true') {
+                                //Push Docker image to ACR.
+                                sh "docker push ${ACRLOGINSERVER}/${DOCKER_ORG_IMAGE}-${SERVICE_VERSION}:${DOCKER_VERSION}"
                             }
 
-                            if (env.BRANCH_NAME.startsWith("release/")) {
-                                sh "docker tag ${ACRLOGINSERVER}/${DOCKER_ORG_IMAGE}-${SERVICE_VERSION}:${DOCKER_VERSION} ${OPENSHIFT_DEV_DOCKER_REGISTRY}/${OPENSHIFT_TEST_NAMESPACE}/${DOCKER_OPENSHIFT_IMAGE}-${SERVICE_VERSION}:${DOCKER_VERSION}"
-                                //Push image to OpenShift
-                                sh "docker push ${OPENSHIFT_DEV_DOCKER_REGISTRY}/${OPENSHIFT_TEST_NAMESPACE}/${DOCKER_OPENSHIFT_IMAGE}-${SERVICE_VERSION}:${DOCKER_VERSION}"
+                            if (${DEPLOY_TO_ON_PREM_OPENSHIFT} == 'true') {
+
+                                //Openshift
+                                sh "~/oc/openshift-origin-client-tools-v3.11.0-0cbc58b-linux-64bit/./oc login --token ${OPENSHIFT_SERVICE_ACCOUNT_TOKEN} ${OPENSHIFT_DEV_DOCKER_LOGIN_URL} --insecure-skip-tls-verify"
+                                sh "docker login -p ${OPENSHIFT_SERVICE_ACCOUNT_TOKEN} -u unused ${OPENSHIFT_DEV_DOCKER_REGISTRY}"
+
+                                //Openshift images per OpenShift repo
+                                if (env.BRANCH_NAME.startsWith("develop")) {
+                                    //Tag image for Openshift
+                                    sh "docker tag ${ACRLOGINSERVER}/${DOCKER_ORG_IMAGE}-${SERVICE_VERSION}:${DOCKER_VERSION} ${OPENSHIFT_DEV_DOCKER_REGISTRY}/${OPENSHIFT_DEV_NAMESPACE}/${DOCKER_OPENSHIFT_IMAGE}-${SERVICE_VERSION}:${DOCKER_VERSION}"
+                                    //Push image to OpenShift
+                                    sh "docker push ${OPENSHIFT_DEV_DOCKER_REGISTRY}/${OPENSHIFT_DEV_NAMESPACE}/${DOCKER_OPENSHIFT_IMAGE}-${SERVICE_VERSION}:${DOCKER_VERSION}"
+                                }
+
+                                if (env.BRANCH_NAME.startsWith("release/")) {
+                                    sh "docker tag ${ACRLOGINSERVER}/${DOCKER_ORG_IMAGE}-${SERVICE_VERSION}:${DOCKER_VERSION} ${OPENSHIFT_DEV_DOCKER_REGISTRY}/${OPENSHIFT_TEST_NAMESPACE}/${DOCKER_OPENSHIFT_IMAGE}-${SERVICE_VERSION}:${DOCKER_VERSION}"
+                                    //Push image to OpenShift
+                                    sh "docker push ${OPENSHIFT_DEV_DOCKER_REGISTRY}/${OPENSHIFT_TEST_NAMESPACE}/${DOCKER_OPENSHIFT_IMAGE}-${SERVICE_VERSION}:${DOCKER_VERSION}"
+                                }
                             }
 
+                            if (${DEPLOY_TO_ON_PREM_AWS}) {
+                                sh """
+                           mkdir -p ~/.aws
+                           cp ./build/aws/credentials ~/.aws/credentials
+                           cp ./build/aws/config ~/.aws/config
+                           export AWS_PROFILE=ikea-tools-system
+
+                           \$(aws ecr get-login --no-include-email --region eu-west-1)
+                           docker tag ${ACRLOGINSERVER}/${DOCKER_ORG_IMAGE}-${SERVICE_VERSION}:${DOCKER_VERSION} ${
+                                    AWS_CONTAINER_REPOSITORY_URL_PROP
+                                }/${DOCKER_ORG_IMAGE}:${DOCKER_VERSION}
+                           docker push ${AWS_CONTAINER_REPOSITORY_URL_PROP}/${DOCKER_ORG_IMAGE}:${DOCKER_VERSION}
+                           """
+                            }
                         }
-//                        sh """
-//                           mkdir -p ~/.aws
-//                           cp ./build/aws/credentials ~/.aws/credentials
-//                           cp ./build/aws/config ~/.aws/config
-//                           export AWS_PROFILE=ikea-tools-system
-//
-//                           \$(aws ecr get-login --no-include-email --region eu-west-1)
-//                           docker tag ${ACRLOGINSERVER}/${DOCKER_ORG_IMAGE}-${SERVICE_VERSION}:${DOCKER_VERSION} ${AWS_CONTAINER_REPOSITORY_URL_PROP}/${DOCKER_ORG_IMAGE}:${DOCKER_VERSION}
-//                           docker push ${AWS_CONTAINER_REPOSITORY_URL_PROP}/${DOCKER_ORG_IMAGE}:${DOCKER_VERSION}
-//                           """
                     }
                 }
             }

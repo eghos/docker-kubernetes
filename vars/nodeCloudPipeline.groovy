@@ -300,11 +300,6 @@ def call(Map pipelineParams) {
                                 sh "docker push ${OPENSHIFT_DEV_DOCKER_REGISTRY}/${OPENSHIFT_TEST_NAMESPACE}/${DOCKER_OPENSHIFT_IMAGE}-${SERVICE_VERSION}:${DOCKER_VERSION}"
                             }
 
-
-                            //todo Add the following lines back under export AWS_PROFILE once aws cli issue is resolved on new jenkins vm
-                            //  \$(aws ecr get-login --no-include-email --region eu-west-1)
-//                            docker tag ${ACRLOGINSERVER}/${DOCKER_ORG_IMAGE}-${SERVICE_VERSION}:${DOCKER_VERSION} ${AWS_CONTAINER_REPOSITORY_URL_PROP}/${DOCKER_ORG_IMAGE}-${SERVICE_VERSION}:${DOCKER_VERSION}
-//                            docker push ${AWS_CONTAINER_REPOSITORY_URL_PROP}/${DOCKER_ORG_IMAGE}-${SERVICE_VERSION}:${DOCKER_VERSION}
                         }
                         sh """
                            mkdir -p ~/.aws
