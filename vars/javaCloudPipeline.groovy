@@ -639,6 +639,7 @@ def call(Map pipelineParams) {
                 }
             }
 
+            //TODO is this step needed for dev branches?
             stage('GIT Commit Changes') {
                 when {
                     anyOf {
