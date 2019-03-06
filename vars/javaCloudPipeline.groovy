@@ -97,7 +97,7 @@ def call(Map pipelineParams) {
                         //stageSetupGeneral()
                         sh 'which java'
                         sh 'java -version'
-//                        sh 'whoami'
+                        sh 'whoami'
 
 //                        echo "GIT_URL: ${GIT_URL}"
 //                        echo "GIT_URL_MODIFIED: ${GIT_URL_MODIFIED}"
