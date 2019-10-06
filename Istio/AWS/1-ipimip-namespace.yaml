@@ -1,8 +1,0 @@
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: ipimip
-  labels:
-   name: ipimip
-   Project: IPIM-IP
-   istio-injection: enabled

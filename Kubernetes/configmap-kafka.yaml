@@ -1,9 +1,0 @@
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: configmap-kafka
-  namespace: default
-data:
-  EU_WEST_DEV_KAFKA_BROKERS: ec2-34-244-216-58.eu-west-1.compute.amazonaws.com:9092,ec2-34-245-46-5.eu-west-1.compute.amazonaws.com:9092,ec2-34-244-72-160.eu-west-1.compute.amazonaws.com:9092
-  EU_WEST_TEST_KAFKA_BROKERS: ip-10-13-13-204.eu-west-1.compute.internal:9092,ip-10-13-49-94.eu-west-1.compute.internal:9092,ip-10-13-63-239.eu-west-1.compute.internal:9092
-  US_EAST_PPE_KAFKA_BROKERS: ip-10-43-20-111.ec2.internal:9092,ip-10-43-58-126.ec2.internal:9092,ip-10-43-9-216.ec2.internal:9092

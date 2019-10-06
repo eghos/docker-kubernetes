@@ -1,0 +1,20 @@
+apiVersion: certmanager.k8s.io/v1alpha1
+kind: Certificate
+metadata:
+  name: biografrica-com-tls
+spec:
+  secretName: biografrica-com #where the certificate is saved- secret that protects it.
+  issuerRef:
+    name: letsencrypt-prod
+    kind: ClusterIssuer
+  commonName: biografrica.com
+  dnsNames: #domains to be added to certificate to make sure are covered by certificate.
+    - biografrica.com
+    - www.biografrica.com
+  acme:
+    config:
+      - http01:
+          ingressClass: nginx
+        domains: # domains that letsencrypt verifies that you own during the checks with cert-manager..
+          - biografrica.com
+          - www.biografrica.com

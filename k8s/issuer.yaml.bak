@@ -1,0 +1,11 @@
+apiVersion: certmanager.k8s.io/v1alpha1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-prod  # using prod version to be on safe side- staging version might have issues
+spec:
+  acme:
+    server: https://acme-v02.api.letsencrypt.org/directory
+    email: 'aeghobor@gmail.com'
+    privateKeySecretRef:
+      name: letsencrypt-prod  #secret key involved in verificatio between cert-manager and let's encrypt
+    http01: {}    #this line is basically telling cert-manager to communicate via http
